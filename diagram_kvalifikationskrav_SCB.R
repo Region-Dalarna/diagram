@@ -136,11 +136,11 @@ diagram_kvalifikationskrav <- function(region_vekt = "20", # Vilken region vill 
     if("kvinnor" %in% unique(px_df$kön) & "män" %in% unique(px_df$kön)) {
       variabellista = c("år","region","Branschgrupp","kompetensniva")
         diagram_titel <- paste0("Kvalifikationskrav för anställda (16-64 år) i ",valt_lan," ",max(px_df$år))
-          objektnamn <- c(objektnamn,paste0("kvalifikationskrav_senastear_",valt_lan))
+          objektnamn <- c(objektnamn,paste0("kvalifikationskrav_bransch_",valt_lan))
     }else {
       variabellista = c("år","kön","region","Branschgrupp","kompetensniva")
         diagram_titel <- paste0("Kvalifikationskrav för anställda ",unique(px_df$kön) ," (16-64 år) i ",valt_lan," ",max(px_df$år))
-          objektnamn <- c(objektnamn,paste0("kvalifikationskrav_senastear_",unique(px_df$kön),"_",valt_lan))
+          objektnamn <- c(objektnamn,paste0("kvalifikationskrav_bransch_",unique(px_df$kön),"_",valt_lan))
     }
     
     diagram_capt <- "Källa: Yrkesregistret i SCB:s öppna statistikdatabas\nBearbetning: Samhällsanalys, Region Dalarna"
