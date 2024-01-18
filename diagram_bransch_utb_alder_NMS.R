@@ -1,4 +1,3 @@
-test = diag_bransch_utb_alder(andel=TRUE,spara_figur = FALSE)
 diag_bransch_utb_alder <- function(output_mapp_data = NA, # Om man vill spara data. Används primärt i Rmarkdown-rapporter.
                                    output_mapp_figur= "G:/Samhällsanalys/Statistik/Näringsliv/basfakta/",
                                    diag_utbildningsniva = TRUE, # Jämför antingen kommuner eller län (beroende på val under jmf_omrade nedan)
