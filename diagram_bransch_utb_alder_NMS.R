@@ -204,7 +204,7 @@ diag_bransch_utb_alder <- function(output_mapp_data = NA, # Om man vill spara da
   if(returnera_figur == TRUE) return(gg_list)
   
   if (!is.na(output_mapp_data) & !is.na(filnamn_data)){
-    write.xlsx(list_data,paste0(output_mapp,filnamn))
+    write.xlsx(list_data,paste0(output_mapp_data,filnamn_data))
   }
 
                                    }
