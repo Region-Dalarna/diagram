@@ -112,7 +112,7 @@ diag_bransch_utb_alder <- function(output_mapp_data = NA, # Om man vill spara da
     }
     
     if(returnera_data == TRUE){
-      assign("bransch_alder", bransch_utb_df_sum, envir = .GlobalEnv)
+      assign("bransch_alder", bransch_alder_df_sum, envir = .GlobalEnv)
     }
 
     diagram_titel <- paste0("Åldersfördelning för förvärvsarbetande 16-74 år per bransch i ",unique(bransch_utb_df_sum$AstLan_namn)," ",unique(bransch_utb_df_sum$bransch_alder_df_sum)," ",unique(bransch_alder_df_sum$year))
