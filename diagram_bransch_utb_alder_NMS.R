@@ -1,8 +1,10 @@
+test = diag_bransch_utb_alder(andel=TRUE,spara_figur = FALSE)
 diag_bransch_utb_alder <- function(output_mapp_data = NA, # Om man vill spara data. Används primärt i Rmarkdown-rapporter.
                                    output_mapp_figur= "G:/Samhällsanalys/Statistik/Näringsliv/basfakta/",
                                    diag_utbildningsniva = TRUE, # Jämför antingen kommuner eller län (beroende på val under jmf_omrade nedan)
                                    diag_alder = TRUE, # Jämför bransch i valt län/kommun
                                    spara_figur = TRUE, # Skall figur sparas
+                                   andel = TRUE, # Skall figurer visas som andel av alla förvärvsarbetande eller antal förvärvsarbetande
                                    filnamn_data = "bransch_utbildning_alder.xlsx", # Filnamn på sparad data
                                    vald_farg = diagramfarger("rus_sex"), # Val av diagramfärger
                                    returnera_figur = TRUE, # Skall figuren returneras som ett ggplot-objekt
@@ -64,35 +66,61 @@ diag_bransch_utb_alder <- function(output_mapp_data = NA, # Om man vill spara da
     
     # Diagrammets titel
     diagram_titel <- paste0("Utbildningsnivå för förvärvsarbetande 16-74 år per bransch i ",unique(bransch_utb_df_sum$AstLan_namn)," ",unique(bransch_utb_alder_df$year))
-    objektnamn <- paste0("utbildningsniva_bransch_",unique(bransch_utb_df_sum$AstLan_namn))
-    diagramfil <-  paste0(objektnamn,".png")
-    
     # Skapar en separat färgkod, så att okänd blir ljusgrå
     farger_gra <- c(rgb(211,211,211, maxColorValue = 255),diagramfarger("rus_sex"))
-    
-    gg_obj <- SkapaStapelDiagram(skickad_df = bransch_utb_df_sum %>% 
-                                            filter(SNI2007_Grupp_namn!="Okänt") %>% 
-                                              mutate(Sun2020Niva_grov_namn = factor(Sun2020Niva_grov_namn,levels = c("Okänd","eftergymnasial","gymnasial","förgymnasial"))), 
-                                          skickad_x_var = "SNI2007_Grupp_namn", 
-                                          skickad_y_var = "Andel", 
-                                          skickad_x_grupp = "Sun2020Niva_grov_namn",
-                                          manual_color = farger_gra,
-                                          x_axis_lutning = 0,
-                                          diagram_titel = diagram_titel,
-                                          x_axis_sort_value = TRUE,
-                                          x_axis_sort_grp = 4,
-                                          diagram_capt = diagram_capt,
-                                          #procent_0_100_10intervaller = TRUE,
-                                          stodlinjer_avrunda_fem = TRUE,
-                                          legend_vand_ordning = TRUE,
-                                          diagram_liggande = TRUE,
-                                          geom_position_stack = TRUE,
-                                          manual_y_axis_title = "procent",
-                                          output_mapp = output_mapp_figur,
-                                          filnamn_diagram = diagramfil,
-                                          skriv_till_diagramfil = spara_figur)
-    
-    gg_list <- c(gg_list, list(gg_obj))
+    if(andel == TRUE){
+      objektnamn <- paste0("utbildningsniva_bransch_andel",unique(bransch_utb_df_sum$AstLan_namn))
+      diagramfil <-  paste0(objektnamn,".png")
+
+      gg_obj <- SkapaStapelDiagram(skickad_df = bransch_utb_df_sum %>% 
+                                              filter(SNI2007_Grupp_namn!="Okänt") %>% 
+                                                mutate(Sun2020Niva_grov_namn = factor(Sun2020Niva_grov_namn,levels = c("Okänd","eftergymnasial","gymnasial","förgymnasial"))), 
+                                            skickad_x_var = "SNI2007_Grupp_namn", 
+                                            skickad_y_var = "Andel", 
+                                            skickad_x_grupp = "Sun2020Niva_grov_namn",
+                                            manual_color = farger_gra,
+                                            x_axis_lutning = 0,
+                                            diagram_titel = diagram_titel,
+                                            x_axis_sort_value = TRUE,
+                                            x_axis_sort_grp = 4,
+                                            diagram_capt = diagram_capt,
+                                            #procent_0_100_10intervaller = TRUE,
+                                            stodlinjer_avrunda_fem = TRUE,
+                                            legend_vand_ordning = TRUE,
+                                            diagram_liggande = TRUE,
+                                            geom_position_stack = TRUE,
+                                            manual_y_axis_title = "procent",
+                                            output_mapp = output_mapp_figur,
+                                            filnamn_diagram = diagramfil,
+                                            skriv_till_diagramfil = spara_figur)
+      
+      gg_list <- c(gg_list, list(gg_obj))
+    } else{
+      objektnamn <- paste0("utbildningsniva_bransch_antal",unique(bransch_utb_df_sum$AstLan_namn))
+      diagramfil <-  paste0(objektnamn,".png")
+      
+      gg_obj <- SkapaStapelDiagram(skickad_df = bransch_utb_df_sum %>% 
+                                     filter(SNI2007_Grupp_namn!="Okänt") %>% 
+                                     mutate(Sun2020Niva_grov_namn = factor(Sun2020Niva_grov_namn,levels = c("Okänd","eftergymnasial","gymnasial","förgymnasial"))), 
+                                   skickad_x_var = "SNI2007_Grupp_namn", 
+                                   skickad_y_var = "Antal", 
+                                   skickad_x_grupp = "Sun2020Niva_grov_namn",
+                                   manual_color = farger_gra,
+                                   x_axis_lutning = 45,
+                                   diagram_titel = diagram_titel,
+                                   x_axis_sort_value = TRUE,
+                                   manual_x_axis_text_vjust=1,
+                                   manual_x_axis_text_hjust=1,
+                                   diagram_capt = diagram_capt,
+                                   stodlinjer_avrunda_fem = TRUE,
+                                   legend_vand_ordning = TRUE,
+                                   geom_position_stack = TRUE,
+                                   output_mapp = output_mapp_figur,
+                                   filnamn_diagram = diagramfil,
+                                   skriv_till_diagramfil = spara_figur)
+      
+      gg_list <- c(gg_list, list(gg_obj))
+    }
   }
 
 
@@ -116,33 +144,60 @@ diag_bransch_utb_alder <- function(output_mapp_data = NA, # Om man vill spara da
     }
 
     diagram_titel <- paste0("Åldersfördelning för förvärvsarbetande 16-74 år per bransch i ",unique(bransch_utb_df_sum$AstLan_namn)," ",unique(bransch_utb_df_sum$bransch_alder_df_sum)," ",unique(bransch_alder_df_sum$year))
-    objektnamn <- c(objektnamn,paste0("alder_bransch_",unique(bransch_alder_df_sum$AstLan_namn)))
-    diagramfil <- paste0("alder_bransch_",unique(bransch_alder_df_sum$AstLan_namn),".png")
-    
-    gg_obj <- SkapaStapelDiagram(skickad_df = bransch_alder_df_sum %>% 
-                                              filter(SNI2007_Grupp_namn!="Okänt") %>% 
-                                                mutate(alder_grupper = factor(alder_grupper,levels = c("71-74 år","65-70 år","50-64 år","35-49 år","20-34 år","16-19 år"))), 
-                                            skickad_x_var = "SNI2007_Grupp_namn", 
-                                            skickad_y_var = "Andel", 
-                                            skickad_x_grupp = "alder_grupper",
-                                            manual_x_axis_text_vjust=1,
-                                            manual_x_axis_text_hjust=1,
-                                            manual_color = diagramfarger("rus_sex"),
-                                            diagram_titel = diagram_titel,
-                                            x_axis_sort_value = TRUE,
-                                            x_axis_lutning = 0,
-                                            x_axis_sort_grp = 6,
-                                            diagram_capt = diagram_capt,
-                                            stodlinjer_avrunda_fem = TRUE,
-                                            diagram_liggande = TRUE,
-                                            legend_vand_ordning = TRUE,
-                                            geom_position_stack = TRUE,
-                                            manual_y_axis_title = "procent",
-                                            output_mapp = output_mapp_figur,
-                                            filnamn_diagram = diagramfil,
-                                            skriv_till_diagramfil = spara_figur)
-    
-    gg_list <- c(gg_list, list(gg_obj))
+    if(andel == TRUE){
+      objektnamn <- c(objektnamn,paste0("alder_bransch_andel",unique(bransch_alder_df_sum$AstLan_namn)))
+      diagramfil <- paste0("alder_bransch_andel",unique(bransch_alder_df_sum$AstLan_namn),".png")
+      
+      gg_obj <- SkapaStapelDiagram(skickad_df = bransch_alder_df_sum %>% 
+                                                filter(SNI2007_Grupp_namn!="Okänt") %>% 
+                                                  mutate(alder_grupper = factor(alder_grupper,levels = c("71-74 år","65-70 år","50-64 år","35-49 år","20-34 år","16-19 år"))), 
+                                              skickad_x_var = "SNI2007_Grupp_namn", 
+                                              skickad_y_var = "Andel", 
+                                              skickad_x_grupp = "alder_grupper",
+                                              manual_x_axis_text_vjust=1,
+                                              manual_x_axis_text_hjust=1,
+                                              manual_color = diagramfarger("rus_sex"),
+                                              diagram_titel = diagram_titel,
+                                              x_axis_sort_value = TRUE,
+                                              x_axis_lutning = 0,
+                                              x_axis_sort_grp = 6,
+                                              diagram_capt = diagram_capt,
+                                              stodlinjer_avrunda_fem = TRUE,
+                                              diagram_liggande = TRUE,
+                                              legend_vand_ordning = TRUE,
+                                              geom_position_stack = TRUE,
+                                              manual_y_axis_title = "procent",
+                                              output_mapp = output_mapp_figur,
+                                              filnamn_diagram = diagramfil,
+                                              skriv_till_diagramfil = spara_figur)
+      
+      gg_list <- c(gg_list, list(gg_obj))
+    } else{
+      objektnamn <- c(objektnamn,paste0("alder_bransch_antal",unique(bransch_alder_df_sum$AstLan_namn)))
+      diagramfil <- paste0("alder_bransch_antal",unique(bransch_alder_df_sum$AstLan_namn),".png")
+      
+      gg_obj <- SkapaStapelDiagram(skickad_df = bransch_alder_df_sum %>% 
+                                     filter(SNI2007_Grupp_namn!="Okänt") %>% 
+                                     mutate(alder_grupper = factor(alder_grupper,levels = c("71-74 år","65-70 år","50-64 år","35-49 år","20-34 år","16-19 år"))), 
+                                   skickad_x_var = "SNI2007_Grupp_namn", 
+                                   skickad_y_var = "Antal", 
+                                   skickad_x_grupp = "alder_grupper",
+                                   manual_x_axis_text_vjust=1,
+                                   manual_x_axis_text_hjust=1,
+                                   manual_color = diagramfarger("rus_sex"),
+                                   diagram_titel = diagram_titel,
+                                   x_axis_sort_value = TRUE,
+                                   x_axis_lutning = 45,
+                                   diagram_capt = diagram_capt,
+                                   diagram_liggande = FALSE,
+                                   legend_vand_ordning = TRUE,
+                                   geom_position_stack = TRUE,
+                                   output_mapp = output_mapp_figur,
+                                   filnamn_diagram = diagramfil,
+                                   skriv_till_diagramfil = spara_figur)
+      
+      gg_list <- c(gg_list, list(gg_obj))
+    }
   }
   
   names(gg_list) <- c(objektnamn)
