@@ -12,14 +12,15 @@ diagram_arbetsmarknadsstatus <-function(region_vekt = hamtakommuner("20"), # Anv
                                                diag_arbetslosthet = TRUE, # TRUE för figur för arbetslöshet
                                                diag_arbetskraftsdeltagande = TRUE, #  arbetskraftsdeltagande
                                                diag_sysselsattningsgrad = TRUE, # "" sysselsättningsgrad
-                                               returnera_data = FALSE){ # "" sysselsättningsgrad
+                                               returnera_data = FALSE, # Skall data returneras
+                                               data_namm = "arbetsmarknadsstatus"){ # Vad skall returnerat dataset heta. Viktigt om data returneras två gånger i samma projekt (annars skrivs de över)
   
   ## =================================================================================================================
   # Diagram för arbetslöshet, sysselsättningsgrad och arbetskraftsdeltagande för senaste observation. 
   # Går att dela upp på kön och ändra åldersgrupp (max 1 åt gången). Det går även att dela upp på utrikes/inrikes födda, vilket ger ett facet-diagram
   # Funkar både för län och kommuner, men bara senaste år
   # diag_arbetsloshet, diag_arbetskraftsdeltagande och diag_sysselsattningsgrad sätts till TRUE baserat på vilka variabler man vill ha
-  # Senast uppdaterad av Jon Frank (2024-01-23)
+  # Senast uppdaterad av Jon Frank (2024-01-24)
   # Potentiell förbättring: Ändra så att man kan köra för utrikes/inrikes separat. Funkar nu, men diagramtitel hänger inte med.
   # =================================================================================================================
   if (!require("pacman")) install.packages("pacman")
@@ -54,7 +55,7 @@ diagram_arbetsmarknadsstatus <-function(region_vekt = hamtakommuner("20"), # Anv
   
   # Returnerar data 
   if(returnera_data == TRUE){
-    assign("arbetsmarknadsstatus", arbetsmarknadsstatus_df, envir = .GlobalEnv)
+    assign(data_namm, arbetsmarknadsstatus_df, envir = .GlobalEnv)
   }
   
   if(diag_sysselsattningsgrad==TRUE){
