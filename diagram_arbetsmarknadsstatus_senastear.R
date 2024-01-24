@@ -1,4 +1,6 @@
-diagram_arbetsmarknadsstatus_kommun <-function(region_vekt = hamtakommuner("20"), # Använd förslagsvis hamtakommuner och hamtaallalan
+
+# test = diagram_arbetsmarknadsstatus(spara_figur = FALSE,fodelseregion_klartext_vekt = c("inrikes född", "utrikes född"))
+diagram_arbetsmarknadsstatus <-function(region_vekt = hamtakommuner("20"), # Använd förslagsvis hamtakommuner och hamtaallalan
                                                fokus_lan = "20", # Måste väljas. Det län som, vid sidan om riket, fokuseras i figuren. Gäller inte vid könsuppdelat
                                                output_mapp_data = NA, # Outputmapp för data
                                                filnamn_data = "arbetsmarknadsstatus.xlsx", # Filnamn för datafil
@@ -61,6 +63,7 @@ diagram_arbetsmarknadsstatus_kommun <-function(region_vekt = hamtakommuner("20")
     
     diagram_capt = "Källa: SCB:s öppna statistikdatabas, befolkningens arbetsmarknadsstatus (BAS).\nBearbetning: Samhällsanalys, Region Dalarna.\nDiagramförklaring: Andelen av befolkningen som är sysselsatt (sysselsättningsgrad)."
     diagramtitel <- paste0("Sysselsättningsgrad i åldersgruppen ",unique(arbetsmarknadsstatus_df$ålder), " i ",unique(arbetsmarknadsstatus_df$månad)," ",unique(arbetsmarknadsstatus_df$år))
+    diagramtitel <- str_wrap(diagramtitel,50)
     objektnamn <-c(objektnamn,("sysselsattningsgrad_senastear"))
     
     # Skapar diagram 
@@ -76,13 +79,15 @@ diagram_arbetsmarknadsstatus_kommun <-function(region_vekt = hamtakommuner("20")
                                  manual_x_axis_text_hjust = 1,
                                  diagram_facet = ifelse(all(c("inrikes född","utrikes född")==fodelseregion_klartext_vekt),TRUE,FALSE),
                                  facet_grp = "födelseregion",
+                                 facet_scale = "fixed",
+                                 y_axis_100proc = TRUE,
                                  manual_color = valda_farger,
                                  diagram_titel = diagramtitel,
                                  diagram_capt =  diagram_capt,
                                  x_var_fokus = ifelse("totalt" %in% kon_klartext,"fokus",NA),
                                  x_axis_sort_value = TRUE,
                                  x_axis_lutning = 45,
-                                 stodlinjer_avrunda_fem = TRUE,
+                                 stodlinjer_avrunda_fem = FALSE,
                                  output_mapp = output_mapp_figur,
                                  filnamn_diagram = "sysselsattningsgrad_senastear.png",
                                  skriv_till_diagramfil = spara_figur)
@@ -94,6 +99,7 @@ diagram_arbetsmarknadsstatus_kommun <-function(region_vekt = hamtakommuner("20")
     
     diagram_capt = "Källa: SCB:s öppna statistikdatabas, befolkningens arbetsmarknadsstatus (BAS).\nBearbetning: Samhällsanalys, Region Dalarna.\nDiagramförklaring: Andelen av personer i arbetskraften som är arbetslösa."
     diagramtitel <- paste0("Arbetslöshet i åldersgruppen ",unique(arbetsmarknadsstatus_df$ålder), " i ",unique(arbetsmarknadsstatus_df$månad)," ",unique(arbetsmarknadsstatus_df$år))
+    diagramtitel <- str_wrap(diagramtitel,50)
     objektnamn <-c(objektnamn,("arbetslosthet_senastear"))
     
     # Skapar diagram 
@@ -110,6 +116,7 @@ diagram_arbetsmarknadsstatus_kommun <-function(region_vekt = hamtakommuner("20")
                                  manual_color = valda_farger,
                                  diagram_facet = ifelse(all(c("inrikes född","utrikes född")==fodelseregion_klartext_vekt),TRUE,FALSE),
                                  facet_grp = "födelseregion",
+                                 facet_scale = "fixed",
                                  diagram_titel = diagramtitel,
                                  diagram_capt =  diagram_capt,
                                  x_var_fokus = ifelse("totalt" %in% kon_klartext,"fokus",NA),
@@ -126,7 +133,8 @@ diagram_arbetsmarknadsstatus_kommun <-function(region_vekt = hamtakommuner("20")
   if(diag_arbetskraftsdeltagande == TRUE){
     
     diagram_capt = "Källa: SCB:s öppna statistikdatabas, befolkningens arbetsmarknadsstatus (BAS).\nBearbetning: Samhällsanalys, Region Dalarna.\nDiagramförklaring: Andelen av personer i arbetskraften som är arbetslösa."
-    diagramtitel <- paste0("Arbetslöshet i åldersgruppen",unique(arbetsmarknadsstatus_df$ålder), " i ",unique(arbetsmarknadsstatus_df$månad)," ",unique(arbetsmarknadsstatus_df$år))
+    diagramtitel <- paste0("Arbetskraftsdeltagande i åldersgruppen ",unique(arbetsmarknadsstatus_df$ålder), " i ",unique(arbetsmarknadsstatus_df$månad)," ",unique(arbetsmarknadsstatus_df$år))
+    diagramtitel <- str_wrap(diagramtitel,50)
     objektnamn <-c(objektnamn,("arbetskraftsdeltagande_senastear"))
     
     # Skapar diagram 
@@ -142,13 +150,15 @@ diagram_arbetsmarknadsstatus_kommun <-function(region_vekt = hamtakommuner("20")
                                  manual_x_axis_text_hjust = 1,
                                  diagram_facet = ifelse(all(c("inrikes född","utrikes född")==fodelseregion_klartext_vekt),TRUE,FALSE),
                                  facet_grp = "födelseregion",
+                                 facet_scale = "fixed",
+                                 y_axis_100proc = TRUE,
                                  manual_color = valda_farger,
                                  diagram_titel = diagramtitel,
                                  diagram_capt =  diagram_capt,
                                  x_var_fokus = ifelse("totalt" %in% kon_klartext,"fokus",NA),
                                  x_axis_sort_value = TRUE,
                                  x_axis_lutning = 45,
-                                 stodlinjer_avrunda_fem = TRUE,
+                                 stodlinjer_avrunda_fem = FALSE,
                                  output_mapp = output_mapp_figur,
                                  filnamn_diagram = "arbetskraftsdeltagande_senastear.png",
                                  skriv_till_diagramfil = spara_figur)
