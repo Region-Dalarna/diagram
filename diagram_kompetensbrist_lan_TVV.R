@@ -19,6 +19,7 @@ diag_kompetensbrist <- function(diagram_capt =  diagram_capt <- "Källa: Tillvä
                  tidyverse)
   
   source("https://raw.githubusercontent.com/Region-Dalarna/funktioner/main/func_SkapaDiagram.R")
+  source("https://raw.githubusercontent.com/Region-Dalarna/funktioner/main/func_API.R")
   options(dplyr.summarise.inform = FALSE)
   
   gg_list <- list()  # skapa en tom lista att lägga flera ggplot-objekt i (om man skapar flera diagram)
