@@ -1,4 +1,3 @@
-#test_list=diag_utb_niva_bakgr_alder(utbildningar = "gymnasial utbildning")
 diag_utb_niva_bakgr_alder <- function(diagram_capt =  "Källa: NMS-databasen (SCB)\nBearbetning: Samhällsanalys, Region Dalarna", 
                                       output_mapp_figur = NA,
                                       utbildningar = "förgymnasial utbildning", # Val av utbildningsnivå till diagram 2. Se nedan för alternativ
