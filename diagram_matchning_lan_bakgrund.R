@@ -49,6 +49,10 @@ diag_matchning_lan <- function(region_vekt = "20", # Region vi är intresserade 
            matchningsgrad = `Matchningsgrad, procent `) %>% 
     mutate("fodelseland" = ifelse(fodelseland %in% c("födda i Europa utom Norden och EU samt Sydamerika, Nordamerika och Oceanien"),"övriga", fodelseland)) 
   
+  if(returnera_data == TRUE){
+    assign("matchning", df, envir = .GlobalEnv)
+  }
+  
   if(diag_lan==TRUE){
     
     diagram_titel <- paste0("Matchningsgrad på arbetsmarknaden år ",max(df$år))
@@ -112,10 +116,6 @@ diag_matchning_lan <- function(region_vekt = "20", # Region vi är intresserade 
   
   names(gg_list) <- c(objektnamn)
   if(returnera_figur == TRUE) return(gg_list)
-  
-  if(returnera_data == TRUE){
-    assign("matchning", df, envir = .GlobalEnv)
-  }
   
   if(!is.na(output_mapp_data) & !is.na(filnamn_data)){
     write.xlsx(df,paste0(output_mapp_data,filnamn_data))
