@@ -11,7 +11,8 @@ diag_matchning_lan <- function(region_vekt = "20", # Region vi är intresserade 
                                returnera_data = FALSE){ # Skall data returneras (till R-studios globla miljö)
   
   # ========================================== Allmän info ============================================
-  # 1: Skapar diagram för matchningsgraden på arbetsmarknaden, dels på länsnivå, dels i ett enskilt län uppdelat på bakgrund
+  # 1: Skapar diagram för matchningsgraden på arbetsmarknaden, dels på länsnivå, dels i ett enskilt län uppdelat på bakgrund.
+  # Enbart för senaste år
   #  
   # Senast uppdaterad: Jon 2024-02-28
   # ========================================== Inställningar ============================================
@@ -38,7 +39,7 @@ diag_matchning_lan <- function(region_vekt = "20", # Region vi är intresserade 
   # Hämtar data
   source("https://raw.githubusercontent.com/Region-Dalarna/hamta_data/main/hamta_data_matchningsgrad_lan_FA.R")
   df = hamta_data_matchning_lan_fa(region = hamtaAllaLan(tamedriket = TRUE),
-                                   tid = "*",
+                                   tid = "9999",
                                    kon_klartext = kon_klartext,
                                    alder_fodelseland = c("Sverige","Norden/EU","Afrika","Asien","Övriga_världen","totalt"),
                                    returnera_data = TRUE)
