@@ -50,7 +50,7 @@ diag_matchning_lan <- function(region_vekt = "20", # Region vi är intresserade 
     mutate("fodelseland" = ifelse(fodelseland %in% c("födda i Europa utom Norden och EU samt Sydamerika, Nordamerika och Oceanien"),"övriga", fodelseland)) 
   
   if(returnera_data == TRUE){
-    assign("matchning", df, envir = .GlobalEnv)
+    assign("matchning_df", df, envir = .GlobalEnv)
   }
   
   if(diag_lan==TRUE){
