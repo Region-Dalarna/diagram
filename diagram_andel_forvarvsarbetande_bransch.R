@@ -1,3 +1,4 @@
+test = diag_sysselsatta_andel()
 diag_sysselsatta_andel <- function(region_vekt = "20", # Region vi är intresserade av. 
                                    output_mapp_figur = "G:/Samhällsanalys/Statistik/Näringsliv/basfakta/", # Här hamnar sparad figur
                                    output_mapp_data = NA, # Här hamnar sparad data
