@@ -1,10 +1,10 @@
-test = diag_sysselsatta_andel()
 diag_sysselsatta_andel <- function(region_vekt = "20", # Region vi är intresserade av. 
                                    output_mapp_figur = "G:/Samhällsanalys/Statistik/Näringsliv/basfakta/", # Här hamnar sparad figur
                                    output_mapp_data = NA, # Här hamnar sparad data
                                    filnamn_data = "andel_forvarvsarbetande.xlsx",
                                    valda_farger = diagramfarger("rus_sex"), # Vilka färger skall användas i diagram
                                    spara_figur = TRUE, # Om true sparas figuren till output_mapp
+                                   caption = "Källa: BAS i SCB:s öppna statistikdatabas\nBearbetning: Samhällsanalys, Region Dalarna\nDiagramförklaring: Branschens andel av totalt antal förvärvsarbetande",
                                    diag_lan = TRUE, # Skapar ett diagram där län jämförs med riket
                                    diag_kommun = TRUE, # Motsvarande diagram där kommuner jämförs med länet
                                    diag_lan_antal = FALSE, # Antal för länet, uppdelat på kvinnor och män
@@ -27,7 +27,7 @@ diag_sysselsatta_andel <- function(region_vekt = "20", # Region vi är intresser
   source("https://raw.githubusercontent.com/Region-Dalarna/funktioner/main/func_API.R")
   
   # Det som står under diagrammet
-  diagram_capt <- "Källa: BAS i SCB:s öppna statistikdatabas\nBearbetning: Samhällsanalys, Region Dalarna\nDiagramförklaring: Branschens andel av totalt antal förvärvsarbetande"
+  diagram_capt <- caption
   
   gg_list <- list()  # skapa en tom lista att lägga flera ggplot-objekt i (om man skapar flera diagram)
   # Skapar en tom vektor som skall innehålla objektnamn
