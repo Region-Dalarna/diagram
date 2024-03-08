@@ -1,3 +1,4 @@
+test = diagram_examen_hogskolan_NMS(returnera_data = TRUE)
 diagram_examen_hogskolan_NMS <- function(output_mapp_figur = "G:/Samhällsanalys/Statistik/Näringsliv/basfakta/", # Här hamnar sparad figur
                                   output_mapp_data = NA, # Här hamnar sparad data
                                   filnamn_data = "hogsoleexamen.xlsx",
@@ -42,17 +43,18 @@ diagram_examen_hogskolan_NMS <- function(output_mapp_figur = "G:/Samhällsanalys
   # Plockar ut de två första siffrorna i sun-koden (för att matcha mot en bredare mall)
   df <- df %>% 
     mutate("SUN2020Inr_2siffer"= substr(SUN2020Inr,1,2)) %>% 
-    left_join(mall_sun,by = "SUN2020Inr") %>% 
-    left_join(mall_sun_2siffer, by = "SUN2020Inr_2siffer") %>% 
-    relocate(antal, .after = SUN2020Inr_2siffer_namn)
-  
-  # Grupperar på år och den bredare utbildningsnivån (2 siffror). 
-  df <- df %>% 
-    group_by(Lar,SUN2020Inr_2siffer_namn) %>% 
-    summarize(antal=sum(antal))
+      left_join(mall_sun,by = "SUN2020Inr") %>% 
+        left_join(mall_sun_2siffer, by = "SUN2020Inr_2siffer") %>% 
+          relocate(antal, .after = SUN2020Inr_2siffer_namn)
   
   if("99" %in% valda_ar) valda_ar <- replace(valda_ar,valda_ar=="99",min(df$Lar))
   if("9999" %in% valda_ar) valda_ar <- replace(valda_ar,valda_ar=="9999",max(df$Lar))
+  
+  # Grupperar på år och den bredare utbildningsnivån (2 siffror). 
+  df <- df %>% 
+    filter(Lar %in%valda_ar) %>%
+      group_by(Lar,SUN2020Inr_2siffer_namn) %>% 
+        summarize(antal=sum(antal))
   
   # Returnerar data till R globala miljö
   if(returnera_data == TRUE){
@@ -68,8 +70,7 @@ diagram_examen_hogskolan_NMS <- function(output_mapp_figur = "G:/Samhällsanalys
                                  filter(SUN2020Inr_2siffer_namn%in%unique(df %>%
                                                                             filter(Lar == max(.$Lar)) %>%
                                                                             filter(antal > 4) %>% 
-                                                                            .$SUN2020Inr_2siffer_namn),
-                                        Lar %in%valda_ar),
+                                                                            .$SUN2020Inr_2siffer_namn)),
                                skickad_x_var = "SUN2020Inr_2siffer_namn",
                                skickad_y_var = "antal",
                                skickad_x_grupp = ifelse(length(valda_ar) == 1,NA,"Lar"),
