@@ -1,4 +1,3 @@
-test = diagram_examen_hogskolan_NMS(returnera_data = TRUE)
 diagram_examen_hogskolan_NMS <- function(output_mapp_figur = "G:/Samhällsanalys/Statistik/Näringsliv/basfakta/", # Här hamnar sparad figur
                                   output_mapp_data = NA, # Här hamnar sparad data
                                   filnamn_data = "hogsoleexamen.xlsx",
