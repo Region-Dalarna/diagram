@@ -28,8 +28,6 @@ diagram_examen_hogskolan_NMS <- function(output_mapp_figur = "G:/Samhällsanalys
   
   gg_list <- list()  # skapa en tom lista att lägga flera ggplot-objekt i (om man skapar flera diagram)
   
-  #vald_region = skapa_kortnamn_lan(hamtaregion_kod_namn("20")$region)
-  
   # =============================================== API-uttag ===============================================
   
   
