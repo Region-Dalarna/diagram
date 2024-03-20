@@ -50,22 +50,22 @@ diagram_kvalifikationskrav <- function(region_vekt = "20", # Vilken region vill 
   
   # Ändra namn på vissa branscher
   px_df$Branschgrupp <- case_when(
-    px_df$`näringslivet` == "jordbruk, skogsbruk och fiske" ~ "Jordbruk och skogsbruk",
-    px_df$`näringslivet` == "tillverkning och utvinning" ~ "Tillverkning och utvinning",
-    px_df$`näringslivet` == "energiförsörjning; miljöverksamhet" ~ "Energi och miljö",
-    px_df$`näringslivet` == "byggverksamhet" ~ "Bygg",
-    px_df$`näringslivet` == "handel" ~ "Handel",
-    px_df$`näringslivet` == "transport och magasinering"~ "Transport",
-    px_df$`näringslivet` == "hotell- och restaurangverksamhet" ~ "Hotell och restaurang",
-    px_df$`näringslivet` == "information och kommunikation" ~ "IT och kommunikation",
-    px_df$`näringslivet` == "finans- och försäkringsverksamhet" ~ "Finans och försäkring",
-    px_df$`näringslivet` == "fastighetsverksamhet" ~ "Fastighet",
-    px_df$`näringslivet` == "företagstjänster" ~ "Företagstjänster",
-    px_df$`näringslivet` == "offentlig förvaltning och försvar"~ "Offentlig förvaltning",
-    px_df$`näringslivet` == "utbildning " ~ "Utbildning",
-    px_df$`näringslivet` == "vård och omsorg; sociala tjänster" ~ "Vård och omsorg",
-    px_df$`näringslivet` == "kulturella och personliga tjänster m.m." ~ "Kultur m.m.",
-    px_df$`näringslivet` == "okänd verksamhet"~ "Okänd verksamhet")
+    px_df$`näringsgren SNI 2007` == "jordbruk, skogsbruk och fiske" ~ "Jordbruk och skogsbruk",
+    px_df$`näringsgren SNI 2007` == "tillverkning och utvinning" ~ "Tillverkning och utvinning",
+    px_df$`näringsgren SNI 2007` == "energiförsörjning; miljöverksamhet" ~ "Energi och miljö",
+    px_df$`näringsgren SNI 2007` == "byggverksamhet" ~ "Bygg",
+    px_df$`näringsgren SNI 2007` == "handel" ~ "Handel",
+    px_df$`näringsgren SNI 2007` == "transport och magasinering"~ "Transport",
+    px_df$`näringsgren SNI 2007` == "hotell- och restaurangverksamhet" ~ "Hotell och restaurang",
+    px_df$`näringsgren SNI 2007` == "information och kommunikation" ~ "IT och kommunikation",
+    px_df$`näringsgren SNI 2007` == "finans- och försäkringsverksamhet" ~ "Finans och försäkring",
+    px_df$`näringsgren SNI 2007` == "fastighetsverksamhet" ~ "Fastighet",
+    px_df$`näringsgren SNI 2007` == "företagstjänster" ~ "Företagstjänster",
+    px_df$`näringsgren SNI 2007` == "offentlig förvaltning och försvar"~ "Offentlig förvaltning",
+    px_df$`näringsgren SNI 2007` == "utbildning " ~ "Utbildning",
+    px_df$`näringsgren SNI 2007` == "vård och omsorg; sociala tjänster" ~ "Vård och omsorg",
+    px_df$`näringsgren SNI 2007` == "kulturella och personliga tjänster m.m." ~ "Kultur m.m.",
+    px_df$`näringsgren SNI 2007` == "okänd verksamhet"~ "Okänd verksamhet")
   
   # Klassificerar yrken utifrån hur avancerade de är
   px_df$kompetensniva <- case_when(
