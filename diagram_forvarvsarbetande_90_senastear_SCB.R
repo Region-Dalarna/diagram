@@ -1,3 +1,4 @@
+test = diagram_forvarvsarbetande_90(spara_figur = FALSE)
 diagram_forvarvsarbetande_90 <- function(region_vekt = "20", # Vilken region vill man ha. Enbart 1 får väljas
                                               output_mapp_data = NA, # Om man vill spara data. Används primärt i Rmarkdown-rapporter.
                                               output_mapp_figur= "G:/Samhällsanalys/Statistik/Näringsliv/basfakta/",
@@ -56,6 +57,20 @@ diagram_forvarvsarbetande_90 <- function(region_vekt = "20", # Vilken region vil
         summarize(antal = sum(antal)) %>% 
           ungroup()
     
+    df_sum <- df_sum %>%
+      mutate(Näringsgren =case_when(
+        Näringsgren == "byggindustri" ~ "Bygg",
+        Näringsgren == "civila myndigheter, försvar; internat. organisationer" ~ "Myndigheter mm" ,
+        Näringsgren == "energi- o vattenförsörjning, avfallshantering" ~ "Energi och miljö",
+        Näringsgren == "enh för hälso- och sjukvård, socialtjänst; veterinärer" ~ "Hälso- och sjukvård mm" ,
+        Näringsgren == "forskning o utveckling; utbildning" ~ "Utbildning",
+        Näringsgren == "handel; transport, magasinering; kommunikation" ~ "Handel, transport mm" ,
+        Näringsgren == "jordbruk, skogsbruk, jakt, fiske" ~ "Jordbruk och skogsbruk",
+        Näringsgren == "kreditinstitut, fastighetsförvaltn, företagstjänster" ~ "Företagstjänster, finans mm",
+        Näringsgren == "näringsgren okänd" ~ "Okänd verksamhet" ,
+        Näringsgren == "personliga och kulturella tjänster" ~ "Kultur mm",
+        Näringsgren == "utvinning av mineral, tillverkningsindustri" ~ "Tillverkning och utvinning"))
+    
     # Om användaren vill returnera data görs detta här
     if(returnera_data == TRUE){
       assign("forvarvsarbetande_90_senastear", df_sum, envir = .GlobalEnv)
@@ -67,15 +82,16 @@ diagram_forvarvsarbetande_90 <- function(region_vekt = "20", # Vilken region vil
     }
   
     # Branscher har för långa namn, vilket justeras här
-    sysselsatta_90_df_alt <- df_sum %>% 
-      mutate(Näringsgren = stringr::str_to_sentence(Näringsgren),
-             Näringsgren = str_wrap(Näringsgren,40))
+    # sysselsatta_90_df_alt <- df_sum %>% 
+    #   mutate(Näringsgren = stringr::str_to_sentence(Näringsgren),
+    #          Näringsgren = str_wrap(Näringsgren,40))
     
+    # Ändrar namn på branscher (så att de bättre överensstämmer med de som finns idag)
   
     diagram_capt <- "Källa: RAMS och BAS i SCB:s öppna statistikdatabas\nBearbetning: Samhällsanalys, Region Dalarna\nDiagramförklaring: Branschgruppering baserad på SNI2002 och SNI92.\nByte från RAMS till BAS som datakälla från och med 2020."
     diagramfil <- paste0(objektnamn,".png")
     
-    gg_obj <- SkapaStapelDiagram(skickad_df = sysselsatta_90_df_alt %>%
+    gg_obj <- SkapaStapelDiagram(skickad_df = df_sum %>%
                                         filter(år%in%valda_ar),
                                       skickad_x_var = "Näringsgren",
                                       skickad_y_var = "antal",
