@@ -1,4 +1,4 @@
-test = diagram_forvarvsarbetande_90(spara_figur = FALSE)
+#test = diagram_forvarvsarbetande_90(spara_figur = FALSE)
 diagram_forvarvsarbetande_90 <- function(region_vekt = "20", # Vilken region vill man ha. Enbart 1 får väljas
                                               output_mapp_data = NA, # Om man vill spara data. Används primärt i Rmarkdown-rapporter.
                                               output_mapp_figur= "G:/Samhällsanalys/Statistik/Näringsliv/basfakta/",
@@ -17,6 +17,8 @@ diagram_forvarvsarbetande_90 <- function(region_vekt = "20", # Vilken region vil
   # Diagram för antalet förvärvsarbetande inom olika branscher från 1990 till senaste observation
   # Finns för tillfället i två varianter, det ena är ett stapeldiagram där varje stapel motsvarar ett år,
   # det andra är ett liggande stapeldiagram med förändring från första till sista år
+  # Uppdaterat av Jon 2024-04-04
+  # Ändrat så att branscherna i det första och andra diagrammet överensstämmer
   # =================================================================================================================
   
   # Skript som behövs
@@ -57,6 +59,8 @@ diagram_forvarvsarbetande_90 <- function(region_vekt = "20", # Vilken region vil
         summarize(antal = sum(antal)) %>% 
           ungroup()
     
+    # Ändrar namn på branscher (så att de bättre överensstämmer med de som finns idag)
+    
     df_sum <- df_sum %>%
       mutate(Näringsgren =case_when(
         Näringsgren == "byggindustri" ~ "Bygg",
@@ -85,8 +89,6 @@ diagram_forvarvsarbetande_90 <- function(region_vekt = "20", # Vilken region vil
     # sysselsatta_90_df_alt <- df_sum %>% 
     #   mutate(Näringsgren = stringr::str_to_sentence(Näringsgren),
     #          Näringsgren = str_wrap(Näringsgren,40))
-    
-    # Ändrar namn på branscher (så att de bättre överensstämmer med de som finns idag)
   
     diagram_capt <- "Källa: RAMS och BAS i SCB:s öppna statistikdatabas\nBearbetning: Samhällsanalys, Region Dalarna\nDiagramförklaring: Branschgruppering baserad på SNI2002 och SNI92.\nByte från RAMS till BAS som datakälla från och med 2020."
     diagramfil <- paste0(objektnamn,".png")
