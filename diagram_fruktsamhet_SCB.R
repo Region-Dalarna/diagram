@@ -1,4 +1,3 @@
-#test = diagram_fruktsamhet(spara_figur=FALSE,region_vekt = "20",visa_var_xte = 2)
 diagram_fruktsamhet <- function(region_vekt = "20", # Val av kommun/län att fokusera på. De figurer som jämför kommuner i samma län väljs automatiskt utefter kommunens länstillhörighet 
                                 output_mapp_figur= "G:/skript/jon/Figurer/", # Vart hamnar figur om den skall sparas
                                 vald_farg = diagramfarger("rus_sex"), # Vilken färgvektor vill man ha. Blir alltid "kon" när man väljer det diagrammet
@@ -55,7 +54,8 @@ diagram_fruktsamhet <- function(region_vekt = "20", # Val av kommun/län att fok
   
   sum_frukts_ar <- fodelsetal_df %>% 
     group_by(år, regionkod, region) %>% 
-    summarise(sum_frukts_ar = round(sum(födelsetal, na.rm = TRUE), 2), .groups = "drop")
+    summarise(sum_frukts_ar = round(sum(födelsetal, na.rm = TRUE), 2), .groups = "drop") %>% 
+      mutate(region = skapa_kortnamn_lan(region,byt_ut_riket_mot_sverige = TRUE))
   
   if(returnera_data == TRUE){
     assign("fruktsamhet_df", sum_frukts_ar, envir = .GlobalEnv)
@@ -141,7 +141,9 @@ diagram_fruktsamhet <- function(region_vekt = "20", # Val av kommun/län att fok
     
     gg_obj <- SkapaStapelDiagram(skickad_df = sum_frukts_ar %>% 
                                    filter(år == max(år)) %>% 
-                                   mutate(fokus = ifelse(regionkod %in% fokus_region, 1, 0)), 
+                                   mutate(fokus = case_when(regionkod %in% fokus_region ~ 1,
+                                                            regionkod == "00"~ 2,
+                                                            TRUE ~ 0)), 
                                  skickad_x_var = "region", 
                                  skickad_y_var = "sum_frukts_ar",
                                  diagram_titel = diagram_titel,
