@@ -1,3 +1,4 @@
+test <- diagram_arbetsmarknadsstatus(spara_figur = FALSE,diag_arbetskraftsdeltagande = FALSE,diag_sysselsattningsgrad = FALSE,returnera_data = TRUE)
 diagram_arbetsmarknadsstatus <-function(region_vekt = hamtakommuner("20"), # Använd förslagsvis hamtakommuner och hamtaallalan
                                         fokus_lan = "20", # Måste väljas. Det län som, vid sidan om riket, fokuseras i figuren. Gäller inte vid könsuppdelat
                                         output_mapp_data = NA, # Outputmapp för data
@@ -20,7 +21,7 @@ diagram_arbetsmarknadsstatus <-function(region_vekt = hamtakommuner("20"), # Anv
   # Går att dela upp på kön och ändra åldersgrupp (max 1 åt gången). Det går även att dela upp på utrikes/inrikes födda, vilket ger ett facet-diagram
   # Funkar både för län och kommuner, men bara senaste år
   # diag_arbetsloshet, diag_arbetskraftsdeltagande och diag_sysselsattningsgrad sätts till TRUE baserat på vilka variabler man vill ha
-  # Senast uppdaterad av Jon Frank (2024-01-24)
+  # Senast uppdaterad av Jon Frank (2024-04-18) - Ändrat så att hämta data görs från skript på Mona. Lagt till så att data bara hämtas för figur som skall plockas ut
   # Potentiell förbättring: Ändra så att man kan köra för utrikes/inrikes separat. Funkar nu, men diagramtitel hänger inte med.
   # =================================================================================================================
   if (!require("pacman")) install.packages("pacman")
@@ -31,14 +32,21 @@ diagram_arbetsmarknadsstatus <-function(region_vekt = hamtakommuner("20"), # Anv
   source("https://raw.githubusercontent.com/Region-Dalarna/hamta_data/main/hamta_bas_arbstatus_region_kon_alder_fodelseregion_prel_manad_ArbStatusM_scb.R")
   
   gg_list <- list()  # skapa en tom lista att lägga flera ggplot-objekt i (om man skapar flera diagram)
-  objektnamn<-c()
+  objektnamn <- c()
+  
+  # Tar bara ut data för de variabler som skal vara med
+  variabel <- c()
+  if(diag_sysselsattningsgrad==TRUE) variabel <- c(variabel,"sysselsattningsgrad")
+  if(diag_arbetslosthet==TRUE) variabel <- c(variabel,"arbetslöshet")
+  if(diag_arbetskraftsdeltagande==TRUE) variabel <- c(variabel,"arbetskraftsdeltagande")
   
   
   arbetsmarknadsstatus_df = hamta_bas_arbstatus_region_kon_alder_fodelseregion_prel_manad_scb(region_vekt = region_vekt,
                                                                                               kon_klartext = kon_klartext,
                                                                                               alder_klartext = alder_klartext,
                                                                                               fodelseregion_klartext = fodelseregion_klartext_vekt,
-                                                                                              cont_klartext = c("arbetslöshet","arbetskraftsdeltagande", "sysselsättningsgrad"),
+                                                                                              cont_klartext = variabel,
+                                                                                              wide_om_en_contvar = FALSE,
                                                                                               tid_koder = "9999")  %>% 
     mutate(ar=substr(månad,1,4),
            manad_long=format(as.Date(paste(ar, str_sub(månad, 6,7),"1", sep = "-")), "%B"),
