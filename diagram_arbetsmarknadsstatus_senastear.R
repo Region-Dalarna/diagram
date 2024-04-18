@@ -1,4 +1,3 @@
-test <- diagram_arbetsmarknadsstatus(spara_figur = FALSE,diag_arbetskraftsdeltagande = FALSE,diag_sysselsattningsgrad = FALSE,returnera_data = TRUE)
 diagram_arbetsmarknadsstatus <-function(region_vekt = hamtakommuner("20"), # Använd förslagsvis hamtakommuner och hamtaallalan
                                         fokus_lan = "20", # Måste väljas. Det län som, vid sidan om riket, fokuseras i figuren. Gäller inte vid könsuppdelat
                                         output_mapp_data = NA, # Outputmapp för data
