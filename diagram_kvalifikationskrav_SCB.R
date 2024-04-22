@@ -16,7 +16,8 @@ diagram_kvalifikationskrav <- function(region_vekt = "20", # Vilken region vill 
   # Diagram som jämför kvalifikationskrav inom olika områden (kommun eller län) och bransch i valt län/kommun 
   # Funkar enbart för senaste år
   # Skapad av Jon 2024-01-17
-  # Senast uppdaterad:
+  # Senast uppdaterad: 2024-03-20
+  # Ändrat Anställda 16-64 år (dagbef) till Anställda 16-64 år med arbetsplats i regionen (dagbef)
   # =================================================================================================================
   
   # Bibliotek som behövs
@@ -92,7 +93,7 @@ diagram_kvalifikationskrav <- function(region_vekt = "20", # Vilken region vill 
     
     px_df_sum <- px_df %>% 
         group_by(across(any_of(variabellista))) %>%
-          summarize(Antal = sum(`Anställda 16-64 år (dagbef)`)) %>%
+          summarize(Antal = sum(`Anställda 16-64 år med arbetsplats i regionen (dagbef)`)) %>%
             mutate(Andel = ((Antal/sum(Antal))*100)-0.001) %>% 
               ungroup()
     
@@ -148,7 +149,7 @@ diagram_kvalifikationskrav <- function(region_vekt = "20", # Vilken region vill 
     px_df_sum <- px_df %>%
       filter(år == max(år),region == valt_lan) %>%
         group_by(across(any_of(variabellista))) %>%
-      summarize(Antal = sum(`Anställda 16-64 år (dagbef)`)) %>%
+      summarize(Antal = sum(`Anställda 16-64 år med arbetsplats i regionen (dagbef)`)) %>%
             mutate(Andel=((Antal/sum(Antal))*100),
                    Andel = ifelse(Andel<0.001,Andel,Andel-0.001))
   
