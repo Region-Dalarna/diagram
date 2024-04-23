@@ -52,9 +52,11 @@ diagram_befolkningsforandring_ar <- function(region_vekt = "20", # Val av kommun
       
       if(length(unique(ut_df$region)) > 1){
         reg_txt <- paste0(reg_txt,"_facet")
+        diagram_titel <- paste0("Folkmängd")
+      }else{
+        diagram_titel <- paste0("Folkmängd i ", reg_txt)
       }
-      
-      diagram_titel <- paste0("Folkmängd i ", reg_txt)
+
       diagramfil <- paste0("Folkmangd_", reg_txt, "_ar_", min(ut_df$år), "_", max(ut_df$år), ".png")
       objektnamn <- c(objektnamn,diagramfil %>% str_remove(".png"))
       
@@ -103,9 +105,12 @@ diagram_befolkningsforandring_ar <- function(region_vekt = "20", # Val av kommun
       
       if(length(unique(ut_df$region)) > 1){
         reg_txt <- paste0(reg_txt,"_facet")
+        diagram_titel <- paste0("Befolkningsutveckling")
+      }else{
+        diagram_titel <- paste0("Befolkningsutveckling i ", reg_txt)
       }
       
-      diagram_titel <- paste0("Befolkningsutveckling i ", reg_txt)
+      
       diagramfil <- paste0("Befolkningsutveckling_", reg_txt, "_ar_", min(ut_df$år), "_", max(ut_df$år), ".png")
       objektnamn <- c(objektnamn,diagramfil %>% str_remove(".png"))
       
