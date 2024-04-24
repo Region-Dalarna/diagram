@@ -9,7 +9,8 @@ diagram_inrikes_flytt_alder <- function(region_vekt = "20", # Val av kommuner
                                         alder_grupp = c(20, 30, 40, 50, 60), # Vilka åldersgrupper skall användas. Välj enligt principen upp till första, sedan intervall mellan och sedan från sista
                                         alder_grupp_fokus = "20-29 år", # Vilken åldersgrupp skall fokuseras i diag_alder_fokus. Måste finnas bland grupperna ovan
                                         valda_ar = c("2021","2022","2023"), # Vilka år skall användas i diag_flyttnetto_alder
-                                        returnera_figur = TRUE # Om man vill att figuren skall returneras från funktionen
+                                        returnera_figur = TRUE, # Om man vill att figuren skall returneras från funktionen
+                                        returnera_data = TRUE
 ){
   
   # ===========================================================================================================
@@ -43,6 +44,9 @@ diagram_inrikes_flytt_alder <- function(region_vekt = "20", # Val av kommuner
     summarize(varde = sum(varde)) %>% 
     ungroup()
   
+  if(returnera_data == TRUE){
+    assign("flytt_aldersgrupper_df", flytt_df, envir = .GlobalEnv)
+  }
   
   skapa_diagram <- function(df, vald_region){
     if(diag_flyttnetto_alder == TRUE){
