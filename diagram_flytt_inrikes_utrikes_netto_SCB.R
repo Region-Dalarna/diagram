@@ -16,6 +16,9 @@ diagram_inr_utr_flytt <- function(region_vekt = "20", # Val av kommuner
   # Förbättringsmöjligheter: Går för tillfället inte att summera  flera regioner
   # ===========================================================================================================
   
+  if(diag_uppdelat == TRUE && "00" %in% region_vekt){
+    stop("Region 00 (Riket) saknar inrikes flyttnetto och kan inte användas.\nÄndra region_vekt eller sätt diag_uppdelat = FALSE")
+  }
   
   if (!require("pacman")) install.packages("pacman")
   p_load(tidyverse)
@@ -47,7 +50,8 @@ diagram_inr_utr_flytt <- function(region_vekt = "20", # Val av kommuner
     if(diag_flyttnetto == TRUE){
       
       if(diag_facet == FALSE){
-        totalvarden_linjebredd <- 0.8      # gör en linjetjocklek på totallinjerna som är 0,2 % av diff (på raden ovan)
+        diff <- max(df$varde) - min(df$varde) # ta reda på skillnaden mellan det högsta och lägsta värdet i datasetet
+        totalvarden_linjebredd <- 0.002*diff      # gör en linjetjocklek på totallinjerna som är 0,2 % av diff (på raden ovan)
         total_list <- list()
         unika_ar <- unique(df$år)
         vald_regionkod = vald_region
@@ -170,8 +174,8 @@ diagram_inr_utr_flytt <- function(region_vekt = "20", # Val av kommuner
         return(gg_list_uppdelat)
         
       }
-      
-      diag_uppdelning <- map(unique(df$variabel), ~ skapa_diagram_uppdelat(df, .x)) %>% flatten
+
+      diag_uppdelning <- map(unique(df$variabel), ~ skapa_diagram_uppdelat(df , .x)) %>% flatten
       gg_list <- c(gg_list, diag_uppdelning)
     }
     return(gg_list)
