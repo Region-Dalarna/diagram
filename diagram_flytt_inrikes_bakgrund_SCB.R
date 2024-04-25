@@ -1,12 +1,12 @@
 diag_inr_flyttnetto_inr_utr_fodda <- function(
-    region_vekt = "20",
+    region_vekt = "20",                               # regionkod eller vektor med regionkoder
     gruppera_namn = NA,                               # om NA skapas ett diagram per region, annars grupperas de ihop och får namnet som anges här
     facet_diagram = FALSE,                            # om TRUE skapas ett diagram för alla regioner, annars ett diagram för varje region
-    farg_vekt = diagramfarger("rd_gron")[c(1,4)],
+    farg_vekt = diagramfarger("rd_gron")[c(1,4)],     # färgvektor för diagrammet
     diagram_capt = "Källa: SCB:s öppna statistikdatabas\nBearbetning: Samhällsanalys, Region Dalarna\nInrikes flyttnetto är skillnaden mellan de som flyttat in till och de som flyttat ut från en kommun/region, från och till andra kommuner/regioner",
     output_mapp = "G:/Samhällsanalys/API/Fran_R/utskrift/",
-    skriv_diagram = TRUE,
-    skriv_excel = FALSE,
+    skriv_diagram = TRUE,                             # TRUE om vi vill skriva ut diagrammet
+    skriv_excel = FALSE,                              # TRUE om vi vill skriva ut data till excel
     spara_som_svg = FALSE,                            # TRUE om vi vill spara diagrammet som svg
     visa_totalvarden = TRUE,                          # skriver ut ett streck för netto både inrikes och utrikes födda
     visa_totalvarden_dataetiketter = FALSE,           # skriver ut dataetiketter för totalvärdena
@@ -86,6 +86,8 @@ diag_inr_flyttnetto_inr_utr_fodda <- function(
     excelfil <- paste0("andel_arblosa_", min(arblosa_bakgr$tid), "_", max(arblosa_bakgr$tid) ,".xlsx")
     write.xlsx(px_df, paste0("Flyttnetto_", reg_namn, "_ar", min(px_df$år), "_", max(px_df$år), ".xlsx"), overwrite = TRUE)
   }
+  
+  
   # ============================================= Skapa diagram ==============================================
   
   #for (reg in unique(px_df$region)) {
