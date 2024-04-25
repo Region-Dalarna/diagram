@@ -1,5 +1,6 @@
 diagram_inrikes_flytt_alder <- function(region_vekt = "20", # Val av kommuner
                                         output_mapp_figur= "G:/skript/jon/Figurer/", # Vart hamnar figur om den skall sparas
+                                        gruppera_namn = NA, # Välj namn på gruppen
                                         vald_farg = diagramfarger("rus_sex"), # Vilken färgvektor vill man ha. Blir alltid "kon" när man väljer det diagrammet
                                         spara_figur = FALSE, # Sparar figuren till output_mapp_figur
                                         tid = "*", # Vilken tid skall användas
@@ -15,9 +16,9 @@ diagram_inrikes_flytt_alder <- function(region_vekt = "20", # Val av kommuner
   
   # ===========================================================================================================
   # Diagram för inrikes flyttar uppdelat på åldersgrupper. Går även att fokusera på en specifik åldersgrupp. 
-  # Finns både med och utan facet
+  # Finns både med och utan facet. Det är även möjligt att skapa grupper av regioner. Gruppen namnges med gruppera_namn
   # Skapad: 2024-04-24
-  # Förbättringsmöjligheter: Går för tillfället inte att summera  flera regioner
+  # Uppdatering: Ändrat så att det går att gruppera på namn. 
   # ===========================================================================================================
   
   if("00" %in% region_vekt){
@@ -42,19 +43,34 @@ diagram_inrikes_flytt_alder <- function(region_vekt = "20", # Val av kommuner
                                                          tid_koder = tid ,
                                                          alder_koder = "*") %>%
     filter(ålder != "totalt ålder") %>% 
-    mutate(alder_grupper = skapa_aldersgrupper(ålder,alder_grupp)) %>% 
-    group_by(år,regionkod,region, variabel , alder_grupper) %>% 
-    summarize(varde = sum(varde)) %>% 
-    ungroup()
+    mutate(alder_grupper = skapa_aldersgrupper(ålder,alder_grupp))
   
+  if(!is.na(gruppera_namn)){
+    # Tar bort regionkod och region i gruppering vilket ger en summering på grupp-nivå
+    flytt_df <- flytt_df %>% 
+      group_by(år,variabel , alder_grupper) %>% 
+      summarize(varde = sum(varde)) %>% 
+      mutate(region = gruppera_namn)
+    # Regionvekt måste sättas till ett värde för att map-funktionen bara skall köra en gång
+    # Används inte vid gruppera namn
+    region_vekt = "00"
+    
+  } else {
+    flytt_df <- flytt_df %>% 
+      group_by(år,regionkod,region, variabel , alder_grupper) %>% 
+      summarize(varde = sum(varde)) %>% 
+      ungroup()
+  }
+  
+  # Returnerar data till R globala miljö
   if(returnera_data == TRUE){
     assign("flytt_aldersgrupper_df", flytt_df, envir = .GlobalEnv)
   }
   
-  skapa_diagram <- function(df, vald_region){
+  skapa_diagram <- function(df, vald_region){ # Start map-funktion
     if(diag_flyttnetto_alder == TRUE){
       
-      df <- df %>% filter(regionkod %in% vald_region)
+      if(is.na(gruppera_namn)) df <- df %>% filter(regionkod %in% vald_region)
       
       reg_txt <- (df$region %>% unique() %>% skapa_kortnamn_lan(T))[1]
       
@@ -94,11 +110,11 @@ diagram_inrikes_flytt_alder <- function(region_vekt = "20", # Val av kommuner
                                    filnamn_diagram = diagramfil)
       
       gg_list <- c(gg_list, list(gg_obj))
-    }
+    }# diag_flyttnetto_alder
     
     if(diag_alder_fokus == TRUE){
       
-      df <- df %>% filter(regionkod %in% vald_region)
+      if(is.na(gruppera_namn)) df <- df %>% filter(regionkod %in% vald_region)
       
       reg_txt <- (df$region %>% unique() %>% skapa_kortnamn_lan(T))[1]
       
@@ -140,17 +156,21 @@ diagram_inrikes_flytt_alder <- function(region_vekt = "20", # Val av kommuner
       
       gg_list <- c(gg_list, list(gg_obj))
       
-    }
+    } # Slut diag_alder_fokus
     names(gg_list) <- objektnamn
     return(gg_list)
-  }
-  
+  } # Slut map-funktion
+  # Om facet väljs körs ingen map-funktion (vi har bara 1 diagram)
   if (diag_facet) {
     diag <- skapa_diagram(flytt_df,region_vekt)
     
   } else {
     diag <- map(region_vekt, ~ skapa_diagram(flytt_df, .x)) %>% flatten()
     
+  }
+  # Går inte att använda facet och gruppera namn samtidigt
+  if(!is.na(gruppera_namn)&&diag_facet==TRUE){
+    print("OBS! --- Gruppera namn och facet kan ej användas samtidigt. Sätt gruppera namn till NA om du vill ha ett facet-diagram --- OBS!")
   }
   
   if(returnera_figur==TRUE) return(diag)
