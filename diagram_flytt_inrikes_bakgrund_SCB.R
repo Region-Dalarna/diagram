@@ -183,12 +183,12 @@ diag_inr_flyttnetto_inr_utr_fodda <- function(
   
   
   if (facet_diagram) {
-    gg_list <- skapa_diagram(px_df,region_vekt)
+    diag <- skapa_diagram(px_df,region_vekt)
     
   } else {
-    gg_list <- map(unique(region_vekt), ~skapa_diagram(px_df,.x)) %>% flatten()
+    diag <- map(unique(region_vekt), ~skapa_diagram(px_df,.x)) %>% flatten()
     
   }
   
-  return(gg_list)
+  return(diag)
 } # slut funktion
