@@ -7,7 +7,7 @@ diag_inr_flyttnetto_inr_utr_fodda <- function(
     output_mapp = "G:/Samhällsanalys/API/Fran_R/utskrift/",
     skriv_diagram = TRUE,                             # TRUE om vi vill skriva ut diagrammet
     skriv_excel = FALSE,                              # TRUE om vi vill skriva ut data till excel
-    returnera_data = FALSE,
+    returnera_data = FALSE,                           # TRUE om vi vill returnera data till R:s globala miljö 
     spara_som_svg = FALSE,                            # TRUE om vi vill spara diagrammet som svg
     visa_totalvarden = TRUE,                          # skriver ut ett streck för netto både inrikes och utrikes födda
     visa_totalvarden_dataetiketter = FALSE,           # skriver ut dataetiketter för totalvärdena
