@@ -7,6 +7,7 @@ diag_inr_flyttnetto_inr_utr_fodda <- function(
     output_mapp = "G:/Samhällsanalys/API/Fran_R/utskrift/",
     skriv_diagram = TRUE,                             # TRUE om vi vill skriva ut diagrammet
     skriv_excel = FALSE,                              # TRUE om vi vill skriva ut data till excel
+    returnera_data = FALSE,
     spara_som_svg = FALSE,                            # TRUE om vi vill spara diagrammet som svg
     visa_totalvarden = TRUE,                          # skriver ut ett streck för netto både inrikes och utrikes födda
     visa_totalvarden_dataetiketter = FALSE,           # skriver ut dataetiketter för totalvärdena
@@ -85,6 +86,11 @@ diag_inr_flyttnetto_inr_utr_fodda <- function(
     reg_namn <- ifelse(!is.na(gruppera_namn), gruppera_namn, paste0(region_vekt, collapse = "_"))
     excelfil <- paste0("andel_arblosa_", min(arblosa_bakgr$tid), "_", max(arblosa_bakgr$tid) ,".xlsx")
     write.xlsx(px_df, paste0("Flyttnetto_", reg_namn, "_ar", min(px_df$år), "_", max(px_df$år), ".xlsx"), overwrite = TRUE)
+  }
+  
+  # Returnerar data till R globala miljö
+  if(returnera_data == TRUE){
+    assign("flytt_bakgrund_df", px_df, envir = .GlobalEnv)
   }
   
   
