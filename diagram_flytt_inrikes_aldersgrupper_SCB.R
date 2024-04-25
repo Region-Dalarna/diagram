@@ -20,6 +20,9 @@ diagram_inrikes_flytt_alder <- function(region_vekt = "20", # Val av kommuner
   # Förbättringsmöjligheter: Går för tillfället inte att summera  flera regioner
   # ===========================================================================================================
   
+  if("00" %in% region_vekt){
+    stop("Region 00 (Riket) saknar inrikes flyttnetto och kan inte användas.\nÄndra region_vekt")
+  }
   
   if (!require("pacman")) install.packages("pacman")
   p_load(tidyverse)
