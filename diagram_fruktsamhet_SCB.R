@@ -19,7 +19,7 @@ diagram_fruktsamhet <- function(region_vekt = hamtakommuner(), # Vilka kommuner 
   # Skript som skapar diagram över fruktsamhet i vald region. Finns för valda regioner över tid (både ett diagram per region och ett facet-diagram för alla regioner),
   # senaste år för alla valda regioner och förändring mellan första och sista året för samtliga valda regioner.
   # Skapad av Jon 2023-04-05 genom att ha kombinerat två av Peters skript (analys_befutv_berakna_summerad_fruktsamhet.R och diagram_summerad_fruktsamhet.R)
-  # Förbättring: har lagt till en mapfunktion§ för att skapa diagram för alla valda regioner över tid.
+  # Revidering : har lagt till en map-funktion för att skapa diagram för alla valda regioner över tid./Jon
   # ===========================================================================================================
   
   
@@ -29,19 +29,11 @@ diagram_fruktsamhet <- function(region_vekt = hamtakommuner(), # Vilka kommuner 
   source("https://raw.githubusercontent.com/Region-Dalarna/funktioner/main/func_SkapaDiagram.R")
   options(dplyr.summarise.inform = FALSE)
   
+  # Skapar två listor, en de diagram jämför regionerna och en för de diagram som tar ut en region i taget
   gg_list <- list()
   gg_list_map <- list()
   objektnamn <- c()
   objektnamn_map <- c()
-  
-  # Get working directory
-  # getwd()
-  
-  # valt_lan = substr(region_vekt, 1, 2)
-  # 
-  # dalarnas_kommuner <- hamtakommuner(lan = valt_lan)
-  # 
-  # vald_region <- c(dalarnas_kommuner) %>% unique()
   
   # Hämta födelsetal för kvinnor 
   
@@ -55,6 +47,7 @@ diagram_fruktsamhet <- function(region_vekt = hamtakommuner(), # Vilka kommuner 
                                                  tid_koder = vald_period)
   
   
+  # Beräknar födelsetal och fruktsamhet
   fodelsetal_df <- bef_df %>% 
     left_join(fodda_df, by = c("år", "regionkod", "region","ålder" = "moderns ålder")) %>% 
     mutate(födelsetal = födda / Folkmängd)
@@ -64,16 +57,16 @@ diagram_fruktsamhet <- function(region_vekt = hamtakommuner(), # Vilka kommuner 
     summarise(sum_frukts_ar = round(sum(födelsetal, na.rm = TRUE), 2), .groups = "drop") %>% 
     mutate(region = skapa_kortnamn_lan(region,byt_ut_riket_mot_sverige = TRUE))
   
+  # Returnera data om användaren vill det. Läggs i R-studios globala miljö så att data kan användas i markdown-rapporterna
   if(returnera_data == TRUE){
     assign("fruktsamhet_df", sum_frukts_ar, envir = .GlobalEnv)
   }
   
   # Region att fokusera på
-  # fokus_region <- region_vekt
   fokus_region_txt <- hamtaregion_kod_namn(fokus_region)$region %>% skapa_kortnamn_lan()
   
   # spara diagram
-  if (length(unique(sum_frukts_ar$regionkod)) > 1) facet_diagram <- TRUE else facet_diagram <- FALSE
+  #if (length(unique(sum_frukts_ar$regionkod)) > 1) facet_diagram <- TRUE else facet_diagram <- FALSE
   
   # Diagram som visar jämförelse i länet
   if(diag_jmf_lan == TRUE){
@@ -109,7 +102,7 @@ diagram_fruktsamhet <- function(region_vekt = hamtakommuner(), # Vilka kommuner 
     names(gg_list) <- objektnamn
     
   }
-  
+  # Diagram som visar förändring i samtliga valda regioner
   if(diag_forandring == TRUE){
     
     diagram_titel <- paste0("Förändring av summerad fruktsamhet per kvinna mellan år ", min(sum_frukts_ar$år), " och ", max(sum_frukts_ar$år))
@@ -147,7 +140,7 @@ diagram_fruktsamhet <- function(region_vekt = hamtakommuner(), # Vilka kommuner 
     
   }
   
-  # diagram med bara fokusregionen över tid
+  # diagram med bara valda regioner över tid (ett för varje). Finns som enskilda och facet
   if(diag_fokus_tid == TRUE){
     
     
@@ -184,11 +177,13 @@ diagram_fruktsamhet <- function(region_vekt = hamtakommuner(), # Vilka kommuner 
                                    output_mapp = output_mapp_figur,
                                    filnamn_diagram = diagramfil)
       
+      # Sparar och namnger diagram
       gg_list_map <- c(gg_list_map, list(gg_obj))
       names(gg_list_map) <- objektnamn_map
       return(gg_list_map)
-    }
+    } # Slut funktion skapa_diagram
     
+    # Funktionen körs enbart med hjälp av map när vi inte har facet-diagram
     if (diag_facet) {
       diag <- skapa_diagram(sum_frukts_ar,region_vekt)
       
@@ -196,13 +191,11 @@ diagram_fruktsamhet <- function(region_vekt = hamtakommuner(), # Vilka kommuner 
       diag <- map(region_vekt, ~ skapa_diagram(sum_frukts_ar, .x)) %>% flatten()
       
     }
-    #diag <- map(region_vekt, ~ skapa_diagram(sum_frukts_ar, .x)) %>% flatten()
+   
     gg_list <- c(gg_list, diag)
   }
   
-  
-  
-  
+  # Om användaren vill returnera en figur, gör detta
   if(returnera_figur==TRUE){
     return(gg_list)
   }
