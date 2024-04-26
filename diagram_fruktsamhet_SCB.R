@@ -1,23 +1,25 @@
-diagram_fruktsamhet <- function(region_vekt = "20", # Val av kommun/län att fokusera på. De figurer som jämför kommuner i samma län väljs automatiskt utefter kommunens länstillhörighet 
+diagram_fruktsamhet <- function(region_vekt = hamtakommuner(), # Vilka kommuner skall väljas. Default är alla kommuner i Dalarna. Bör var minst ett par stycken för att diag_jmf_lan och diag_forandring skall se vettiga ut
+                                fokus_region = "20", # Vilken region skall fokuseras på. Måste vara ett som finns i region_vekt
                                 output_mapp_figur= "G:/skript/jon/Figurer/", # Vart hamnar figur om den skall sparas
                                 vald_farg = diagramfarger("rus_sex"), # Vilken färgvektor vill man ha. Blir alltid "kon" när man väljer det diagrammet
                                 diag_capt = "Källa: SCB:s öppna statistikdatabas, bearbetning av Samhällsanalys, Region Dalarna\nSummerad fruktsamhet per kvinna är ett mått på hur många barn som en kvinna i genomsnitt skulle föda under\n sin fruktsamma period utifrån, den vid tidpunkten för beräkningen, gällande fruktsamheten.",
-                                vald_period = c(2000:9999), # Vilka år skall väljas
-                                visa_var_xte = 4, # Hur många år som skall visas på x-axeln. NA ger alla och 2 ger vartannat, 4 var fjärde osv.
+                                vald_period = c(2000:9999), # Vilka år skall väljas. 9999 ger sista år och "*" ger alla år
+                                visa_var_xte = 4, # Hur många år som skall visas på x-axeln. Automatiskt var 8:e vid facet-diagram.
                                 spara_figur = FALSE, # Sparar figuren till output_mapp_figur
-                                diag_fokus_tid = TRUE, # Skapa diagram för alla valda år i valt län
-                                diag_facet = TRUE, # Skapa diagram för flyttnetto uppdelat
-                                diag_jmf_lan = TRUE, # Skapa diagram för jämförelse på länsnivå
-                                diag_forandring = TRUE, # Skapa diagram för förändring mellan första och sista år för samtliga kommuner i län
+                                diag_fokus_tid = TRUE, # Skapa diagram för alla valda år i valda regioner
+                                diag_facet = FALSE, # diag_fokus_tid som facet-diagram istället för ett per region
+                                diag_jmf_lan = TRUE, # Skapa diagram för jämförelse mellan valda regioner
+                                diag_forandring = TRUE, # Skapa diagram för förändring mellan första och sista år för valda regioner
                                 returnera_figur = TRUE, # Om man vill att figuren skall returneras från funktionen
                                 returnera_data = FALSE){ # True om användaren vill returnera data från funktionen
   
   
   # ===========================================================================================================
   #
-  # Skript som skapar diagram över fruktsamhet i vald region. Finns för vald region över tid, facet för alla kommuner i regionen
-  # senaste år för alla kommuner i regionen och förändring mellan första och sista året för samtliga kommuner i regionen.
+  # Skript som skapar diagram över fruktsamhet i vald region. Finns för valda regioner över tid (både ett diagram per region och ett facet-diagram för alla regioner),
+  # senaste år för alla valda regioner och förändring mellan första och sista året för samtliga valda regioner.
   # Skapad av Jon 2023-04-05 genom att ha kombinerat två av Peters skript (analys_befutv_berakna_summerad_fruktsamhet.R och diagram_summerad_fruktsamhet.R)
+  # Förbättring: har lagt till en mapfunktion§ för att skapa diagram för alla valda regioner över tid.
   # ===========================================================================================================
   
   
@@ -28,21 +30,26 @@ diagram_fruktsamhet <- function(region_vekt = "20", # Val av kommun/län att fok
   options(dplyr.summarise.inform = FALSE)
   
   gg_list <- list()
+  gg_list_map <- list()
   objektnamn <- c()
+  objektnamn_map <- c()
   
-  valt_lan = substr(region_vekt, 1, 2)
+  # Get working directory
+  # getwd()
   
-  dalarnas_kommuner <- hamtakommuner(lan = valt_lan)
-  
-  vald_region <- c(dalarnas_kommuner) %>% unique()
+  # valt_lan = substr(region_vekt, 1, 2)
+  # 
+  # dalarnas_kommuner <- hamtakommuner(lan = valt_lan)
+  # 
+  # vald_region <- c(dalarnas_kommuner) %>% unique()
   
   # Hämta födelsetal för kvinnor 
   
-  fodda_df <- hamta_fodda_moderns_alder_region_scb(region_vekt = vald_region,
+  fodda_df <- hamta_fodda_moderns_alder_region_scb(region_vekt = region_vekt,
                                                    alder_moder = c(15:48),
                                                    tid_koder = vald_period)
   
-  bef_df <- hamta_bef_folkmangd_alder_kon_ar_scb(region_vekt = vald_region,
+  bef_df <- hamta_bef_folkmangd_alder_kon_ar_scb(region_vekt = region_vekt,
                                                  alder = c(15:48),
                                                  kon_klartext = "kvinnor",
                                                  tid_koder = vald_period)
@@ -55,88 +62,24 @@ diagram_fruktsamhet <- function(region_vekt = "20", # Val av kommun/län att fok
   sum_frukts_ar <- fodelsetal_df %>% 
     group_by(år, regionkod, region) %>% 
     summarise(sum_frukts_ar = round(sum(födelsetal, na.rm = TRUE), 2), .groups = "drop") %>% 
-      mutate(region = skapa_kortnamn_lan(region,byt_ut_riket_mot_sverige = TRUE))
+    mutate(region = skapa_kortnamn_lan(region,byt_ut_riket_mot_sverige = TRUE))
   
   if(returnera_data == TRUE){
     assign("fruktsamhet_df", sum_frukts_ar, envir = .GlobalEnv)
   }
   
   # Region att fokusera på
-  fokus_region <- region_vekt
+  # fokus_region <- region_vekt
   fokus_region_txt <- hamtaregion_kod_namn(fokus_region)$region %>% skapa_kortnamn_lan()
   
   # spara diagram
   if (length(unique(sum_frukts_ar$regionkod)) > 1) facet_diagram <- TRUE else facet_diagram <- FALSE
   
-  
-  #diagtitel_txt <- if(facet_diagram) "" else paste0(" i ", unique(sum_frukts_ar$region) %>% skapa_kortnamn_lan())
-  diagfilnamn_txt <- paste0(unique(sum_frukts_ar$regionkod), collapse = "_")
-  
-  # diagram med bara fokusregionen över tid
-  if(diag_fokus_tid == TRUE){
-    
-    diagram_titel <- paste0("Summerad fruktsamhet per kvinna i ", fokus_region_txt)
-    diagramfil <- paste0("summerad_fruktsamhet_", fokus_region, "_ar_", min(sum_frukts_ar$år), "_", max(sum_frukts_ar$år), ".png")
-    objektnamn <- c(objektnamn,diagramfil %>% str_remove(".png"))
-    
-    gg_obj <- SkapaStapelDiagram(skickad_df = sum_frukts_ar %>% 
-                                   filter(regionkod == fokus_region), 
-                                 skickad_x_var = "år", 
-                                 skickad_y_var = "sum_frukts_ar",
-                                 diagram_titel = diagram_titel,
-                                 diagram_capt = diag_capt,
-                                 #x_axis_storlek = 8,
-                                 stodlinjer_avrunda_fem = TRUE,
-                                 x_axis_visa_var_xe_etikett = visa_var_xte,
-                                 manual_x_axis_text_vjust = 1,
-                                 manual_x_axis_text_hjust = 1,
-                                 manual_y_axis_title = "",
-                                 facet_grp = "region",
-                                 skriv_till_diagramfil = spara_figur,
-                                 manual_color = vald_farg[1],
-                                 output_mapp = output_mapp_figur,
-                                 filnamn_diagram = diagramfil)
-    
-    gg_list <- c(gg_list, list(gg_obj))
-    
-  }
-  
-  # facetdiagram med alla regioner över tid
-  if(diag_facet==TRUE){
-    
-    diagram_titel <- paste0("Summerad fruktsamhet per kvinna")
-    diagramfil <- paste0("summerad_fruktsamhet_facet_", valt_lan, "_ar_", min(sum_frukts_ar$år), "_", max(sum_frukts_ar$år), ".png")
-    objektnamn <- c(objektnamn,diagramfil %>% str_remove(".png"))
-    
-    gg_obj <- SkapaStapelDiagram(skickad_df = sum_frukts_ar, 
-                                 skickad_x_var = "år", 
-                                 skickad_y_var = "sum_frukts_ar",
-                                 diagram_titel = diagram_titel,
-                                 diagram_capt = diag_capt,
-                                 #x_axis_storlek = 8,
-                                 stodlinjer_avrunda_fem = TRUE,
-                                 x_axis_visa_var_xe_etikett = visa_var_xte,
-                                 manual_x_axis_text_vjust = 1,
-                                 manual_x_axis_text_hjust = 1,
-                                 manual_y_axis_title = "",
-                                 diagram_facet = facet_diagram,
-                                 facet_grp = "region",
-                                 facet_scale = "fixed",
-                                 facet_x_axis_storlek = 6,
-                                 skriv_till_diagramfil = spara_figur,
-                                 manual_color = vald_farg[1],
-                                 output_mapp = output_mapp_figur,
-                                 filnamn_diagram = diagramfil)
-    
-    gg_list <- c(gg_list, list(gg_obj))
-    
-  }
-  
   # Diagram som visar jämförelse i länet
   if(diag_jmf_lan == TRUE){
     
     diagram_titel <- paste0("Summerad fruktsamhet per kvinna år ", max(sum_frukts_ar$år) %>% unique())
-    diagramfil <- paste0("summerad_fruktsamhet_ar_", max(sum_frukts_ar$år), "_", valt_lan, "_ar.png")
+    diagramfil <- paste0("jmf_summerad_fruktsamhet_ar_", max(sum_frukts_ar$år), "_", fokus_region_txt, "_ar.png")
     objektnamn <- c(objektnamn,diagramfil %>% str_remove(".png"))
     
     gg_obj <- SkapaStapelDiagram(skickad_df = sum_frukts_ar %>% 
@@ -163,6 +106,7 @@ diagram_fruktsamhet <- function(region_vekt = "20", # Val av kommun/län att fok
     
     
     gg_list <- c(gg_list, list(gg_obj))
+    names(gg_list) <- objektnamn
     
   }
   
@@ -170,7 +114,7 @@ diagram_fruktsamhet <- function(region_vekt = "20", # Val av kommun/län att fok
     
     diagram_titel <- paste0("Förändring av summerad fruktsamhet per kvinna mellan år ", min(sum_frukts_ar$år), " och ", max(sum_frukts_ar$år))
     diagram_titel <- str_wrap(diagram_titel, width = 50)
-    diagramfil <- paste0("forandring_summerad_fruktsamhet_ar_",min(sum_frukts_ar$år), "_", max(sum_frukts_ar$år), "_", valt_lan, "_ar.png")
+    diagramfil <- paste0("forandring_summerad_fruktsamhet_ar_",min(sum_frukts_ar$år), "_", max(sum_frukts_ar$år), "_", fokus_region_txt, "_ar.png")
     objektnamn <- c(objektnamn,diagramfil %>% str_remove(".png"))
     
     gg_obj <- SkapaStapelDiagram(skickad_df = sum_frukts_ar %>% 
@@ -199,10 +143,66 @@ diagram_fruktsamhet <- function(region_vekt = "20", # Val av kommun/län att fok
                                  filnamn_diagram = diagramfil)
     
     gg_list <- c(gg_list, list(gg_obj))
+    names(gg_list) <- objektnamn
     
   }
   
-  names(gg_list) <- objektnamn
+  # diagram med bara fokusregionen över tid
+  if(diag_fokus_tid == TRUE){
+    
+    
+    skapa_diagram <- function(df,vald_region){
+      vald_region_txt <- (hamtaregion_kod_namn(vald_region)$region %>% skapa_kortnamn_lan())[1]
+      
+      if(length(unique(df$region)) > 1){
+        vald_region_txt <- paste0(vald_region_txt,"_facet_")
+        diagram_titel <- paste0("Summerad fruktsamhet per kvinna")
+      }else{
+        diagram_titel <- paste0("Summerad fruktsamhet per kvinna i ", vald_region_txt)
+      }
+      
+      diagramfil <- paste0("summerad_fruktsamhet_", vald_region_txt, "_ar_", min(df$år), "_", max(df$år), ".png")
+      objektnamn_map <- c(objektnamn_map,diagramfil %>% str_remove(".png"))
+      
+      gg_obj <- SkapaStapelDiagram(skickad_df = df %>% 
+                                     filter(regionkod == vald_region), 
+                                   skickad_x_var = "år", 
+                                   skickad_y_var = "sum_frukts_ar",
+                                   diagram_titel = diagram_titel,
+                                   diagram_capt = diag_capt,
+                                   stodlinjer_avrunda_fem = TRUE,
+                                   x_axis_visa_var_xe_etikett = ifelse(length(unique(df$region)) > 1,8,visa_var_xte),
+                                   manual_x_axis_text_vjust = 1,
+                                   manual_x_axis_text_hjust = 1,
+                                   manual_y_axis_title = "",
+                                   diagram_facet = length(unique(df$region)) > 1,
+                                   facet_grp = "region",
+                                   facet_scale = "free",
+                                   facet_legend_bottom = TRUE,
+                                   skriv_till_diagramfil = spara_figur,
+                                   manual_color = vald_farg[1],
+                                   output_mapp = output_mapp_figur,
+                                   filnamn_diagram = diagramfil)
+      
+      gg_list_map <- c(gg_list_map, list(gg_obj))
+      names(gg_list_map) <- objektnamn_map
+      return(gg_list_map)
+    }
+    
+    if (diag_facet) {
+      diag <- skapa_diagram(sum_frukts_ar,region_vekt)
+      
+    } else {
+      diag <- map(region_vekt, ~ skapa_diagram(befolkning_df, .x)) %>% flatten()
+      
+    }
+    #diag <- map(region_vekt, ~ skapa_diagram(sum_frukts_ar, .x)) %>% flatten()
+    gg_list <- c(gg_list, diag)
+  }
+  
+  
+  
+  
   if(returnera_figur==TRUE){
     return(gg_list)
   }
