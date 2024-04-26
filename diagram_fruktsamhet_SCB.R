@@ -193,7 +193,7 @@ diagram_fruktsamhet <- function(region_vekt = hamtakommuner(), # Vilka kommuner 
       diag <- skapa_diagram(sum_frukts_ar,region_vekt)
       
     } else {
-      diag <- map(region_vekt, ~ skapa_diagram(befolkning_df, .x)) %>% flatten()
+      diag <- map(region_vekt, ~ skapa_diagram(sum_frukts_ar, .x)) %>% flatten()
       
     }
     #diag <- map(region_vekt, ~ skapa_diagram(sum_frukts_ar, .x)) %>% flatten()
