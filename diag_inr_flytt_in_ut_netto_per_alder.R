@@ -31,6 +31,7 @@ diag_inr_flytt_in_ut_netto_per_alder <- function(region_vekt = "20",
                                                          tid_koder = tid_koder,
                                                          cont_klartext = c("Inrikes inflyttningar", "Inrikes utflyttningar"))
   
+  # grupperar datasetet om man angett värde för gruppera_namn
   if (!is.na(gruppera_namn)){
     flytt_df <- flytt_df %>% 
       group_by(across(where(is.character))) %>% 
@@ -40,10 +41,6 @@ diag_inr_flytt_in_ut_netto_per_alder <- function(region_vekt = "20",
              regionkod = "gg")
   } 
 
-  
-  
-  
-  
   chart_df <- flytt_df %>% 
     filter(ålder != "totalt ålder") %>% 
     mutate(varde = ifelse(variabel == "Inrikes utflyttningar", varde*-1, varde),

@@ -1,5 +1,6 @@
 
-diag_utbniva_tidserie_och_lansjmfr <- function(region_vekt = c("00", "20"),
+diag_utbniva_tidserie_och_lansjmfr <- function(
+                                       region_vekt = c("00", "20"),
                                        output_mapp = "G:/Samhällsanalys/API/Fran_R/utskrift/",
                                        diagram_capt = "Källa: SCB:s öppna statistikdatabas.\nBearbetning: Samhällsanalys, Region Dalarna",
                                        skapa_fil = TRUE,
@@ -62,6 +63,7 @@ diag_utbniva_tidserie_och_lansjmfr <- function(region_vekt = c("00", "20"),
          pxweb)
   
   # Skript som behövs
+  source("https://raw.githubusercontent.com/Region-Dalarna/hamta_data/main/hamta_utbniva_SCB.R")
   source("https://raw.githubusercontent.com/Region-Dalarna/funktioner/main/func_SkapaDiagram.R", encoding = "utf-8", echo = FALSE)
   source("https://raw.githubusercontent.com/Region-Dalarna/funktioner/main/func_API.R", encoding = "utf-8", echo = FALSE)
   options(dplyr.summarise.inform = FALSE)
@@ -74,8 +76,6 @@ diag_utbniva_tidserie_och_lansjmfr <- function(region_vekt = c("00", "20"),
   
   region_txt <- region_vekt %>% paste0(., collapse = "_")
   
-  
-  
   if (length(valt_ar) > 1) print("Endast ett år kan skickas med i funktionen, bara första året i vektorn kommer att användas.")
   if (is.na(valt_ar[1])) valt_ar <- max(alla_giltiga_ar) else {
     valt_ar <- valt_ar[1]
@@ -83,23 +83,11 @@ diag_utbniva_tidserie_och_lansjmfr <- function(region_vekt = c("00", "20"),
   }
   
   # ========================================== Läser in data ============================================
-  # Skapa en lista med information som vi vill ha hem -- skapas lättast via pxweb_interactive()
-  pxweb_query_list <- 
-    list(Region = region_vekt,
-         Kon = "*",
-         Alder = c(as.character(25:64)),
-         UtbildningsNiva ="*",
-         ContentsCode = "*",
-         Tid = "*")
-  
-  # Download data 
-  px_data <- pxweb_get(url = tab_url, query = pxweb_query_list)
-  
-  # Convert to data.frame 
-  px_df <- as.data.frame(px_data) %>% 
-    bind_cols(as.data.frame(px_data, variable.value.type = "code") %>% 
-                select(regionkod = region)) %>% 
-    relocate(regionkod, .before = "region") 
+  px_df <- hamta_data_utbniva(region = region_vekt,
+                                kon_klartext = c("män","kvinnor"),
+                                alder = c(as.character(25:64)),
+                                utbildningsniva_klartext = "*",
+                                tid = "*")
   
   px_df_utskrift_kon <- px_df %>%
     filter(regionkod %in% region_vekt) %>% 
