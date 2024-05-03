@@ -35,7 +35,7 @@ diagram_arbetsmarknadsstatus <-function(region_vekt = hamtakommuner("20"), # Anv
   
   # Tar bara ut data för de variabler som skal vara med
   variabel <- c()
-  if(diag_sysselsattningsgrad==TRUE) variabel <- c(variabel,"sysselsattningsgrad")
+  if(diag_sysselsattningsgrad==TRUE) variabel <- c(variabel,"sysselsättningsgrad")
   if(diag_arbetslosthet==TRUE) variabel <- c(variabel,"arbetslöshet")
   if(diag_arbetskraftsdeltagande==TRUE) variabel <- c(variabel,"arbetskraftsdeltagande")
   
