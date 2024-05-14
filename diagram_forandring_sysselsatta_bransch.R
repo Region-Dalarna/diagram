@@ -31,8 +31,8 @@ diag_sysselsatta_forandring_bransch <- function(region_vekt = "20", # Region vi 
   list_data <- lst()
 
   # =============================================== API-uttag ===============================================
-
-  source("C:/Users/frkjon/Projekt/laget_i_Dalarna/Skript/hamta_sysselsatta_region_kon_sni2007_fodelseregion_tid_ArbStDoNMNN_scb.R")
+  
+  source("https://raw.githubusercontent.com/Region-Dalarna/hamta_data/main/hamta_sysselsatta_region_kon_sni2007_fodelseregion_tid_ArbStDoNMNN_scb.R")
   df <- hamta_sysselsatta_region_kon_sni2007_fodelseregion_tid_scb(region_vekt = region_vekt,
                                                                    kon_klartext = "totalt",
                                                                    fodelseregion_klartext = "totalt",
