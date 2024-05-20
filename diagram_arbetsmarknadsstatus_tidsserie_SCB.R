@@ -104,8 +104,9 @@ diagram_arbetsmarknadsstatus_tidsserie <-function(region_vekt = "20", # Max 1 re
       diagramfilnamn <- paste0("arbetslöshet_tidsserie_facet_",fodelseregion_klartext,"_",unique(arbetsmarknadsstatus_df$region),".png")
       objektnamn <- c(objektnamn,str_remove(diagramfilnamn,".png"))
       
-      gg_obj <- SkapaLinjeDiagram(skickad_df = arb_df %>% 
-                                    mutate(födelseregion = factor(födelseregion,levels = c("totalt","inrikes född","utrikes född"))),
+      gg_obj <- SkapaLinjeDiagram(skickad_df = arb_df %>%
+                                    filter(födelseregion != "totalt") %>% 
+                                      mutate(födelseregion = factor(födelseregion,levels = c("inrikes född","utrikes född"))),
                                   skickad_x_var = "manad_long", 
                                   skickad_y_var = "varde", 
                                   skickad_x_grupp = "ar",
