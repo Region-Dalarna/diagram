@@ -93,7 +93,11 @@ diagram_inflyttlan_utflyttlan <- function(output_mapp_figur= "G:/skript/jon/Figu
     rename("Antal_flyttar" = `Inrikes omflyttning mellan län `)
   
   if(returnera_data == TRUE){
-    assign("inflytt_utflytt_lan_df", inflytt_utflytt_df, envir = .GlobalEnv)
+    if(length(unique(inflytt_utflytt_df$Inflyttningslän)) == 1){
+    assign("inflytt_lan_df", inflytt_utflytt_df, envir = .GlobalEnv)
+    }else{
+      assign("utflytt_lan_df", inflytt_utflytt_df, envir = .GlobalEnv)
+    }
   }
   
   if(diag_senaste_ar == TRUE){
