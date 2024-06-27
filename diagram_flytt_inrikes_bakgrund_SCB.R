@@ -146,7 +146,7 @@ diag_inr_flyttnetto_inr_utr_fodda <- function(
     #ar_alla_kommuner_i_ett_lan(vald_regionkod)
     
     #diagram_titel <- paste0("Inrikes flyttnetto", diagtitel_txt)
-    diagramfil <- paste0("Flyttnetto_bakgrund", reg_txt %>% paste0(collapse = "_"), "_ar", min(df$år), "_", max(df$år), ".png")
+    diagramfil <- paste0("Flyttnetto_bakgrund", reg_txt %>% paste0(collapse = "_"),".png")
     
     gg_obj <- SkapaStapelDiagram(skickad_df = df, 
                                  skickad_x_var = "år", 
