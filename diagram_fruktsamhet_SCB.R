@@ -73,7 +73,7 @@ diagram_fruktsamhet <- function(region_vekt = hamtakommuner(), # Vilka kommuner 
   if(diag_jmf_lan == TRUE){
     
     diagram_titel <- paste0("Summerad fruktsamhet per kvinna år ", max(sum_frukts_ar$år) %>% unique())
-    diagramfil <- paste0("jmf_summerad_fruktsamhet", fokus_region_txt, "_ar.png")
+    diagramfil <- paste0("jmf_summerad_fruktsamhet_", fokus_region_txt, ".png")
     objektnamn <- c(objektnamn,diagramfil %>% str_remove(".png"))
     
     gg_obj <- SkapaStapelDiagram(skickad_df = sum_frukts_ar %>% 
@@ -108,7 +108,7 @@ diagram_fruktsamhet <- function(region_vekt = hamtakommuner(), # Vilka kommuner 
     
     diagram_titel <- paste0("Förändring av summerad fruktsamhet per kvinna mellan år ", min(sum_frukts_ar$år), " och ", max(sum_frukts_ar$år))
     diagram_titel <- str_wrap(diagram_titel, width = 50)
-    diagramfil <- paste0("forandring_summerad_fruktsamhet_", fokus_region_txt, "_ar.png")
+    diagramfil <- paste0("forandring_summerad_fruktsamhet_", fokus_region_txt, ".png")
     objektnamn <- c(objektnamn,diagramfil %>% str_remove(".png"))
     
     gg_obj <- SkapaStapelDiagram(skickad_df = sum_frukts_ar %>% 
