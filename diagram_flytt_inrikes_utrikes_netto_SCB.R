@@ -84,7 +84,7 @@ diagram_inr_utr_flytt <- function(region_vekt = "20", # Val av kommuner
       }
       
       #diagram_titel <- paste0("Flyttnetto i ", reg_txt)
-      diagramfil <- paste0("Flyttnetto_", reg_txt, "_ar_", min(df$år), "_", max(df$år), ".png")
+      diagramfil <- paste0("Flyttnetto_", reg_txt, ".png")
       #objektnamn <- c(objektnamn,diagramfil %>% str_remove(".png"))
       
       gg_obj <- SkapaStapelDiagram(skickad_df = df, 
@@ -139,7 +139,7 @@ diagram_inr_utr_flytt <- function(region_vekt = "20", # Val av kommuner
           diagram_titel <- paste0(vald_variabel," ", reg_txt)
         }
         
-        diagramfil <- paste0(vald_variabel, "_", reg_txt, "_ar_", min(df$år), "_", max(df$år), ".png")
+        diagramfil <- paste0(vald_variabel, "_", reg_txt,".png")
         objektnamn_uppdelat <- c(objektnamn_uppdelat,diagramfil %>% str_remove(".png"))
         
         gg_obj <- SkapaStapelDiagram(skickad_df = df %>% 
