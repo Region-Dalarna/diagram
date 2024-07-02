@@ -1,4 +1,4 @@
-diagram_fruktsamhet <- function(region_vekt = hamtakommuner(), # Vilka kommuner skall väljas. Default är alla kommuner i Dalarna. Bör var minst ett par stycken för att diag_jmf_lan och diag_forandring skall se vettiga ut
+diagram_fruktsamhet <- function(region_vekt = hamtakommuner("20"), # Vilka kommuner skall väljas. Default är alla kommuner i Dalarna. Bör var minst ett par stycken för att diag_jmf_lan och diag_forandring skall se vettiga ut
                                 fokus_region = "20", # Vilken region skall fokuseras på. Måste vara ett som finns i region_vekt
                                 output_mapp_figur= "G:/skript/jon/Figurer/", # Vart hamnar figur om den skall sparas
                                 vald_farg = diagramfarger("rus_sex"), # Vilken färgvektor vill man ha. Blir alltid "kon" när man väljer det diagrammet
@@ -148,7 +148,7 @@ diagram_fruktsamhet <- function(region_vekt = hamtakommuner(), # Vilka kommuner 
     skapa_diagram <- function(df,vald_region){
       vald_region_txt <- (hamtaregion_kod_namn(vald_region)$region %>% skapa_kortnamn_lan())[1]
       
-      if(length(unique(df$region)) > 1){
+      if(length(vald_region) > 1){
         vald_region_txt <- paste0(vald_region_txt,"_facet")
         diagram_titel <- paste0("Summerad fruktsamhet per kvinna")
       }else{
@@ -165,11 +165,11 @@ diagram_fruktsamhet <- function(region_vekt = hamtakommuner(), # Vilka kommuner 
                                    diagram_titel = diagram_titel,
                                    diagram_capt = diag_capt,
                                    stodlinjer_avrunda_fem = TRUE,
-                                   x_axis_visa_var_xe_etikett = ifelse(length(unique(df$region)) > 1,8,visa_var_xte),
+                                   x_axis_visa_var_xe_etikett = ifelse(length(vald_region) > 1,8,visa_var_xte),
                                    manual_x_axis_text_vjust = 1,
                                    manual_x_axis_text_hjust = 1,
                                    manual_y_axis_title = "",
-                                   diagram_facet = length(unique(df$region)) > 1,
+                                   diagram_facet = length(vald_region) > 1,
                                    facet_grp = "region",
                                    facet_scale = facet_skala,
                                    facet_legend_bottom = TRUE,
