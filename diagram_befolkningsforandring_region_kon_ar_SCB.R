@@ -17,6 +17,7 @@ diagram_befolkningsforandring_ar <- function(region_vekt = "20", # Val av kommun
   # Uppdelning på kön är möjlig
   # Skapad: 2024-04-23
   # Förbättringsmöjligheter: Går för tillfället inte att summera  flera regioner
+  # Uppdaterat så att ggplot-objekten inte innehåller år i sina namn (för att undvika problem i rapporter). /Jon
   # ===========================================================================================================
   
   
@@ -56,7 +57,8 @@ diagram_befolkningsforandring_ar <- function(region_vekt = "20", # Val av kommun
         diagram_titel <- paste0("Folkmängd i ", reg_txt)
       }
 
-      diagramfil <- paste0("Folkmangd_", reg_txt, "_ar_", min(ut_df$år), "_", max(ut_df$år), ".png")
+      #diagramfil <- paste0("Folkmangd_", reg_txt, "_ar_", min(ut_df$år), "_", max(ut_df$år), ".png")
+      diagramfil <- paste0("Folkmangd_", reg_txt, ".png")
       objektnamn <- c(objektnamn,diagramfil %>% str_remove(".png"))
       
       if(length(kon_klartext)>1){
@@ -110,7 +112,8 @@ diagram_befolkningsforandring_ar <- function(region_vekt = "20", # Val av kommun
       }
       
       
-      diagramfil <- paste0("Befolkningsutveckling_", reg_txt, "_ar_", min(ut_df$år), "_", max(ut_df$år), ".png")
+      #diagramfil <- paste0("Befolkningsutveckling_", reg_txt, "_ar_", min(ut_df$år), "_", max(ut_df$år), ".png")
+      diagramfil <- paste0("Befolkningsutveckling_", reg_txt, ".png")
       objektnamn <- c(objektnamn,diagramfil %>% str_remove(".png"))
       
       if(length(kon_klartext)>1) vald_farg = diagramfarger("kon")

@@ -81,7 +81,7 @@ diagram_inrikes_flytt_alder <- function(region_vekt = "20", # Val av kommuner
         diagram_titel <- paste0("Inrikes flyttnetto i ", reg_txt)
       }
       
-      diagramfil <- paste0("Inrikes_flyttnetto_alder_", reg_txt, "_ar_", min(valda_ar), "_", max(valda_ar), ".png")
+      diagramfil <- paste0("Inrikes_flyttnetto_alder_", reg_txt,".png")
       objektnamn <- c(objektnamn,diagramfil %>% str_remove(".png"))
       
       gg_obj <- SkapaStapelDiagram(skickad_df = df %>% 
@@ -125,7 +125,7 @@ diagram_inrikes_flytt_alder <- function(region_vekt = "20", # Val av kommuner
         diagram_titel <- paste0("Inrikes flyttnetto (",alder_grupp_fokus ,") i ", reg_txt)
       }
       
-      diagramfil <- paste0("Inrikes flyttnetto_alder_", reg_txt, "_ar_", min(df$år), "_", max(df$år), ".png")
+      diagramfil <- paste0("Inrikes flyttnetto_alder_",alder_grupp_fokus,"_", reg_txt,".png")
       objektnamn <- c(objektnamn,diagramfil %>% str_remove(".png"))
       
       gg_obj <- SkapaStapelDiagram(skickad_df = df %>% 
