@@ -6,6 +6,7 @@ diagram_inr_utr_flytt <- function(region_vekt = "20", # Val av kommuner
                                   diag_facet = FALSE, # Sätts till TRUE om man istället vill ha ett facet-diagram
                                   diag_flyttnetto = TRUE, # Skapa diagram för flyttnetto
                                   diag_uppdelat = TRUE, # Skapa diagram för flyttnetto uppdelat
+                                  demo = FALSE,                                     # sätts till TRUE om man bara vill se ett exempel på diagrammet i webbläsaren och inget annat    visa_totalvarden = TRUE,                          # skriver ut ett streck för netto både inrikes och utrikes födda
                                   returnera_figur = TRUE, # Om man vill att figuren skall returneras från funktionen
                                   returnera_data = FALSE # True om användaren vill returnera data från funktionen
 ){
@@ -15,6 +16,20 @@ diagram_inr_utr_flytt <- function(region_vekt = "20", # Val av kommuner
   # Skapad: 2024-04-24
   # Förbättringsmöjligheter: Går för tillfället inte att summera  flera regioner
   # ===========================================================================================================
+  
+  # om parametern demo är satt till TRUE så öppnas en flik i webbläsaren med ett exempel på hur diagrammet ser ut och därefter avslutas funktionen
+  # demofilen måste läggas upp på 
+  if (demo){
+    # om diagramskriptet skriver ut flera diagram läggs länkarna som vektor i demo_url nedan
+    demo_url <- 
+        c("https://region-dalarna.github.io/utskrivna_diagram/Flyttnetto_Dalarna.png",
+          "https://region-dalarna.github.io/utskrivna_diagram/Inrikes%20flyttningsöverskott_Dalarna.png",
+          "https://region-dalarna.github.io/utskrivna_diagram/invandringsöverskott_Dalarna.png")
+          
+    walk(demo_url, ~browseURL(.x))
+    if (length(demo_url) > 1) cat(paste0(length(demo_url), " diagram har öppnats i webbläsaren."))
+    stop_tyst()
+  }
   
   if(diag_uppdelat == TRUE && "00" %in% region_vekt){
     stop("Region 00 (Riket) saknar inrikes flyttnetto och kan inte användas.\nÄndra region_vekt eller sätt diag_uppdelat = FALSE")

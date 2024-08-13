@@ -9,7 +9,8 @@ diag_inr_flyttnetto_inr_utr_fodda <- function(
     skriv_excel = FALSE,                              # TRUE om vi vill skriva ut data till excel
     returnera_data = FALSE,                           # TRUE om vi vill returnera data till R:s globala miljö 
     spara_som_svg = FALSE,                            # TRUE om vi vill spara diagrammet som svg
-    visa_totalvarden = TRUE,                          # skriver ut ett streck för netto både inrikes och utrikes födda
+    fixa_y_axel_varden_jamna_tal = TRUE,              # TRUE om vi vill ha vettigare värden på y-axeln, men funkar inte alltid och då kan man stänga av detta.
+    demo = FALSE,                                     # sätts till TRUE om man bara vill se ett exempel på diagrammet i webbläsaren och inget annat    visa_totalvarden = TRUE,                          # skriver ut ett streck för netto både inrikes och utrikes födda
     visa_totalvarden_dataetiketter = FALSE,           # skriver ut dataetiketter för totalvärdena
     totalvarden_dataetiketter_farg = "black",         # välj färg på totalstrecken
     totalvarden_dataetiketter_hjust = 20,             # justerar dataetiketter för totalvärden i höjdled
@@ -23,6 +24,15 @@ diag_inr_flyttnetto_inr_utr_fodda <- function(
   # Senast uppdaterad: 2024-04-25
   # Förbättringsmöjligheter: Går för tillfället inte att summera  flera regioner
   # ===========================================================================================================
+  
+  # om parametern demo är satt till TRUE så öppnas en flik i webbläsaren med ett exempel på hur diagrammet ser ut och därefter avslutas funktionen
+  # demofilen måste läggas upp på 
+  if (demo){
+    demo_url <- 
+        "https://region-dalarna.github.io/utskrivna_diagram/Flyttnetto_bakgrund_Dalarna.png"
+    browseURL(demo_url)
+    stop_tyst()
+  }
   
   if("00" %in% region_vekt){
     stop("Region 00 (Riket) saknar inrikes flyttnetto och kan inte användas.\nÄndra region_vekt")
@@ -146,7 +156,7 @@ diag_inr_flyttnetto_inr_utr_fodda <- function(
     #ar_alla_kommuner_i_ett_lan(vald_regionkod)
     
     #diagram_titel <- paste0("Inrikes flyttnetto", diagtitel_txt)
-    diagramfil <- paste0("Flyttnetto_bakgrund", reg_txt %>% paste0(collapse = "_"),".png")
+    diagramfil <- paste0("Flyttnetto_bakgrund_", reg_txt %>% paste0(collapse = "_"),".png")
     
     gg_obj <- SkapaStapelDiagram(skickad_df = df, 
                                  skickad_x_var = "år", 
@@ -154,7 +164,7 @@ diag_inr_flyttnetto_inr_utr_fodda <- function(
                                  skickad_x_grupp = "födelseregion",
                                  diagram_titel = diagram_titel,
                                  diagram_capt = diagram_capt,
-                                 stodlinjer_avrunda_fem = FALSE,
+                                 stodlinjer_avrunda_fem = fixa_y_axel_varden_jamna_tal,
                                  manual_x_axis_text_vjust = 1,
                                  manual_x_axis_text_hjust = 1,
                                  manual_y_axis_title = "",

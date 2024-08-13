@@ -9,6 +9,7 @@ diag_inr_flytt_in_ut_netto_per_alder <- function(region_vekt = "20",
                                      kon_klartext = NA,
                                      visa_flyttnetto_linje = TRUE,
                                      skriv_diagramfil = TRUE,
+                                     demo = FALSE,                    # sätts till TRUE om man bara vill se ett exempel på diagrammet i webbläsaren och inget annat
                                      alder_koder = "*",
                                      tid_koder = "9999"){
 
@@ -21,6 +22,15 @@ diag_inr_flytt_in_ut_netto_per_alder <- function(region_vekt = "20",
   # Länk till SCB-tabell där data hämtas: https://www.statistikdatabasen.scb.se/pxweb/sv/ssd/START__BE__BE0701/LivslUtbLan/
   #
   # =======================================================================================================================
+  
+  # om parametern demo är satt till TRUE så öppnas en flik i webbläsaren med ett exempel på hur diagrammet ser ut och därefter avslutas funktionen
+  # demofilen måste läggas upp på webben för att kunna öppnas, vi lägger den på Region Dalarnas github-repo som heter utskrivna_diagram
+  if (demo){
+    demo_url <- 
+      "https://region-dalarna.github.io/utskrivna_diagram/in_utflyttning_Dalarnas%20l%C3%A4n_ar_2023.png"
+    browseURL(demo_url)
+    stop_tyst()
+  } 
   
   if (!require("pacman")) install.packages("pacman")
   p_load(tidyverse,

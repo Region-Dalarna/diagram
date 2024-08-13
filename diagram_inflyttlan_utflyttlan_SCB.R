@@ -8,6 +8,7 @@ diagram_inflyttlan_utflyttlan <- function(output_mapp_figur= "G:/skript/jon/Figu
                                           diag_senaste_ar = TRUE, # Skapar ett diagram för antingen in eller utflytt från ett län till alla andra valda län. Enbart senaste valda år
                                           diag_flera_ar = FALSE, # Skapar ett diagram per vald destination (in- eller utflyttningslan). Enbart intressant om flera år väljs
                                           diag_facet = FALSE, # Sätts till TRUE om man istället vill ha diag_flera_ar som ett facet-diagram
+                                          demo = FALSE,                                     # sätts till TRUE om man bara vill se ett exempel på diagrammet i webbläsaren och inget annat
                                           returnera_figur = TRUE, # Om man vill att figuren skall returneras från funktionen
                                           returnera_data = FALSE # True om användaren vill returnera data från funktionen
 ){
@@ -16,6 +17,19 @@ diagram_inflyttlan_utflyttlan <- function(output_mapp_figur= "G:/skript/jon/Figu
   # Stapeldiagram för inflyttningslan respektive utflyttningslan (i antal).Går att få för senaste år (1 diagram) eller över tid (flera diagram eller facet).
   # Skapad: 2024-06-25 av Jon
   # ===========================================================================================================
+  
+  # om parametern demo är satt till TRUE så öppnas en flik i webbläsaren med ett exempel på hur diagrammet ser ut och därefter avslutas funktionen
+  # demofilen måste läggas upp på 
+  if (demo){
+    # om diagramskriptet skriver ut flera diagram läggs länkarna som vektor i demo_url nedan
+    demo_url <- 
+        c("https://region-dalarna.github.io/utskrivna_diagram/Flytt_fran_Dalarna.png",
+          "https://region-dalarna.github.io/utskrivna_diagram/Flytt_fran_Dalarna_facet.png")
+    walk(demo_url, ~browseURL(.x))
+    if (length(demo_url) > 1) cat(paste0(length(demo_url), " diagram har öppnats i webbläsaren."))
+    stop_tyst()
+  }
+  
   
   if(length(inflyttningsl_klartext) > 1 && length(utflyttningsl_klartext) >1 ){
     stop("Max 1 län får väljas för antingen inflyttningsl_klartext eller utflyttningsl_klartext")
@@ -43,59 +57,16 @@ diagram_inflyttlan_utflyttlan <- function(output_mapp_figur= "G:/skript/jon/Figu
                                                                          returnera_df = TRUE)
   
   # Byter dåliga namn på regioner till bättre
-  inflytt_utflytt_df <- inflytt_utflytt_df %>% 
-    mutate(Inflyttningslän = case_when(
-      Inflyttningslän == " Stockholms län (Inflyttningslän)" ~ "Stockholm",
-      Inflyttningslän == " Uppsala län (Inflyttningslän)" ~ "Uppsala",
-      Inflyttningslän == " Södermanlands län (Inflyttningslän)" ~ "Södermanland",
-      Inflyttningslän == " Östergötlands län (Inflyttningslän)" ~ "Östergötland",
-      Inflyttningslän == " Jönköpings län (Inflyttningslän)" ~ "Jönköping",
-      Inflyttningslän == " Kronobergs län (Inflyttningslän)" ~ "Kronoberg",
-      Inflyttningslän == " Kalmar län (Inflyttningslän)" ~ "Kalmar",
-      Inflyttningslän == " Gotlands län (Inflyttningslän)" ~ "Gotland",
-      Inflyttningslän == " Blekinge län (Inflyttningslän)" ~ "Blekinge",
-      Inflyttningslän == " Skåne län (Inflyttningslän)" ~ "Skåne",
-      Inflyttningslän == " Hallands län (Inflyttningslän)" ~ "Halland",
-      Inflyttningslän == " Västra Götalands län (Inflyttningslän)" ~ "Västra Götaland",
-      Inflyttningslän == " Värmlands län (Inflyttningslän)" ~ "Värmland",
-      Inflyttningslän == " Örebro län (Inflyttningslän)" ~ "Örebro",
-      Inflyttningslän == " Västmanlands län (Inflyttningslän)" ~ "Västmanland",
-      Inflyttningslän == " Dalarnas län (Inflyttningslän)" ~ "Dalarna",
-      Inflyttningslän == " Gävleborgs län (Inflyttningslän)" ~ "Gävleborg",
-      Inflyttningslän == " Västernorrlands län (Inflyttningslän)" ~ "Västernorrland",
-      Inflyttningslän == " Jämtlands län (Inflyttningslän)" ~ "Jämtland",
-      Inflyttningslän == " Västerbottens län (Inflyttningslän)" ~ "Västerbotten",
-      Inflyttningslän == " Norrbottens län (Inflyttningslän)" ~ "Norrbotten"
-    )) %>% 
-    mutate(Utflyttningslän = case_when(
-      Utflyttningslän == " Stockholms län (Utflyttningslän)" ~ "Stockholm",
-      Utflyttningslän == " Uppsala län (Utflyttningslän)" ~ "Uppsala",
-      Utflyttningslän == " Södermanlands län (Utflyttningslän)" ~ "Södermanland",
-      Utflyttningslän == " Östergötlands län (Utflyttningslän)" ~ "Östergötland",
-      Utflyttningslän == " Jönköpings län (Utflyttningslän)" ~ "Jönköping",
-      Utflyttningslän == " Kronobergs län (Utflyttningslän)" ~ "Kronoberg",
-      Utflyttningslän == " Kalmar län (Utflyttningslän)" ~ "Kalmar",
-      Utflyttningslän == " Gotlands län (Utflyttningslän)" ~ "Gotland",
-      Utflyttningslän == " Blekinge län (Utflyttningslän)" ~ "Blekinge",
-      Utflyttningslän == " Skåne län (Utflyttningslän)" ~ "Skåne",
-      Utflyttningslän == " Hallands län (Utflyttningslän)" ~ "Halland",
-      Utflyttningslän == " Västra Götalands län (Utflyttningslän)" ~ "Västra Götaland",
-      Utflyttningslän == " Värmlands län (Utflyttningslän)" ~ "Värmland",
-      Utflyttningslän == " Örebro län (Utflyttningslän)" ~ "Örebro",
-      Utflyttningslän == " Västmanlands län (Utflyttningslän)" ~ "Västmanland",
-      Utflyttningslän == " Dalarnas län (Utflyttningslän)" ~ "Dalarna",
-      Utflyttningslän == " Gävleborgs län (Utflyttningslän)" ~ "Gävleborg",
-      Utflyttningslän == " Västernorrlands län (Utflyttningslän)" ~ "Västernorrland",
-      Utflyttningslän == " Jämtlands län (Utflyttningslän)" ~ "Jämtland",
-      Utflyttningslän == " Västerbottens län (Utflyttningslän)" ~ "Västerbotten",
-      Utflyttningslän == " Norrbottens län (Utflyttningslän)" ~ "Norrbotten"
-    )) %>% 
+  inflytt_utflytt_df <- inflytt_utflytt_df %>%
+    mutate(Inflyttningslän = Inflyttningslän %>% str_remove("\\(Inflyttningslän\\)") %>% str_trim() %>% skapa_kortnamn_lan(),
+           Utflyttningslän = Utflyttningslän %>% str_remove("\\(Utflyttningslän\\)") %>% str_trim() %>% skapa_kortnamn_lan()) %>% 
     rename("Antal_flyttar" = `Inrikes omflyttning mellan län `)
+
   
   if(returnera_data == TRUE){
     if(length(unique(inflytt_utflytt_df$Inflyttningslän)) == 1){
     assign("inflytt_lan_df", inflytt_utflytt_df, envir = .GlobalEnv)
-    }else{
+    } else {
       assign("utflytt_lan_df", inflytt_utflytt_df, envir = .GlobalEnv)
     }
   }
@@ -108,7 +79,7 @@ diagram_inflyttlan_utflyttlan <- function(output_mapp_figur= "G:/skript/jon/Figu
       objektnamn <- c(objektnamn,diagramfil %>% str_remove(".png"))
       ut_df <- inflytt_utflytt_df %>% 
         filter(Utflyttningslän != unique(inflytt_utflytt_df$Inflyttningslän))
-    }else{
+    } else {
       diagram_titel<- paste0("Antal flyttar från ",unique(inflytt_utflytt_df$Utflyttningslän)," år ",max(inflytt_utflytt_df$år))
       diagramfil <- paste0("Flytt_fran_",unique(inflytt_utflytt_df$Utflyttningslän),".png")
       objektnamn <- c(objektnamn,diagramfil %>% str_remove(".png"))
