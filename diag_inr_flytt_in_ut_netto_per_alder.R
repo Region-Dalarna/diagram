@@ -1,7 +1,5 @@
 
 
-
-
 diag_inr_flytt_in_ut_netto_per_alder <- function(region_vekt = "20",
                                      gruppera_namn = NA,
                                      ta_med_logga = TRUE,
@@ -14,6 +12,16 @@ diag_inr_flytt_in_ut_netto_per_alder <- function(region_vekt = "20",
                                      alder_koder = "*",
                                      tid_koder = "9999"){
 
+  # =======================================================================================================================
+  #
+  # Hämta hem data med funktionen hamta_bef_flyttningar_region_alder_kon_scb och skriv ut ett diagram. Defaultinställning är
+  # att visa en flyttnettolinje. Diagrammet liknar en Det finns fler innehålls-
+  # variabler, vilka primärt används för att beräkna dödsrisker och återstående medellivslängd.
+  #
+  # Länk till SCB-tabell där data hämtas: https://www.statistikdatabasen.scb.se/pxweb/sv/ssd/START__BE__BE0701/LivslUtbLan/
+  #
+  # =======================================================================================================================
+  
   if (!require("pacman")) install.packages("pacman")
   p_load(tidyverse,
          glue)
@@ -22,14 +30,23 @@ diag_inr_flytt_in_ut_netto_per_alder <- function(region_vekt = "20",
   source("https://raw.githubusercontent.com/Region-Dalarna/funktioner/main/func_SkapaDiagram.R")
   source("https://raw.githubusercontent.com/Region-Dalarna/hamta_data/main/hamta_bef_flyttningar_region_alder_kon_scb.R")
   
-  if(is.na(farg_vektor) & exists("diagramfarger")) farg_vektor <- diagramfarger("rus_sex")
-  
+  if(all(is.na(farg_vektor)) & exists("diagramfarger")) farg_vektor <- diagramfarger("rus_sex")
   
   flytt_df <- hamta_bef_flyttningar_region_alder_kon_scb(region_vekt = region_vekt,
                                                          kon_klartext = kon_klartext,
                                                          alder_koder = alder_koder,
                                                          tid_koder = tid_koder,
                                                          cont_klartext = c("Inrikes inflyttningar", "Inrikes utflyttningar"))
+  
+  # kolla om kön är med som variabel
+  kon_txt <- if (!is.na(kon_klartext)) "_kon" else ""
+  
+  # välj ut variabler till gruppering av netto-datasetet, dvs. med eller utan kön
+  if (!is.na(kon_klartext)) {
+    netto_grp_var <- c("år", "regionkod", "region", "alder_num", "kön", "ålder")
+  } else {
+    netto_grp_var <- c("år", "regionkod", "region", "alder_num", "ålder")
+  }
   
   # grupperar datasetet om man angett värde för gruppera_namn
   if (!is.na(gruppera_namn)){
@@ -49,7 +66,7 @@ diag_inr_flytt_in_ut_netto_per_alder <- function(region_vekt = "20",
     mutate(ålder = factor(ålder, levels = unique(ålder)))
            
   netto_df <- chart_df %>% 
-    group_by(år, regionkod, region, alder_num, ålder) %>% 
+    group_by(across(any_of(netto_grp_var))) %>% 
     summarise(varde = sum(varde[variabel == "Inrikes inflyttningar"]) + sum(varde[variabel == "Inrikes utflyttningar"])) %>% 
     ungroup() %>% 
     mutate(variabel = "Netto")
@@ -62,7 +79,7 @@ diag_inr_flytt_in_ut_netto_per_alder <- function(region_vekt = "20",
   
   diagram_capt <- "Källa: Befolkningsstatistik, SCB:s öppna statistikdatabas\nBearbetning av Samhällsanalys, Region Dalarna"
   diagram_titel <- glue("In- och utflyttning i {unique(chart_df$region)} år {unique(chart_df$år)}")
-  diagram_filnamn <- glue("in_utflyttning_{unique(chart_df$region)}_ar_{unique(chart_df$år)}.png")
+  diagram_filnamn <- glue("in_utflyttning_{unique(chart_df$region)}_ar_{unique(chart_df$år)}{kon_txt}.png")
   
   gg_obj <- SkapaStapelDiagram(skickad_df = chart_df,
                                skickad_x_var = "ålder",
@@ -78,6 +95,9 @@ diag_inr_flytt_in_ut_netto_per_alder <- function(region_vekt = "20",
                                manual_y_axis_title = "Antal in- och utflyttade",
                                diagram_titel = diagram_titel,
                                diagram_capt = diagram_capt,
+                               diagram_facet = if (!is.na(kon_klartext)) TRUE else FALSE,
+                               facet_grp = if (!is.na(kon_klartext)) "kön" else NA,
+                               facet_legend_bottom = TRUE,
                                skriv_till_diagramfil = FALSE,
                                filnamn_diagram = diagram_filnamn,
                                output_mapp = utskriftsmapp()
@@ -102,6 +122,4 @@ diag_inr_flytt_in_ut_netto_per_alder <- function(region_vekt = "20",
   # skriver ut diagramfilen om det är valt
   if (skriv_diagramfil) skriv_till_diagramfil(gg_obj, output_mapp = utskriftsmapp(), filnamn_diagram = diagram_filnamn)
  
-  
-   
-}
+}  # slut funktion
