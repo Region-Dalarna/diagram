@@ -11,6 +11,7 @@ diagram_fruktsamhet <- function(region_vekt = hamtakommuner("20"), # Vilka kommu
                                 facet_skala = "free", # Finns free (varje diagram får en egen y-axel) eller fixed (alla diagram delar y-axel)
                                 diag_jmf_lan = TRUE, # Skapa diagram för jämförelse mellan valda regioner
                                 diag_forandring = TRUE, # Skapa diagram för förändring mellan första och sista år för valda regioner
+                                demo = FALSE,             # sätts till TRUE om man bara vill se ett exempel på diagrammet i webbläsaren och inget annat
                                 returnera_figur = TRUE, # Om man vill att figuren skall returneras från funktionen
                                 returnera_data = FALSE){ # True om användaren vill returnera data från funktionen
   
@@ -24,6 +25,18 @@ diagram_fruktsamhet <- function(region_vekt = hamtakommuner("20"), # Vilka kommu
   # ===========================================================================================================
   
   
+# om parametern demo är satt till TRUE så öppnas en flik i webbläsaren med ett exempel på hur diagrammet ser ut och därefter avslutas funktionen
+# demofilen måste läggas upp på webben för att kunna öppnas, vi lägger den på Region Dalarnas github-repo som heter utskrivna_diagram
+if (demo){
+  demo_url <- 
+c("https://region-dalarna.github.io/utskrivna_diagram/forandring_summerad_fruktsamhet_Dalarna.png",
+"https://region-dalarna.github.io/utskrivna_diagram/jmf_summerad_fruktsamhet_Dalarna.png",
+"https://region-dalarna.github.io/utskrivna_diagram/summerad_fruktsamhet_Riket_facet.png")
+  walk(demo_url, ~browseURL(.x))
+  if (length(demo_url) > 1) cat(paste0(length(demo_url), " diagram har öppnats i webbläsaren."))
+  stop_tyst()
+}
+
   source("https://raw.githubusercontent.com/Region-Dalarna/funktioner/main/func_API.R", encoding = "utf-8", echo = FALSE)
   source("https://raw.githubusercontent.com/Region-Dalarna/hamta_data/main/hamta_fodda_moderns_alder_region_scb.R")
   source("https://raw.githubusercontent.com/Region-Dalarna/hamta_data/main/hamta_bef_folkmangd_alder_kon_ar_scb.R")

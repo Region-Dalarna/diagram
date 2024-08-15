@@ -9,6 +9,7 @@ diag_befolkningsforandring_manad_scb <- function(region_vekt = "20",
                                                  kon_klartext = "totalt",
                                                  tid_koder = "*",
                                                  nth_etikett = 3,
+                                                 skriv_diagramfil = TRUE,
                                                  utmapp = utskriftsmapp(),
                                                  diagram_capt = "Källa: SCB:s öppna statistikdatabas\nBearbetning: Samhällsanalys, Region Dalarna"
                                                  ) {
@@ -83,7 +84,7 @@ diag_befolkningsforandring_manad_scb <- function(region_vekt = "20",
                                  facet_legend_bottom = if (konsuppdelat) TRUE,
                                  logga_scaling = 20,
                                  #logga_path = logga_path,
-                                 #skriv_till_diagramfil = skriv_diagam_val,
+                                 skriv_till_diagramfil = skriv_diagramfil,
                                  #skriv_till_excelfil = skriv_excelfil_val,
                                  output_mapp = utmapp,
                                  filnamn_diagram = diagramfil)

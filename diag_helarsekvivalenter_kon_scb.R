@@ -17,6 +17,7 @@ diag_helarsekvivalenter <- function(
     ta_med_logga = TRUE,
     logga_sokvag = NA,
     output_mapp = NA,
+    skriv_diagramfil = TRUE,
     excelfil_mapp = NA,			# anges om man vill exportera en excelfil med uttaget, den mapp man vill spara excelfilen till
     excel_filnamn = "helarsekvivalenter.xlsx",			# filnamn för excelfil som exporteras om excel_filnamn och output_mapp anges
 ) {
@@ -143,7 +144,8 @@ diag_helarsekvivalenter <- function(
     			 logga_path = logga_sokvag,
     			 facet_grp = "region",
     			 facet_scale = "free",
-    			 facet_legend_bottom = TRUE
+    			 facet_legend_bottom = TRUE,
+    			 skriv_till_diagramfil = skriv_diagramfil
     )
     
     gg_list <- c(gg_list, list(gg_obj))

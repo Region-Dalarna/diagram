@@ -4,7 +4,9 @@
 
 diag_ekonomiska_prognoser_olika_progn_institut_ki <- function(vald_variabel = "BNP",                  # finns: "BNP", "Hushållens konsumtion", "Offentlig konsumtion", "Fasta bruttoinvesteringar", "Lagerinvesteringar., förändr. i proc. av BNP föreg. år", "Export", "Import", "Antal sysselsatta, 15-74 år (AKU)", "Arbetslöshet, procent av arbetskraften, 15-74 år (AKU)", "Timlön, totalt (konjunkturlönestatistiken)", "Konsumentprisindex (KPI), årsgenomsnitt", "KPI med fast bostadsränta (KPIF), årsgenomsnitt", "Real disponibel inkomst (nationalräkenskaperna)", "Styrränta, vid årets slut, procent**", "Offentligt finansiellt sparande, procent av BNP", "Bytesbalans, procent av BNP (nationalräkenskaperna)", "Timlön, näringslivet (konjunkturlönestatistiken)"
                                                               valda_prognos_ar = NA,                  # NA eller "*" = alla år
-                                                              endast_mest_aktuell_prognos = TRUE      # TRUE om man bara vill ha den mest aktuella prognosen varje år, annars kommer alla prognoser som institut har gjort för prognosåret med i datasetet
+                                                              endast_mest_aktuell_prognos = TRUE,      # TRUE om man bara vill ha den mest aktuella prognosen varje år, annars kommer alla prognoser som institut har gjort för prognosåret med i datasetet
+                                                              output_mapp = utskriftsmapp(),
+                                                              skriv_diagramfil = TRUE
                                                               ) { 
   
   if (!require("pacman")) install.packages("pacman")
@@ -44,7 +46,8 @@ diag_ekonomiska_prognoser_olika_progn_institut_ki <- function(vald_variabel = "B
                                facet_grp = "prognos_ar",
                                facet_scale = "free_x",
                                manual_color = diagramfarger("rus_sex")[1],
-                               output_mapp = utskriftsmapp(),
+                               output_mapp = output_mapp,
+                               skriv_till_diagramfil = skriv_diagramfil,
                                filnamn_diagram = diagramfil)
   
   gg_list <- c(gg_list, list(gg_obj))
