@@ -15,6 +15,7 @@ diag_pendling_over_kommungrans <- function(vald_kommun = "20", # Länsnamn ger s
                                            output_mapp_figur = "G:/Samhällsanalys/API/Fran_R/Utskrift/", # Hit sparas figuren
                                            output_mapp_data = NA, # Hit sparas data
                                            spara_data = FALSE, # Skall data sparas
+                                           demo = FALSE,             # sätts till TRUE om man bara vill se ett exempel på diagrammet i webbläsaren och inget annat
                                            filnamn_data = "pendling.xlsx",
                                            returnera_data = TRUE) {# Filnamn för sparad data
   
@@ -26,6 +27,17 @@ diag_pendling_over_kommungrans <- function(vald_kommun = "20", # Länsnamn ger s
   # Senast uppdaterad: Jon, 2023-12-20
   # ===========================================================================================================
   
+# om parametern demo är satt till TRUE så öppnas en flik i webbläsaren med ett exempel på hur diagrammet ser ut och därefter avslutas funktionen
+# demofilen måste läggas upp på webben för att kunna öppnas, vi lägger den på Region Dalarnas github-repo som heter utskrivna_diagram
+if (demo){
+  demo_url <- 
+c("https://region-dalarna.github.io/utskrivna_diagram/in_utpendling_Dalarna2021.png",
+"https://region-dalarna.github.io/utskrivna_diagram/in_utpendling_procent_Dalarna2021.png")
+  walk(demo_url, ~browseURL(.x))
+  if (length(demo_url) > 1) cat(paste0(length(demo_url), " diagram har öppnats i webbläsaren."))
+  stop_tyst()
+}
+
   if (!require("pacman")) install.packages("pacman")
   p_load(pxweb,
          httr,
