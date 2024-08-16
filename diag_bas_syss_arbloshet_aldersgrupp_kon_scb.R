@@ -1,6 +1,6 @@
 
 diag_bas_syss_arbloshet_aldersgrupp_kon_scb <- function(
-    vald_region = "2061",
+    vald_region = "20",
     vald_alder = c("16-19 år", "20-24 år", "25-29 år", "30-34 år", "35-39 år", "40-44 år", 
                    "45-49 år", "50-54 år", "55-59 år", "60-64 år", "65-69 år", "70-74 år"),
     vald_cont = c("arbetslöshet", "sysselsättningsgrad"),
