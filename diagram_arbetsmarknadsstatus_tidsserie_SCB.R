@@ -111,6 +111,7 @@ diagram_arbetsmarknadsstatus_tidsserie <-function(region_vekt = "20", # Max 1 re
                                   skickad_y_var = "varde", 
                                   skickad_x_grupp = "ar",
                                   diagram_facet = TRUE,
+                                  facet_scale = "free",
                                   facet_grp = "födelseregion",
                                   facet_legend_bottom = TRUE,
                                   manual_color = valda_farger,

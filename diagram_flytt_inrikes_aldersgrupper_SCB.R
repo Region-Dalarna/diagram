@@ -9,7 +9,8 @@ diagram_inrikes_flytt_alder <- function(region_vekt = "20", # Val av kommuner
                                         diag_facet = FALSE, # Skall diagrammet göras med facet eller ej
                                         alder_grupp = c(20, 30, 40, 50, 60), # Vilka åldersgrupper skall användas. Välj enligt principen upp till första, sedan intervall mellan och sedan från sista
                                         alder_grupp_fokus = "20-29 år", # Vilken åldersgrupp skall fokuseras i diag_alder_fokus. Måste finnas bland grupperna ovan
-                                        demo = FALSE,                    # sätts till TRUE om man bara vill se ett exempel på diagrammet i webbläsaren och inget annat                                        valda_ar = c("2021","2022","2023"), # Vilka år skall användas i diag_flyttnetto_alder
+                                        demo = FALSE,                    # sätts till TRUE om man bara vill se ett exempel på diagrammet i webbläsaren och inget annat                                        
+                                        valda_ar = c("2021","2022","2023"), # Vilka år skall användas i diag_flyttnetto_alder
                                         returnera_figur = TRUE, # Om man vill att figuren skall returneras från funktionen
                                         returnera_data = TRUE
 ){
