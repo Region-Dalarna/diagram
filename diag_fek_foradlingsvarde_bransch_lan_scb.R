@@ -12,8 +12,8 @@ diag_fek_foradlingsvarde_bransch_lan_scb <- function(
   output_mapp = NA,
   skriv_diagramfil = TRUE,
   returnera_data_rmarkdown = FALSE,
-  excelfil_mapp = NA,      # anges om man vill exportera en excelfil med uttaget, den mapp man vill spara excelfilen till
   demo = FALSE,             # sätts till TRUE om man bara vill se ett exempel på diagrammet i webbläsaren och inget annat
+  excelfil_mapp = NA,      # anges om man vill exportera en excelfil med uttaget, den mapp man vill spara excelfilen till
   excel_filnamn = "helarsekvivalenter.xlsx"      # filnamn för excelfil som exporteras om excel_filnamn och output_mapp anges
 ) {
 
