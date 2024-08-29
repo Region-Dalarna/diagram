@@ -13,8 +13,8 @@ diag_brp_per_inv_scb <- function(
   returnera_data_rmarkdown = FALSE,
   excelfil_mapp = NA,      # anges om man vill exportera en excelfil med uttaget, den mapp man vill spara excelfilen till
   excel_filnamn = "brp_per_inv.xlsx",      # filnamn för excelfil som exporteras om excel_filnamn och output_mapp anges
-  diag_lansjmfr_valt_ar = TRUE,
   demo = FALSE,             # sätts till TRUE om man bara vill se ett exempel på diagrammet i webbläsaren och inget annat
+  diag_lansjmfr_valt_ar = TRUE,
   diag_valt_lan_riket_tidsserie = TRUE
 ) {
 
