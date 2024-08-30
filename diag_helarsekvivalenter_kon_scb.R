@@ -19,7 +19,7 @@ diag_helarsekvivalenter <- function(
     output_mapp = NA,
     skriv_diagramfil = TRUE,
     excelfil_mapp = NA,			# anges om man vill exportera en excelfil med uttaget, den mapp man vill spara excelfilen till
-    excel_filnamn = "helarsekvivalenter.xlsx",			# filnamn för excelfil som exporteras om excel_filnamn och output_mapp anges
+    excel_filnamn = "helarsekvivalenter.xlsx"			# filnamn för excelfil som exporteras om excel_filnamn och output_mapp anges
 ) {
   
   # ==============================================================================================================================
@@ -73,7 +73,7 @@ diag_helarsekvivalenter <- function(
       summarise(varde = sum(varde, na.rm = TRUE), .groups = "drop") %>% 
       rename(regionkod = lanskod) %>% 
       left_join(regionnyckel, by = "regionkod")
-  }
+  } else helarsekv_lan <- NULL
   
   # Lägg ihop dataframe för kommuner/riket och län
   helarsekv_alla_df <- helarsekvivalenter_df  %>%
@@ -84,7 +84,7 @@ diag_helarsekvivalenter <- function(
   # om man vill gruppera ihop flera kommuner eller län till en större geografisk indelning
   # så anges den med namn i gruppera_namn. Lämnas den tom görs ingenting nedan
   if (!is.na(gruppera_namn)) {
-    helarsekv_alla_df2 <- helarsekv_alla_df %>% 
+    helarsekv_alla_df <- helarsekv_alla_df %>% 
     group_by(across(-c(regionkod, region, varde))) %>% 
       summarise(varde = sum(varde, na.rm = TRUE), .groups = "drop") %>% 
       mutate(regionkod = "gg",
@@ -140,7 +140,7 @@ diag_helarsekvivalenter <- function(
     			 manual_color = diagram_farger,
     			 output_mapp = output_mapp,
     			 diagram_facet = length(unique(chart_df$region)) > 1,
-    			 ta_med_logga = ta_med_logga,
+    			 lagg_pa_logga = ta_med_logga,
     			 logga_path = logga_sokvag,
     			 facet_grp = "region",
     			 facet_scale = "free",

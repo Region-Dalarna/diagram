@@ -1,5 +1,5 @@
 
-diag_aterstaende_medellivslangd <- function(
+diag_aterstaende_medellivslangd_utbniva_lan_scb <- function(
     region_vekt = "20",
     ar_vekt = "*",                                      # "*" = alla år, "9999" = senaste år
     cont_var_klartext = "Antal återstående år",        # Är främst den relevanta variabeln för oss att använda i denna tabell
