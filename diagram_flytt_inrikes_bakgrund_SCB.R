@@ -8,7 +8,8 @@ diag_inr_flyttnetto_inr_utr_fodda <- function(
     skriv_diagram = TRUE,                             # TRUE om vi vill skriva ut diagrammet
     skriv_excel = FALSE,                              # TRUE om vi vill skriva ut data till excel
     returnera_data = FALSE,                           # TRUE om vi vill returnera data till R:s globala miljö 
-    spara_som_svg = FALSE,                            # TRUE om vi vill spara diagrammet som svg
+    #spara_som_svg = FALSE,                            # TRUE om vi vill spara diagrammet som svg
+    filformat = "png",                                # filformat för diagrammet
     visa_totalvarden = TRUE,                          # skriver ut ett streck för netto både inrikes och utrikes födda
     fixa_y_axel_varden_jamna_tal = TRUE,              # TRUE om vi vill ha vettigare värden på y-axeln, men funkar inte alltid och då kan man stänga av detta.
     demo = FALSE,                                     # sätts till TRUE om man bara vill se ett exempel på diagrammet i webbläsaren och inget annat    visa_totalvarden = TRUE,                          # skriver ut ett streck för netto både inrikes och utrikes födda
@@ -175,7 +176,8 @@ diag_inr_flyttnetto_inr_utr_fodda <- function(
                                  facet_grp = "region",
                                  skriv_till_diagramfil = !visa_totalvarden,
                                  manual_color = farg_vekt,
-                                 diagram_som_svg = spara_som_svg,
+                                 #diagram_som_svg = spara_som_svg,
+                                 diagram_bildformat = filformat,
                                  output_mapp = output_mapp,
                                  filnamn_diagram = diagramfil)
     
