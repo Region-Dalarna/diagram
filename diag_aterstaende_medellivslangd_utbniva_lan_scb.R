@@ -43,7 +43,7 @@ c("https://region-dalarna.github.io/utskrivna_diagram/medellivslangd_aterstaende
   source("https://raw.githubusercontent.com/Region-Dalarna/funktioner/main/func_SkapaDiagram.R", encoding = "utf-8")
   source("https://raw.githubusercontent.com/Region-Dalarna/funktioner/main/func_text.R", encoding = "utf-8")
   
-  diag_fargvektor <- if (is.na(diag_fargvektor) & exists("diagramfarger")) diagramfarger("rus_sex")[c(2,1,3)] else c("darkred", "yellow", "darkgreen")
+  diag_fargvektor <- if (all(is.na(diag_fargvektor)) & exists("diagramfarger")) diagramfarger("rus_sex")[c(5,1,3)] else c("darkred", "yellow", "darkgreen")
   
   gg_list <- list()
   
@@ -83,7 +83,7 @@ c("https://region-dalarna.github.io/utskrivna_diagram/medellivslangd_aterstaende
   			 diagram_capt = diagram_capt,
   			 y_axis_borjar_pa_noll = FALSE,
   			 filnamn_diagram = diagramfil,
-  			 manual_y_axis_title = "",
+  			 #manual_y_axis_title = "",
   			 manual_x_axis_title = "årsintervall",
   			 manual_color = diag_fargvektor,
   			 lagg_pa_logga = visa_logga_i_diagram,
