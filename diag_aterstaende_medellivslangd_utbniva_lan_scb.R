@@ -10,6 +10,7 @@ diag_aterstaende_medellivslangd_utbniva_lan_scb <- function(
     diagram_capt = "Källa: Demografisk analys - Befolkning, SCB:s öppna statistikdatabas\nBearbetning: Samhällsanalys, Region Dalarna",
     skriv_diagramfil = TRUE,                           # TRUE om diagram ska skrivas till fil, FALSE om diagram inte ska skrivas till fil
     excel_mapp = NA,                                   # mapp där excelfil ska sparas, NA = sparas ingen fil
+    demo = FALSE,             # sätts till TRUE om man bara vill se ett exempel på diagrammet i webbläsaren och inget annat
     utmapp = "G:/Samhällsanalys/API/Fran_R/utskrift/"
     ) {
 
@@ -24,6 +25,16 @@ diag_aterstaende_medellivslangd_utbniva_lan_scb <- function(
   #
   # =======================================================================================================================
     
+# om parametern demo är satt till TRUE så öppnas en flik i webbläsaren med ett exempel på hur diagrammet ser ut och därefter avslutas funktionen
+# demofilen måste läggas upp på webben för att kunna öppnas, vi lägger den på Region Dalarnas github-repo som heter utskrivna_diagram
+if (demo){
+  demo_url <- 
+c("https://region-dalarna.github.io/utskrivna_diagram/medellivslangd_aterstaende_vid_30 år_alder_Dalarna_ar2012-2016_2019-2023.png")
+  walk(demo_url, ~browseURL(.x))
+  if (length(demo_url) > 1) cat(paste0(length(demo_url), " diagram har öppnats i webbläsaren."))
+  stop_tyst()
+}
+
   if (!require("pacman")) install.packages("pacman")
   p_load(tidyverse,
      			glue)
