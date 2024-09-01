@@ -9,7 +9,7 @@ diag_demografi <-function(region = hamtakommuner("20",tamedlan = TRUE,tamedriket
                           tid = 2007:2100, # Tid. Ett högt sistavärde ger senaste år
                           spara_figur = TRUE, # Skall figuren sparas
                           returnera_figur = TRUE, # Skall figur returneras från funktion
-                          returnera_data = FALSE,# Om TRUE returneras data till R-Studios globala miljö
+                          returnera_data = FALSE, # Om TRUE returneras data till R-Studios globala miljö
                           demo = FALSE             # sätts till TRUE om man bara vill se ett exempel på diagrammet i webbläsaren och inget annat
                           ) {
   

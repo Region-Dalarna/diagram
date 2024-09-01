@@ -8,7 +8,9 @@ diag_matchning_lan <- function(region_vekt = "20", # Region vi är intresserade 
                                diag_lan = TRUE, # Skapar ett diagram där alla län jämförs
                                diag_bakgrund = TRUE, # Skapar ett diagram där bakgrund i samma län jämförs
                                returnera_figur = TRUE, # Skall figur returneras (i en lista)
-                               returnera_data = FALSE){ # Skall data returneras (till R-studios globla miljö)
+                               returnera_data = FALSE,# Skall data returneras (till R-studios globla miljö)
+                               demo = FALSE             # sätts till TRUE om man bara vill se ett exempel på diagrammet i webbläsaren och inget annat
+                               ) {
   
   # ========================================== Allmän info ============================================
   # 1: Skapar diagram för matchningsgraden på arbetsmarknaden, dels på länsnivå, dels i ett enskilt län uppdelat på bakgrund.
@@ -17,6 +19,18 @@ diag_matchning_lan <- function(region_vekt = "20", # Region vi är intresserade 
   # Senast uppdaterad: Jon 2024-02-28
   # ========================================== Inställningar ============================================
   # Nödvändiga bibliotek och funktioner
+
+# om parametern demo är satt till TRUE så öppnas en flik i webbläsaren med ett exempel på hur diagrammet ser ut och därefter avslutas funktionen
+# demofilen måste läggas upp på webben för att kunna öppnas, vi lägger den på Region Dalarnas github-repo som heter utskrivna_diagram
+if (demo){
+  demo_url <- 
+c("https://region-dalarna.github.io/utskrivna_diagram/matchning_bakgrund.png",
+"https://region-dalarna.github.io/utskrivna_diagram/matchning_jmf.png")
+  walk(demo_url, ~browseURL(.x))
+  if (length(demo_url) > 1) cat(paste0(length(demo_url), " diagram har öppnats i webbläsaren."))
+  stop_tyst()
+}
+
   if (!require("pacman")) install.packages("pacman")
   pacman::p_load(openxlsx,
                  here,
