@@ -9,7 +9,9 @@ diag_demografi <-function(region = hamtakommuner("20",tamedlan = TRUE,tamedriket
                           tid = 2007:2100, # Tid. Ett högt sistavärde ger senaste år
                           spara_figur = TRUE, # Skall figuren sparas
                           returnera_figur = TRUE, # Skall figur returneras från funktion
-                          returnera_data = FALSE){ # Om TRUE returneras data till R-Studios globala miljö
+                          returnera_data = FALSE,# Om TRUE returneras data till R-Studios globala miljö
+                          demo = FALSE             # sätts till TRUE om man bara vill se ett exempel på diagrammet i webbläsaren och inget annat
+                          ) {
   
   # ===========================================================================================================  # 
   # Skript som skriver ut diagram för demografisk försörjningskvot och medelålder. Går att välja med eller utan uppdelning på kön
@@ -20,6 +22,18 @@ diag_demografi <-function(region = hamtakommuner("20",tamedlan = TRUE,tamedriket
   
   
   # ========================================== Inställningar ============================================
+
+# om parametern demo är satt till TRUE så öppnas en flik i webbläsaren med ett exempel på hur diagrammet ser ut och därefter avslutas funktionen
+# demofilen måste läggas upp på webben för att kunna öppnas, vi lägger den på Region Dalarnas github-repo som heter utskrivna_diagram
+if (demo){
+  demo_url <- 
+c("https://region-dalarna.github.io/utskrivna_diagram/demo_fors.png",
+"https://region-dalarna.github.io/utskrivna_diagram/medelalder.png")
+  walk(demo_url, ~browseURL(.x))
+  if (length(demo_url) > 1) cat(paste0(length(demo_url), " diagram har öppnats i webbläsaren."))
+  stop_tyst()
+}
+
   if (!require("pacman")) install.packages("pacman")
   p_load(pxweb,
          tidyverse,
