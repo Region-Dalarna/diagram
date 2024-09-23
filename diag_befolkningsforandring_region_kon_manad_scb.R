@@ -29,7 +29,7 @@ diag_befolkningsforandring_manad_scb <- function(region_vekt = "20",
                                                    tid_koder = tid_koder)
   
   beffor_df <- beffor_df %>% 
-    manader_bearbeta_scbtabeller() %>%                      # splittar kolumnen månad (t ex "2021M07" för juli år 2021) till kolumner för år, månad, år_månad samt månad_år
+    #manader_bearbeta_scbtabeller() %>%                      # splittar kolumnen månad (t ex "2021M07" för juli år 2021) till kolumner för år, månad, år_månad samt månad_år
     mutate(region = region %>% skapa_kortnamn_lan())
   
   konsuppdelat <- ifelse(length(unique(beffor_df$kön)) > 1, TRUE, FALSE)
@@ -94,6 +94,7 @@ diag_befolkningsforandring_manad_scb <- function(region_vekt = "20",
   } # slut skapa_diagram
   
   
+  return(gg_list)
   
 } # slut funktion
 

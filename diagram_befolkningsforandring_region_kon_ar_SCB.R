@@ -154,7 +154,7 @@ diagram_befolkningsforandring_ar <- function(region_vekt = "20", # Val av kommun
     diag <- skapa_diagram(befolkning_df,region_vekt)
     
   } else {
-    diag <- map(region_vekt, ~ skapa_diagram(befolkning_df, .x)) %>% flatten()
+    diag <- map(region_vekt, ~ skapa_diagram(befolkning_df, .x)) %>% purrr::flatten()
     
   }
   

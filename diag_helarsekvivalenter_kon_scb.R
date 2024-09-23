@@ -125,7 +125,7 @@ diag_helarsekvivalenter <- function(
     			 skickad_x_var = "månad_år",
     			 skickad_y_var = "varde",
     			 skickad_x_grupp = "variabel",
-    			 x_axis_visa_var_xe_etikett = 4,
+    			 x_axis_visa_var_xe_etikett = 6,
     			 geom_position_stack = TRUE,
     			 legend_vand_ordning = TRUE,
     			 diagram_titel = diagramtitel,
