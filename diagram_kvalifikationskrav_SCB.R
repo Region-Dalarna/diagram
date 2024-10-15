@@ -16,7 +16,7 @@ diagram_kvalifikationskrav <- function(region_vekt = "20", # Vilken region vill 
   # Diagram som jämför kvalifikationskrav inom olika områden (kommun eller län) och bransch i valt län/kommun 
   # Funkar enbart för senaste år
   # Skapad av Jon 2024-01-17
-  # Senast uppdaterad: 2024-03-20
+  # Senast uppdaterad: 2024-10-15
   # Ändrat Anställda 16-64 år (dagbef) till Anställda 16-64 år med arbetsplats i regionen (dagbef)
   # =================================================================================================================
   
@@ -81,11 +81,11 @@ diagram_kvalifikationskrav <- function(region_vekt = "20", # Vilken region vill 
   if(diag_jmf_omrade == TRUE){
     if("kvinnor" %in% unique(px_df$kön) & "män" %in% unique(px_df$kön)) {
       variabellista = c("år","region","kompetensniva")
-      diagram_titel <- paste0("Kvalifikationskrav för anställda (16-64 år) ",max(px_df$år))
+      diagram_titel <- paste0("Kvalifikationskrav för anställda 16-64 år ",max(px_df$år))
       objektnamn <- paste0("kvalifikationskrav_jmf_",jmf_omrade)
     }else {
       variabellista = c("år","kön","region","kompetensniva")
-      diagram_titel <- paste0("Kvalifikationskrav för anställda ",unique(px_df$kön) ," (16-64 år) i ",max(px_df$år))
+      diagram_titel <- paste0("Kvalifikationskrav för anställda ",unique(px_df$kön) ," 16-64 år i ",max(px_df$år))
       objektnamn <- paste0("kvalifikationskrav_jmf_",unique(px_df$kön),"_",jmf_omrade)
     }
 
@@ -136,11 +136,11 @@ diagram_kvalifikationskrav <- function(region_vekt = "20", # Vilken region vill 
   if(diag_jmf_bransch == TRUE){
     if("kvinnor" %in% unique(px_df$kön) & "män" %in% unique(px_df$kön)) {
       variabellista = c("år","region","Branschgrupp","kompetensniva")
-        diagram_titel <- paste0("Kvalifikationskrav för anställda (16-64 år) i ",valt_lan," ",max(px_df$år))
+        diagram_titel <- paste0("Kvalifikationskrav för anställda 16-64 år i ",valt_lan," ",max(px_df$år))
           objektnamn <- c(objektnamn,paste0("kvalifikationskrav_bransch_",valt_lan))
     }else {
       variabellista = c("år","kön","region","Branschgrupp","kompetensniva")
-        diagram_titel <- paste0("Kvalifikationskrav för anställda ",unique(px_df$kön) ," (16-64 år) i ",valt_lan," ",max(px_df$år))
+        diagram_titel <- paste0("Kvalifikationskrav för anställda ",unique(px_df$kön) ," 16-64 år i ",valt_lan," ",max(px_df$år))
           objektnamn <- c(objektnamn,paste0("kvalifikationskrav_bransch_",unique(px_df$kön),"_",valt_lan))
     }
     
