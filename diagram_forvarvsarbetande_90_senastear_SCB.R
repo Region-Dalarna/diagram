@@ -46,11 +46,11 @@ diagram_forvarvsarbetande_90 <- function(region_vekt = "20", # Vilken region vil
     
     if("kvinnor" %in% unique(df$kön) & "män" %in% unique(df$kön)) {
       variabellista = c("region","Näringsgren","år")
-      diagram_titel <- paste0("Förvärvsarbetande (16+ år) i ",skapa_kortnamn_lan(hamtaregion_kod_namn(region_vekt)[2]))
+      diagram_titel <- paste0("Förvärvsarbetande 16-74 år i ",skapa_kortnamn_lan(hamtaregion_kod_namn(region_vekt)[2]))
       objektnamn <- paste0("forvarvsarbetande_90_totalt_",skapa_kortnamn_lan(hamtaregion_kod_namn(region_vekt)[2]))
     }else {
         variabellista = c("region","kön","Näringsgren","år")
-        diagram_titel <- paste0("Förvärvsarbetande ",unique(df$kön) ," (16+ år) i ",skapa_kortnamn_lan(hamtaregion_kod_namn(region_vekt)[2]))
+        diagram_titel <- paste0("Förvärvsarbetande ",unique(df$kön) ," 16-74 år i ",skapa_kortnamn_lan(hamtaregion_kod_namn(region_vekt)[2]))
         objektnamn <- paste0("forvarvsarbetande_90_",unique(df$kön),"_",skapa_kortnamn_lan(hamtaregion_kod_namn(region_vekt)[2]))
         }
     
@@ -72,7 +72,7 @@ diagram_forvarvsarbetande_90 <- function(region_vekt = "20", # Vilken region vil
         Näringsgren == "jordbruk, skogsbruk, jakt, fiske" ~ "Jordbruk och skogsbruk",
         Näringsgren == "kreditinstitut, fastighetsförvaltn, företagstjänster" ~ "Företagstjänster, finans mm",
         Näringsgren == "näringsgren okänd" ~ "Okänd verksamhet" ,
-        Näringsgren == "personliga och kulturella tjänster" ~ "Kultur mm",
+        Näringsgren == "personliga och kulturella tjänster" ~ "Hotell, restaurang och kultur mm",
         Näringsgren == "utvinning av mineral, tillverkningsindustri" ~ "Tillverkning och utvinning"))
     
     # Om användaren vill returnera data görs detta här
@@ -140,7 +140,7 @@ diagram_forvarvsarbetande_90 <- function(region_vekt = "20", # Vilken region vil
         Näringsgren == "jordbruk, skogsbruk, jakt, fiske" ~ "Jordbruk och skogsbruk",
         Näringsgren == "kreditinstitut, fastighetsförvaltn, företagstjänster" ~ "Företagstjänster, finans mm",
         Näringsgren == "näringsgren okänd" ~ "Okänd verksamhet" ,
-        Näringsgren == "personliga och kulturella tjänster" ~ "Kultur mm",
+        Näringsgren == "personliga och kulturella tjänster" ~ "Hotell, restaurang och kultur mm",
         Näringsgren == "utvinning av mineral, tillverkningsindustri" ~ "Tillverkning och utvinning"))
     
     # Om användaren vill returnera data görs detta här
@@ -153,7 +153,7 @@ diagram_forvarvsarbetande_90 <- function(region_vekt = "20", # Vilken region vil
       list_data <- c(list_data,list("Förändring" = df_for))
     }
     
-    diagram_titel <- paste0("Förändring av antalet förvärvsarbetande (16-74) år från år ", min(df_for$år), " till ", max(df_for$år))
+    diagram_titel <- paste0("Förändring av antalet förvärvsarbetande 16-74 år från år ", min(df_for$år), " till ", max(df_for$år))
     diagramfil <- "forvarvsarbetande_90_forandring.png"
     objektnamn <- c(objektnamn,paste0("forvarvsarbetande_90_forandring_",skapa_kortnamn_lan(hamtaregion_kod_namn(region_vekt)[2])))
     
@@ -164,7 +164,9 @@ diagram_forvarvsarbetande_90 <- function(region_vekt = "20", # Vilken region vil
                                     manual_color = vald_farg[1],
                                     diagram_titel = diagram_titel,
                                     x_axis_sort_value = TRUE,
-                                    x_axis_lutning = 90,
+                                    x_axis_lutning = 45,
+                                    manual_x_axis_text_vjust = 1,
+                                    manual_x_axis_text_hjust = 1,
                                     diagram_capt = diagram_capt,
                                     diagram_liggande = TRUE,
                                     stodlinjer_avrunda_fem = TRUE,
