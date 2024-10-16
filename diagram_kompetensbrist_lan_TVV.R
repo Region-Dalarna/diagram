@@ -1,5 +1,6 @@
 diag_kompetensbrist <- function(diagram_capt =  diagram_capt <- "Källa: Tillväxtverket: Företagens villkor och verklighet.\nBearbetning:Samhällsanalys, Region Dalarna\nDiagramförklaring: Andel småföretag som anser att tillgång till lämplig arbetskraft är ett stort hinder för tillväxt", 
                                 output_mapp_figur = NA,
+                                skapa_fil = TRUE,
                                 start_ar = "2020",# År som senaste år skall jämföras med. Finns 2011,2014,2017 och 2020
                                 returnera_data = FALSE,
                                 returnera_figur = TRUE
@@ -34,7 +35,7 @@ diag_kompetensbrist <- function(diagram_capt =  diagram_capt <- "Källa: Tillvä
     pivot_longer(2:length(names(.)),names_to = "År",values_to = "Andel") %>% 
     mutate(Region = skapa_kortnamn_lan(Region))
   
-  spara_figur = TRUE
+  spara_figur = skapa_fil
   
   if(is.na(output_mapp_figur)) spara_figur = FALSE
   

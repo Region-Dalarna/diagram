@@ -1,4 +1,5 @@
 diag_utb_niva_bakgr_alder <- function(diagram_capt =  "Källa: NMS-databasen (SCB)\nBearbetning: Samhällsanalys, Region Dalarna", 
+                                      skapa_fil = TRUE,
                                       output_mapp_figur = NA,
                                       utbildningar = "förgymnasial utbildning", # Val av utbildningsnivå till diagram 2. Se nedan för alternativ
                                       diag_utb_bakgrund = TRUE,
@@ -36,7 +37,7 @@ diag_utb_niva_bakgr_alder <- function(diagram_capt =  "Källa: NMS-databasen (SC
   # Läser in data från Excel (ursprung NMS-databasen)
   df <- read.xlsx("G:/skript/projekt/data/kompetensforsorjning/9_feb_24_utdata_utbildningsniva_befolkning_bakgrund.xlsx",sheet=1)
   
-  spara_figur = TRUE
+  spara_figur = skapa_fil
   
   if(is.na(output_mapp_figur)) spara_figur = FALSE
   
