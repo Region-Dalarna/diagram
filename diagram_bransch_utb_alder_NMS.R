@@ -142,7 +142,10 @@ diag_bransch_utb_alder <- function(output_mapp_data = NA, # Om man vill spara da
       assign("bransch_alder", bransch_alder_df_sum, envir = .GlobalEnv)
     }
 
-    diagram_titel <- paste0("Åldersfördelning för förvärvsarbetande 16-74 år per bransch i ",unique(bransch_utb_df_sum$AstLan_namn)," ",unique(bransch_utb_df_sum$bransch_alder_df_sum)," år ",unique(bransch_alder_df_sum$year))
+    diagram_titel <- paste0("Åldersfördelning för förvärvsarbetande 16-74 år per bransch i ", unique(bransch_utb_df_sum$AstLan_namn), " år ", unique(bransch_alder_df_sum$year))
+    
+    # unique(bransch_utb_df_sum$bransch_alder_df_sum)
+    
     if(andel == TRUE){
       objektnamn <- c(objektnamn,paste0("alder_bransch_andel",unique(bransch_alder_df_sum$AstLan_namn)))
       diagramfil <- paste0("alder_bransch_andel",unique(bransch_alder_df_sum$AstLan_namn),".png")
