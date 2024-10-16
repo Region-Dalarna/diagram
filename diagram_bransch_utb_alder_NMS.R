@@ -13,7 +13,7 @@ diag_bransch_utb_alder <- function(output_mapp_data = NA, # Om man vill spara da
   # Diagram som jämför utbildningsnivå och ålder för förvärvsarbetande inom olika branscher i Dalarna
   # Data hämtas från NMS
   # Skapad av Jon 2024-01-18
-  # Senast uppdaterad:
+  # Senast uppdaterad:2024-10-16, ändrat ordningen på legenden så att de skrivs ut radvis, Peter
   # Data uppdaterat senast: 2024-01-18 
   # Fil för att hämta data finns på MONA/NMS: P1079_GEM/Jon/Kompetensförsörjning/utbildningsniva_bransch_korrekt.R
   # =================================================================================================================
@@ -164,6 +164,7 @@ diag_bransch_utb_alder <- function(output_mapp_data = NA, # Om man vill spara da
                                               stodlinjer_avrunda_fem = TRUE,
                                               diagram_liggande = TRUE,
                                               legend_vand_ordning = TRUE,
+                                              legend_byrow = TRUE,
                                               geom_position_stack = TRUE,
                                               manual_y_axis_title = "procent",
                                               output_mapp = output_mapp_figur,
@@ -190,6 +191,7 @@ diag_bransch_utb_alder <- function(output_mapp_data = NA, # Om man vill spara da
                                    diagram_capt = diagram_capt,
                                    diagram_liggande = FALSE,
                                    legend_vand_ordning = TRUE,
+                                   legend_byrow = TRUE,
                                    geom_position_stack = TRUE,
                                    output_mapp = output_mapp_figur,
                                    filnamn_diagram = diagramfil,
