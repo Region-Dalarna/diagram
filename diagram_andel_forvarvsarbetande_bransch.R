@@ -15,7 +15,7 @@ diag_sysselsatta_andel <- function(region_vekt = "20", # Region vi är intresser
   
   # 1: Skapar diagram för andelen förvärvsarbetande inom olika branscher, dels på länsnivå, dels på kommunnivå. Enbart senaste år och ingen uppdelning på kön
   # 1: Antal förvärvsarbetande senaste observation uppdelat på kön
-  # Senast uppdaterad: Jon 2024-01-18
+  # Senast uppdaterad: Jon 2024-10-16
   # ========================================== Inställningar ============================================
   # Nödvändiga bibliotek och funktioner
   if (!require("pacman")) install.packages("pacman")
@@ -46,10 +46,11 @@ diag_sysselsatta_andel <- function(region_vekt = "20", # Region vi är intresser
   
   # Summerar på region och sektor
   df_sum <- df %>%
-    group_by(år, månad_år, region, bransch) %>% 
+    group_by(år, månad_år, tid, region, bransch) %>% 
         summarize("Antal" = sum(`sysselsatta efter arbetsställets belägenhet`)) %>% 
       mutate(andel = (Antal/sum(Antal))*100,
-             region = skapa_kortnamn_lan(region,byt_ut_riket_mot_sverige = TRUE))
+             region = skapa_kortnamn_lan(region,byt_ut_riket_mot_sverige = TRUE),
+             manad_txt = format(as.Date(paste0(str_sub(tid, 6,7), "-01"), format = "%m-%d"), "%B"))
   
   if(diag_lan == TRUE | diag_kommun == TRUE){
     if(returnera_data == TRUE){
@@ -64,7 +65,7 @@ diag_sysselsatta_andel <- function(region_vekt = "20", # Region vi är intresser
 
   if(diag_lan==TRUE){
     
-    diagram_titel <- paste0("Andel förvärvsarbetande (16-74 år) per bransch ",unique(df_sum$månad_år))
+    diagram_titel <- paste0("Andel förvärvsarbetande 16-74 år\nper bransch i ",unique(df_sum$manad_txt), " ", unique(df_sum$år))
     diagramfil <- "andel_per_bransch.png"
     objektnamn <- c(objektnamn,"andel_per_bransch")
     
@@ -97,7 +98,7 @@ diag_sysselsatta_andel <- function(region_vekt = "20", # Region vi är intresser
   j=1
   if(diag_kommun==TRUE){
     while(j <= length(kommun_vektor$region)){
-      diagram_titel <- paste0("Andel förvärvsarbetande (16-74 år) per bransch ",unique(df_sum$månad_år))
+      diagram_titel <- paste0("Andel förvärvsarbetande 16-74 år per bransch i ",unique(df_sum$manad_txt), " ", unique(df_sum$år))
       diagram_typ <- paste0("andel_per_bransch","_",kommun_vektor$region[j])
       diagramfil <- paste0(diagram_typ,".png")
       objektnamn <- c(objektnamn,diagram_typ)
@@ -135,8 +136,9 @@ diag_sysselsatta_andel <- function(region_vekt = "20", # Region vi är intresser
     # Summerar på region och sektor
     df_kon <- df %>%
       rename("Antal" = `sysselsatta efter arbetsställets belägenhet`) %>% 
-        mutate(region = skapa_kortnamn_lan(region,byt_ut_riket_mot_sverige = TRUE)) %>%
-          select(år, månad_år, region, kön, bransch, Antal) %>% 
+        mutate(region = skapa_kortnamn_lan(region,byt_ut_riket_mot_sverige = TRUE),
+               manad_txt = format(as.Date(paste0(str_sub(tid, 6,7), "-01"), format = "%m-%d"), "%B")) %>%
+          select(år, månad_år, manad_txt, region, kön, bransch, Antal) %>% 
             filter(region == vald_region)
     
     if(returnera_data == TRUE){
@@ -147,7 +149,7 @@ diag_sysselsatta_andel <- function(region_vekt = "20", # Region vi är intresser
       list_data <- c(list_data,list("Antal per bransch" = df_kon))
     }
     
-    diagram_titel <- paste0("Antal förvärvsarbetande (16-74 år) per bransch i ",vald_region," ",unique(df_sum$månad_år))
+    diagram_titel <- paste0("Antal förvärvsarbetande 16-74 år per bransch\ni ",vald_region," i ",unique(df_sum$manad_txt), " ", unique(df_sum$år))
     diagramfil <- "antal_per_bransch.png"
     objektnamn <- c(objektnamn,"antal_per_bransch")
     
