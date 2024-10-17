@@ -5,7 +5,7 @@ diag_utbniva_inr_utr_fodda_kon_lan <- function(
     valt_kon = c("män", "kvinnor"),           #  Finns: "män och kvinnor", "män", "kvinnor"
     tid_koder = "9999",			                  # "*" = alla år eller månader, "9999" = senaste, finns: "1997", "1998", "1999", "2000", "2001", "2002", "2003", "2004", "2005", "2006", "2007", "2008", "2009", "2010", "2011", "2012", "2013", "2014", "2015", "2016", "2017", "2018", "2019", "2020", "2021", "2022"
     bakgrund_klartext = c("andel med förgymnasial utbildning, procent", "andel med gymnasial utbildning, procent", "andel med eftergymnasial utbildning, procent"),			 #  Finns: "andel 0-19 år, procent", "andel 20-64 år, procent", "andel 65+ år, procent", "samtliga utbildningsnivåer, procent", "andel med förgymnasial utbildning, procent", "andel med gymnasial utbildning, procent", "andel med eftergymnasial utbildning, procent", "andel där uppgift saknas för utbildningsnivå, procent", "samtliga, procent"
-    con_klartext = c("Födda i Sverige", "Utrikes födda"),			 #  Finns: "Födda i Sverige", "Utländsk bakgrund", "Utrikes födda", "Födda i Norden exkl. Sverige", "Födda i EU/EFTA exkl. Norden", "Födda i övriga världen"
+    cont_klartext = c("Födda i Sverige", "Utrikes födda"),			 #  Finns: "Födda i Sverige", "Utländsk bakgrund", "Utrikes födda", "Födda i Norden exkl. Sverige", "Födda i EU/EFTA exkl. Norden", "Födda i övriga världen"
     diagram_capt = "Källa: Tema registerbaserad integration, SCB:s öppna statistikdatabas\nBearbetning: Samhällsanalys, Region Dalarna",
     output_mapp = NA,
     returnera_df_rmarkdown = FALSE,
