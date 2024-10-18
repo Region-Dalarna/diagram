@@ -75,11 +75,7 @@ diag_antal_utbniva_alder_kon <- function(
       TRUE ~ utbildningsnivå_alla # behåller ursprungligt värde om ingen matchning
     )) %>% 
     relocate(utbildningsnivå, .before = utbildningsnivå_alla)
-  
-  if (vald_utbniva != "*") {
-    utbniva_df <- utbniva_df %>% filter(utbildningsnivå %in% vald_utbniva)
-  }
-  
+
   if (!"ålder" %in% names(utbniva_df)) utbniva_df <- utbniva_df %>% mutate(ålder = "16-74 år")
   
   if (!all(is.na(alder_grupper))) {
@@ -102,7 +98,11 @@ diag_antal_utbniva_alder_kon <- function(
   }
   
   if(returnera_df_rmarkdown == TRUE){
-    assign("utbniva_kon_df", utbniva_df, envir = .GlobalEnv)
+    assign("utbniva_kon_alder_df", utbniva_df, envir = .GlobalEnv)
+  }
+  
+  if (vald_utbniva != "*") {
+    utbniva_df <- utbniva_df %>% filter(utbildningsnivå %in% vald_utbniva)
   }
   
   skapa_diagram <- function(chart_df, skickad_regionkod, valt_ar) {

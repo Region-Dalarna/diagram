@@ -14,7 +14,7 @@ diagram_befolkningsforandring <- function(region_vekt = hamtaAllaLan(tamedriket 
   # Diagram som beräknar befolkningsförändring under en tidsperiod uppdelat på inrikes/utrikes flytt och demografisk förändring
   # Diagrammet kan skapas för olika åldersintervall
   # Skapad av Jon 2024-01-19
-  # Senast uppdaterad:
+  # Senast uppdaterad: 2024-10-18, snyggat till rubriker, Peter
   # Förbättringsmöjligheter: Markera total förändring i diagram (exepelvis som en svart linje)
   # =================================================================================================================
   
@@ -90,8 +90,8 @@ diagram_befolkningsforandring <- function(region_vekt = hamtaAllaLan(tamedriket 
   diagram_capt <- "Källa: Befolkningsregistret i SCB:s öppna statistikdatabas.\nBearbetning: Samhällsanalys, Region Dalarna."
   
   if(all(alder == "tot")) {
-    diagramtitel <- paste0("Befolkningsförändring (hela befolkningen) år ",min(bef_df$år),"-",max(bef_df$år))
-  }else diagramtitel <- paste0("Befolkningsförändring (",min(bef_df$ålder)," - ",max(bef_df$ålder),") år ",min(bef_df$år),"-",max(bef_df$år))
+    diagramtitel <- paste0("Befolkningsförändring invånare alla åldrar år ",min(bef_df$år),"-",max(bef_df$år))
+  }else diagramtitel <- paste0("Befolkningsförändring invånare ",min(bef_df$ålder) %>% str_remove(" år"),"-",max(bef_df$ålder)," under perioden år ",min(bef_df$år),"-",max(bef_df$år))
   
   objektnamn <- "befolkningsforandring_20_64"
   diagramfilnamn <- paste0(objektnamn,".png")
