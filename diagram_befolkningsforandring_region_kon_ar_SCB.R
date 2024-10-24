@@ -34,10 +34,11 @@ diagram_befolkningsforandring_ar <- function(region_vekt = "20", # Val av kommun
   gg_list <- list()
   objektnamn <- c()
   
-  befolkning_df <- hamta_bef_folkmangd_alder_kon_ar_scb(region_vekt = region_vekt,
+  befolkning_df <- suppress_specific_warning(
+    hamta_bef_folkmangd_alder_kon_ar_scb(region_vekt = region_vekt,
                                                         tid_koder = tid,
                                                         kon_klartext = kon_klartext,
-                                                        cont_klartext = c("folkmängd", "folkökning")) 
+                                                        cont_klartext = c("folkmängd", "folkökning"))) 
   
   if(returnera_data == TRUE){
     assign("befolkning_df", befolkning_df, envir = .GlobalEnv)
