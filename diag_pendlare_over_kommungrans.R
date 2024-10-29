@@ -10,8 +10,8 @@ diag_pendling_over_kommungrans <- function(vald_kommun = "20", # Länsnamn ger s
                                            skapa_fil = TRUE, # skapa en fil dig figuren sparas
                                            returnera_figur = TRUE, # Om TRUE returneras figur som ggplot-objekt
                                            enbart_in_ut = FALSE, # TRUE om man bara vill visa in och utpendling (ej bor och arbetar i samma kommun)
-                                           diagramfarg_vektor = diagramfarger("rd_bla")[c(1,2,4)], # Valda färger
-                                           diagram_capt = "Källa: SCB:s öppna statistikdatabas (RAMS)\nBearbetning: Samhällsanalys, Region Dalarna",
+                                           diagramfarg_vektor = NA, # Valda färger
+                                           diagram_capt = "Källa: SCB:s öppna statistikdatabas (RAMS tom 2019, därefter BAS), bearbetning: Samhällsanalys, Region Dalarna\nDiagramförklaring: Pendlingsdata kommer från RAMS tom år 2019 och inkluderar då åldrarna 16-74 år. Därefter kommer pendlingsdata från BAS och inkluderar åldrarna 15-74 år, från och med år 2020.",
                                            output_mapp_figur = "G:/Samhällsanalys/API/Fran_R/Utskrift/", # Hit sparas figuren
                                            output_mapp_data = NA, # Hit sparas data
                                            spara_data = FALSE, # Skall data sparas
@@ -49,8 +49,40 @@ c("https://region-dalarna.github.io/utskrivna_diagram/in_utpendling_Dalarna2021.
   source("https://raw.githubusercontent.com/Region-Dalarna/funktioner/main/func_API.R", encoding = "utf-8", echo = FALSE)
   source("https://raw.githubusercontent.com/Region-Dalarna/funktioner/main/func_text.R", encoding = "utf-8", echo = FALSE)
   options(dplyr.summarise.inform = FALSE)
-                                           
-  url_uttag <- "https://api.scb.se/OV0104/v1/doris/sv/ssd/START/AM/AM0207/AM0207Z/PendlingKN"
+                              
+  # om ingen färgvektor är medskickad, kolla om funktionen diagramfärger finns, annars använd r:s defaultfärger
+  if (all(is.na(diagramfarg_vektor))) {
+    if (exists("diagramfarger", mode = "function")) {
+      diagramfarg_vektor <- diagramfarger("rus_sex")
+    } else {
+      diagramfarg_vektor <- hue_pal()(9)
+    }
+  }
+               
+  #url_uttag <- "https://api.scb.se/OV0104/v1/doris/sv/ssd/START/AM/AM0207/AM0207Z/PendlingKN"
+  
+  url_scb <- c("https://api.scb.se/OV0104/v1/doris/sv/ssd/START/AM/AM0210/AM0210F/ArRegPend1",
+               "https://api.scb.se/OV0104/v1/doris/sv/ssd/START/AM/AM0207/AM0207Z/PendlingKN",
+               "https://api.scb.se/OV0104/v1/doris/sv/ssd/START/AM/AM0207/AM0207L/PendlingK",
+               "https://api.scb.se/OV0104/v1/doris/sv/ssd/START/AM/AM0207/AM0207L/PendlingK9303")
+  
+  
+  px_meta_list <- map(url_scb, ~ pxweb_get(.x))
+  
+  px_meta_enkel_list <- extrahera_unika_varden_flera_scb_tabeller(px_meta_list)
+  tabell_variabler <- pxvarlist(list(title = NULL, variables = px_meta_enkel_list))
+  
+  # om det finns fler än en tabell så kollar vi om det finns värden som överlappar mellan tabellerna
+  px_meta_overlappande_varden <- if (length(url_scb) > 1) overlappande_varden_pxweb_hantera(px_meta_list, url_scb, var_kod = "Tid") else NULL  
+  overlapp_txt <- if (is.null(px_meta_overlappande_varden)) "" else "\t"
+  
+  # om det finns år och månader så sorterar vi dessa i listan så det blir snyggare när de listas som möjliga värden i parameterlistan
+  if ("tid" %in% tolower(tabell_variabler$koder)) {
+    px_meta_enkel_list <- sortera_px_variabler(px_meta_enkel_list, sorterings_vars = "tid", sortera_pa_kod = TRUE)
+  }
+  px_meta <- list(title = px_meta_list[[1]]$title, variables = px_meta_enkel_list)
+  
+  
   gg_list <- list()  # skapa en tom lista att lägga flera ggplot-objekt i (om man skapar flera diagram)
   list_data <- list() # Skapar en tom lista som används för att spara data 
   
@@ -79,15 +111,15 @@ c("https://region-dalarna.github.io/utskrivna_diagram/in_utpendling_Dalarna2021.
   
   # ta ut senaste år om vi inte skickat med några år eller om   
   if (is.na(valt_ar)) {
-    valt_ar <- max(hamta_giltiga_varden_fran_tabell(url_uttag, "tid"))
+    valt_ar <- max(hamta_giltiga_varden_fran_tabell(px_meta, "tid"))
   }
 
-  # hämta rätt kod för kön
-  if (is.na(as.numeric(valt_kon))) {
-     valt_kon_kod <- hamta_kod_med_klartext(url_uttag, valt_kon)
-  } else {
-    valt_kon_kod <- valt_kon
-  }
+  # # hämta rätt kod för kön
+  # if (is.na(as.numeric(valt_kon))) {
+  #    valt_kon_kod <- hamta_kod_med_klartext(url_uttag, valt_kon)
+  # } else {
+  #   valt_kon_kod <- valt_kon
+  # }
   
   # hämta rätt kod för kommun
   if (is.na(as.numeric(vald_kommun))) {
@@ -102,35 +134,39 @@ c("https://region-dalarna.github.io/utskrivna_diagram/in_utpendling_Dalarna2021.
 
   # =============================================== API-uttag ===============================================
   
-  varlista <- list(
-    Region = vald_kommun_kod,
-    Kon = valt_kon_kod,
-    ContentsCode = '*',
-    Tid = valt_ar
-  )
+  # varlista <- list(
+  #   Region = vald_kommun_kod,
+  #   Kon = valt_kon_kod,
+  #   ContentsCode = '*',
+  #   Tid = valt_ar
+  # )
+  # 
+  # px_uttag <- pxweb_get(url = url_uttag, query = varlista)     # uttag från scb:s api
+  # 
+  # # Lägg API-uttaget i px_df, lägg på ytterligare ett uttag men med koder istället för klartext,
+  # # välj ut bara regionkolumnen i det andra uttaget, döp om den till regionkod och lägg den först av kolumnerna
+  # suppressWarnings(px_df <- as.data.frame(px_uttag) %>% 
+  #   cbind(as.data.frame(px_uttag, column.name.type = "code", variable.value.type = "code") %>%
+  #           select(Region)) %>% 
+  #   rename(regionkod = Region) %>% 
+  #   relocate(regionkod, .before = region) %>% 
+  #   mutate(`Utpendlare över kommungräns` = `Utpendlare över kommungräns` * -1) %>% 
+  #   pivot_longer(c("Inpendlare över kommungräns", "Utpendlare över kommungräns",
+  #                  "Bor och arbetar i kommunen"), values_to = "antal förvärvsarbetande", names_to = "pendlingstyp") %>% 
+  #   mutate(pendlingstyp = factor(pendlingstyp, levels = c("Inpendlare över kommungräns",
+  #                                                         "Bor och arbetar i kommunen",
+  #                                                         "Utpendlare över kommungräns"))))
   
-  px_uttag <- pxweb_get(url = url_uttag, query = varlista)     # uttag från scb:s api
-  
-  # Lägg API-uttaget i px_df, lägg på ytterligare ett uttag men med koder istället för klartext,
-  # välj ut bara regionkolumnen i det andra uttaget, döp om den till regionkod och lägg den först av kolumnerna
-  suppressWarnings(px_df <- as.data.frame(px_uttag) %>% 
-    cbind(as.data.frame(px_uttag, column.name.type = "code", variable.value.type = "code") %>%
-            select(Region)) %>% 
-    rename(regionkod = Region) %>% 
-    relocate(regionkod, .before = region) %>% 
-    mutate(`Utpendlare över kommungräns` = `Utpendlare över kommungräns` * -1) %>% 
-    pivot_longer(c("Inpendlare över kommungräns", "Utpendlare över kommungräns",
-                   "Bor och arbetar i kommunen"), values_to = "antal förvärvsarbetande", names_to = "pendlingstyp") %>% 
-    mutate(pendlingstyp = factor(pendlingstyp, levels = c("Inpendlare över kommungräns",
-                                                          "Bor och arbetar i kommunen",
-                                                          "Utpendlare över kommungräns"))))
+  px_df <-  hamta_pendling_over_grans_region_kon_tid_scb(region_vekt = vald_kommun_kod,
+                                                         kon_klartext = valt_kon,
+                                                         tid_koder = valt_ar)
   
   # ============================== diagram med absoluta tal ==================================
   if (diag_absoluta_tal) {
     
     px_df_ut = px_df
     
-    if(enbart_in_ut == TRUE) px_df_ut <- px_df_ut %>% filter(pendlingstyp != "Bor och arbetar i kommunen")
+    if(enbart_in_ut == TRUE) px_df_ut <- px_df_ut %>% filter(variabel != "Bor och arbetar i kommunen")
     
     if(!is.na(output_mapp_figur) & !is.na(filnamn_data)){
       list_data <- c(list_data,list("antal_pendlare" = px_df_ut))
@@ -145,13 +181,14 @@ c("https://region-dalarna.github.io/utskrivna_diagram/in_utpendling_Dalarna2021.
     
     gg_obj <- SkapaStapelDiagram(skickad_df = px_df_ut,  
                        skickad_x_var = "region", 
-                       skickad_y_var = "antal förvärvsarbetande",
-                       skickad_x_grupp = "pendlingstyp",
+                       skickad_y_var = "varde",
+                       skickad_x_grupp = "variabel",
                        diagram_titel = diagram_titel,
                        diagram_capt = diagram_capt,
                        manual_x_axis_text_vjust = 1,
                        manual_x_axis_text_hjust = 1,
                        manual_color = diagramfarg_vektor,
+                       manual_y_axis_title = "antal förvärvsarbetande",
                        stodlinjer_avrunda_fem = TRUE,
                        geom_position_stack = TRUE,
                        dataetiketter = visa_dataetiketter,
@@ -168,14 +205,14 @@ c("https://region-dalarna.github.io/utskrivna_diagram/in_utpendling_Dalarna2021.
   if (diag_procent) {
     
     px_df_andel = px_df %>% 
-      pivot_wider(names_from = pendlingstyp,values_from = `antal förvärvsarbetande`) %>% 
+      pivot_wider(names_from = variabel, values_from = varde) %>% 
         mutate("Andel utpendling" = (abs(`Utpendlare över kommungräns`)/(`Bor och arbetar i kommunen`+abs(`Utpendlare över kommungräns`)))*100,
                "Andel inpendling" = (`Inpendlare över kommungräns`/(`Bor och arbetar i kommunen`+`Inpendlare över kommungräns`))*100,
                "Bor och arbetar i samma kommun" = (`Bor och arbetar i kommunen`/(`Bor och arbetar i kommunen`+abs(`Utpendlare över kommungräns`)))*100) %>% 
           select(-c(`Inpendlare över kommungräns`,`Utpendlare över kommungräns`,`Bor och arbetar i kommunen`)) %>% 
-            pivot_longer((length(names(.))-2):length(names(.)),names_to = "pendlingstyp",values_to = "andel")
+            pivot_longer((length(names(.))-2):length(names(.)),names_to = "variabel",values_to = "andel")
     
-    if(enbart_in_ut == TRUE) px_df_andel <- px_df_andel %>% filter(pendlingstyp != "Bor och arbetar i samma kommun")
+    if(enbart_in_ut == TRUE) px_df_andel <- px_df_andel %>% filter(variabel != "Bor och arbetar i samma kommun")
     
     if(!is.na(output_mapp_figur) & !is.na(filnamn_data)){
       list_data <- c(list_data,list("andel_pendlare" = px_df_andel))
@@ -194,7 +231,7 @@ c("https://region-dalarna.github.io/utskrivna_diagram/in_utpendling_Dalarna2021.
     gg_obj <- SkapaStapelDiagram(skickad_df = px_df_andel ,  
                        skickad_x_var = "region", 
                        skickad_y_var = "andel",
-                       skickad_x_grupp = "pendlingstyp",
+                       skickad_x_grupp = "variabel",
                        diagram_titel = diagram_titel,
                        diagram_capt = diagram_capt,
                        manual_y_axis_title = "procent",
