@@ -13,8 +13,7 @@ diag_arbetspendling_over_tid <- function(
     diag_in_ut = TRUE,
     diag_nettopendling = TRUE,
     diag_storsta_inpendlrelationer = TRUE,
-    diag_storsta_utpendlrelationer = TRUE,
-    diag_pendling_over_grans = TRUE
+    diag_storsta_utpendlrelationer = TRUE
   ) {
 
   # =======================================================================================================
