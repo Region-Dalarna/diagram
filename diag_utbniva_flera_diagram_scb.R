@@ -8,6 +8,7 @@ diag_utbniva_tidserie_och_lansjmfr <- function(
                                        valt_ar = NA,
                                        ta_med_logga = TRUE,
                                        logga_sokvag = NA,
+                                       sverige_istallet_for_riket = TRUE,
                                        region_lagg_forst = NA,
                                        diag_hogutb_over_tid = TRUE,
                                        diag_lagutb_over_tid = FALSE,
@@ -91,7 +92,7 @@ diag_utbniva_tidserie_och_lansjmfr <- function(
   
   px_df_utskrift_kon <- px_df %>%
     filter(regionkod %in% region_vekt) %>% 
-    mutate(region = region %>% skapa_kortnamn_lan(byt_ut_riket_mot_sverige = TRUE))
+    mutate(region = region %>% skapa_kortnamn_lan(byt_ut_riket_mot_sverige = sverige_istallet_for_riket))
   
   if (!is.na(gruppering_namn)) {
     px_df_utskrift_kon <- px_df_utskrift_kon %>% 
@@ -113,9 +114,13 @@ diag_utbniva_tidserie_och_lansjmfr <- function(
     # testa om region_lagg_forst-koderna finns i datasetet
     if (any(region_lagg_forst %in% unique(px_df_utskrift_kon$regionkod))) {
       
+      regionkoder_i_df <- unique(px_df_utskrift_kon$regionkod)
+      region_i_df <- unique(px_df_utskrift_kon$region)
       # skapa sorteringsvektorer
-      reg_ej_fokus <- unique(px_df_utskrift_kon$region[!px_df_utskrift_kon$regionkod %in% region_lagg_forst]) %>% sort()
-      reg_fokus <- unique(px_df_utskrift_kon$region[px_df_utskrift_kon$regionkod %in% region_lagg_forst])
+      reg_ej_fokus <- unique(region_i_df[!regionkoder_i_df %in% region_lagg_forst]) %>% sort()
+      reg_fokus <- unique(region_i_df[regionkoder_i_df %in% region_lagg_forst])        # bara de regioner som finns i datasetet kommer med
+      reg_fokus_koder <- unique(regionkoder_i_df[regionkoder_i_df %in% region_lagg_forst])        # bara de regioner som finns i datasetet kommer med
+      reg_fokus <- reg_fokus[match(region_lagg_forst, reg_fokus_koder)]               # sortera utifrån ordningen i region_lagg_forst
       region_sort <- c(reg_fokus, reg_ej_fokus)    
       
       # sortera med hjälp av region_sort som vi skapade ovan
@@ -278,7 +283,7 @@ diag_utbniva_tidserie_och_lansjmfr <- function(
       relocate(regionkod, .before = "region") 
     
     px_df_jmfr_lan <- px_df %>%
-      mutate(region = region %>% skapa_kortnamn_lan(byt_ut_riket_mot_sverige = TRUE))
+      mutate(region = region %>% skapa_kortnamn_lan(byt_ut_riket_mot_sverige = sverige_istallet_for_riket))
     
     # bearbeta datasetet
     px_df_jmfr_lan <- px_df_jmfr_lan %>% 
