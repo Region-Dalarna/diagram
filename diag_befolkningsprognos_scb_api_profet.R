@@ -25,6 +25,7 @@ SkapaBefPrognosDiagram <- function(region_vekt = "20",
                                    andel_istallet_for_antal = FALSE,    # om man vill ha procent istället för absolut antal, för skillnad mellan start- och slutår
                                    prognos_ar = "9999",                 # om vi vill ha en prognos för ett specfikt år, "9999" = senaste prognosår - detta gäller endast profet-data, när man skickar med url för SCB finns bara ett år per url
                                    stodlinjer_avrunda_fem = TRUE,
+                                   spara_dataframe_till_global_environment = FALSE,          # om man vill spara en dataframe till global environment (kan vara bra när man gör rmarkdownrapporter tex)
                                    dataetiketter = FALSE,
                                    spara_excelfil = FALSE,
                                    farger_diagram = NA,
@@ -149,6 +150,10 @@ SkapaBefPrognosDiagram <- function(region_vekt = "20",
            andel = round(((rowSums(select(., all_of(slutar)), na.rm = TRUE)) - (rowSums(select(., all_of(startar)), na.rm = TRUE))) /     # beräkna andel av förändring i åldergrupper
                            (rowSums(select(., all_of(startar)), na.rm = TRUE)) * 100,1),
            aldergrp = factor(aldergrp, levels = c("totalt", "0-19 år", "20-64 år", "65-79 år", "80+ år")))      # Gör om aldergrp till factor som vi lägger i den ordning vi vill plotta diagrammet
+  
+  if(spara_dataframe_till_global_environment) {
+    assign("bef_progn_nms_df", prognos_diff_df, envir = .GlobalEnv)
+  }
   
   # skriv ut själva diagrammen som ligger i en funktion
   if (!is.na(facet_variabel)) {
