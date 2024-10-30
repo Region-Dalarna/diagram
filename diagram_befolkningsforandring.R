@@ -1,3 +1,6 @@
+source("https://raw.githubusercontent.com/Region-Dalarna/funktioner/main/func_API.R", encoding = "utf-8", echo = FALSE)
+
+
 diagram_befolkningsforandring <- function(region_vekt = hamtaAllaLan(tamedriket = FALSE), # Vilka regioner/kommuner vill man titta på
                                           output_mapp_data = NA, # Om man vill spara data. Används primärt i Rmarkdown-rapporter.
                                           output_mapp_figur = "G:/Samhällsanalys/Statistik/Näringsliv/basfakta/",
@@ -29,7 +32,6 @@ diagram_befolkningsforandring <- function(region_vekt = hamtaAllaLan(tamedriket 
   
   # Hämtar funktioner och laddar skript som hämtar data
   source("https://raw.githubusercontent.com/Region-Dalarna/funktioner/main/func_SkapaDiagram.R")
-  source("https://raw.githubusercontent.com/Region-Dalarna/funktioner/main/func_API.R", encoding = "utf-8", echo = FALSE)
   source("https://raw.githubusercontent.com/Region-Dalarna/hamta_data/main/hamta_bef_folkmangd_alder_kon_ar_scb.R")
   source("https://raw.githubusercontent.com/Region-Dalarna/hamta_data/main/hamta_bef_flyttningar_region_alder_kon_scb.R")
 

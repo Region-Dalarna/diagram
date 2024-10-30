@@ -1,5 +1,6 @@
+source("https://raw.githubusercontent.com/Region-Dalarna/funktioner/main/func_API.R", encoding = "utf-8", echo = FALSE)
 
-diag_pendling_over_lans_fa_grans <- function(region_vekt = "20",               # 
+diag_pendling_over_lans_fa_grans <- function(region_vekt = hamtaAllaLan(F),            # 
                                            valt_kon = "totalt",                # 
                                            valt_ar = "9999",                   # 
                                            visa_dataetiketter = FALSE,         # dataetiketter i diagrammet
@@ -34,7 +35,6 @@ diag_pendling_over_lans_fa_grans <- function(region_vekt = "20",               #
   
   source("https://raw.githubusercontent.com/Region-Dalarna/hamta_data/main/hamta_pendling_lan_fa_region_utbildngrupp_kon_tid_RegionInd19U2N1_RegionInd19U2_scb.R")  
   source("https://raw.githubusercontent.com/Region-Dalarna/funktioner/main/func_SkapaDiagram.R", encoding = "utf-8", echo = FALSE)
-  source("https://raw.githubusercontent.com/Region-Dalarna/funktioner/main/func_API.R", encoding = "utf-8", echo = FALSE)
   source("https://raw.githubusercontent.com/Region-Dalarna/funktioner/main/func_text.R", encoding = "utf-8", echo = FALSE)
   options(dplyr.summarise.inform = FALSE)
                               
