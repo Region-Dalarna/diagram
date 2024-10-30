@@ -24,7 +24,7 @@ diag_pendling_over_kommungrans <- function(vald_kommun = "20", # Länsnamn ger s
   # Skript för att skriva ut diagram (från RAMS, SCB) med andel och antal in- och utpendlare över kommungräns,
   # samt även de som bor och arbetar i samma kommun.
   # Skapad av: Peter
-  # Senast uppdaterad: Jon, 2023-12-20
+  # Senast uppdaterad: Peter, 2024-10-30
   # ===========================================================================================================
   
 # om parametern demo är satt till TRUE så öppnas en flik i webbläsaren med ett exempel på hur diagrammet ser ut och därefter avslutas funktionen
@@ -45,6 +45,7 @@ c("https://region-dalarna.github.io/utskrivna_diagram/in_utpendling_Dalarna2021.
          dplyr,
          openxlsx)
   
+  source("https://raw.githubusercontent.com/Region-Dalarna/hamta_data/main/hamta_pendling_over_grans_region_kon_tid_ArRegPend1_PendlingKN_PendlingK_PendlingK9303_scb.R")
   source("https://raw.githubusercontent.com/Region-Dalarna/funktioner/main/func_SkapaDiagram.R", encoding = "utf-8", echo = FALSE)
   source("https://raw.githubusercontent.com/Region-Dalarna/funktioner/main/func_API.R", encoding = "utf-8", echo = FALSE)
   source("https://raw.githubusercontent.com/Region-Dalarna/funktioner/main/func_text.R", encoding = "utf-8", echo = FALSE)
