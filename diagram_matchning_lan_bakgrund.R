@@ -1,3 +1,7 @@
+gg_matchning <- diag_matchning_lan(region_vekt = "20",
+                                   spara_figur = TRUE,
+                                   returnera_data = FALSE,
+                                   kon_klartext = "*")
 diag_matchning_lan <- function(region_vekt = "20", # Region vi är intresserade av. Gäller diagrammet 
                                output_mapp_figur = "G:/Samhällsanalys/Statistik/Näringsliv/basfakta/", # Här hamnar sparad figur
                                output_mapp_data = NA, # Här hamnar sparad data
@@ -68,7 +72,8 @@ c("https://region-dalarna.github.io/utskrivna_diagram/matchning_bakgrund.png",
     assign("matchning_df", df, envir = .GlobalEnv)
   }
   
-  if(length(unique(matchning_df$kön))>2) df <- df %>% filter(unique(kön)%in% c("män","kvinnor"))
+  # Om det finns fler än två kön i datafilen så filtreras de bort. 
+  if(length(unique(df$kön))>2) df <- df %>% filter(kön %in%c("män","kvinnor"))
   
   if(diag_lan==TRUE){
     
