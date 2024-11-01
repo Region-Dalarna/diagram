@@ -26,7 +26,7 @@ diag_utbniva_inr_utr_fodda_kon_lan <- function(
   p_load(tidyverse,
      			glue)
   
-  source("https://raw.githubusercontent.com/Region-Dalarna/hamta_data/main/hamta_integration_region_kon_bakgrund_tid_IntGr3LanKONS_scb.R")
+  source("https://raw.githubusercontent.com/Region-Dalarna/hamta_data/main/hamta_integration_region_kon_bakgrund_tid_IntGr3LanKONS_IntGr3RikKONS_scb.R")  
   source("https://raw.githubusercontent.com/Region-Dalarna/funktioner/main/func_SkapaDiagram.R", encoding = "utf-8")
   source("https://raw.githubusercontent.com/Region-Dalarna/funktioner/main/func_text.R", encoding = "utf-8")
   
@@ -50,7 +50,7 @@ diag_utbniva_inr_utr_fodda_kon_lan <- function(
     }
   }
 
-  integration_df <- hamta_integration_region_kon_bakgrund_tid_scb(
+  integration_df <- hamta_integration_region_bakgrund_tid_kon_scb(
   			region_vekt = region_vekt,			   
   			kon_klartext = valt_kon,			 
   			bakgrund_klartext = bakgrund_klartext,
