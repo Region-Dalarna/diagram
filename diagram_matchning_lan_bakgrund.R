@@ -3,7 +3,7 @@ diag_matchning_lan <- function(region_vekt = "20", # Region vi är intresserade 
                                output_mapp_data = NA, # Här hamnar sparad data
                                filnamn_data = "matchning.xlsx",
                                spara_figur = TRUE, # Om true sparas figuren till output_mapp
-                               kon_klartext = c("män", "kvinnor"), # Alternativet är "samtliga anställda" för att undvika könsuppdelning
+                               kon_klartext = c("män", "kvinnor"), # Alternativet är "samtliga anställda" för att undvika könsuppdelning. Vill man ha alla tre i datafilen som returneras sätts denna till "*". Det blir enbart kvinnor och män i diagrammet
                                valda_farger = diagramfarger("kon"), # Vilka färger skall användas i diagram
                                diag_lan = TRUE, # Skapar ett diagram där alla län jämförs
                                diag_bakgrund = TRUE, # Skapar ett diagram där bakgrund i samma län jämförs
@@ -16,7 +16,7 @@ diag_matchning_lan <- function(region_vekt = "20", # Region vi är intresserade 
   # 1: Skapar diagram för matchningsgraden på arbetsmarknaden, dels på länsnivå, dels i ett enskilt län uppdelat på bakgrund.
   # Enbart för senaste år
   #  
-  # Senast uppdaterad: Jon 2024-02-28
+  # Senast uppdaterad: Jon 2024-11-01
   # ========================================== Inställningar ============================================
   # Nödvändiga bibliotek och funktioner
 
@@ -67,6 +67,9 @@ c("https://region-dalarna.github.io/utskrivna_diagram/matchning_bakgrund.png",
   if(returnera_data == TRUE){
     assign("matchning_df", df, envir = .GlobalEnv)
   }
+  
+  # Om det finns fler än två kön i datafilen så filtreras de bort. 
+  if(length(unique(df$kön))>2) df <- df %>% filter(kön %in%c("män","kvinnor"))
   
   if(diag_lan==TRUE){
     
