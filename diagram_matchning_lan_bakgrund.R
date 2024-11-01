@@ -1,7 +1,3 @@
-gg_matchning <- diag_matchning_lan(region_vekt = "20",
-                                   spara_figur = TRUE,
-                                   returnera_data = FALSE,
-                                   kon_klartext = "*")
 diag_matchning_lan <- function(region_vekt = "20", # Region vi är intresserade av. Gäller diagrammet 
                                output_mapp_figur = "G:/Samhällsanalys/Statistik/Näringsliv/basfakta/", # Här hamnar sparad figur
                                output_mapp_data = NA, # Här hamnar sparad data
