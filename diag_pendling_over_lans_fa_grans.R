@@ -91,7 +91,7 @@ diag_pendling_over_lans_fa_grans <- function(region_vekt = hamtaAllaLan(F),     
     }
     
     if(returnera_data == TRUE){
-      assign("antal_pendlare", px_df_ut, envir = .GlobalEnv)
+      assign("antal_pendlare_lan_df", px_df_ut, envir = .GlobalEnv)
     }
   
     diagram_titel <- paste0("Antal pendlare 20-64 år i ", vald_kommun_txt, " år ", unique(px_df$år))
@@ -137,7 +137,7 @@ diag_pendling_over_lans_fa_grans <- function(region_vekt = hamtaAllaLan(F),     
     }
     
     if(returnera_data == TRUE){
-      assign("andel_pendlare", px_df_andel, envir = .GlobalEnv)
+      assign("andel_pendlare_lan_df", px_df_andel, envir = .GlobalEnv)
     }
     
     diagram_titel <- paste0("Andel pendlare av förvärvsarbetande 20-64 år i ", vald_kommun_txt, " år ", unique(px_df$år)) %>% 

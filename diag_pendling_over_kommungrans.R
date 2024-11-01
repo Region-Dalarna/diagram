@@ -174,7 +174,7 @@ c("https://region-dalarna.github.io/utskrivna_diagram/in_utpendling_Dalarna2021.
     }
     
     if(returnera_data == TRUE){
-      assign("antal_pendlare", px_df_ut, envir = .GlobalEnv)
+      assign("antal_pendlare_kommun_df", px_df_ut, envir = .GlobalEnv)
     }
   
     diagram_titel <- paste0("Antal pendlare i ", titel_tillag, "i ", vald_kommun_txt, " år ", unique(px_df$år))
@@ -220,7 +220,7 @@ c("https://region-dalarna.github.io/utskrivna_diagram/in_utpendling_Dalarna2021.
     }
     
     if(returnera_data == TRUE){
-      assign("andel_pendlare", px_df_andel, envir = .GlobalEnv)
+      assign("andel_pendlare_kommun_df", px_df_andel, envir = .GlobalEnv)
     }
     
     
