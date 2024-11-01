@@ -68,7 +68,7 @@ c("https://region-dalarna.github.io/utskrivna_diagram/matchning_bakgrund.png",
     assign("matchning_df", df, envir = .GlobalEnv)
   }
   
-  if(length(unique(matchning_df$kön))>2) df <- df %>% filter(unique(Kön)%in% c("män","kvinnor"))
+  if(length(unique(matchning_df$kön))>2) df <- df %>% filter(unique(kön)%in% c("män","kvinnor"))
   
   if(diag_lan==TRUE){
     
