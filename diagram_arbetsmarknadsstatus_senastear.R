@@ -1,6 +1,8 @@
 diagram_arbetsmarknadsstatus <-function(region_vekt = hamtakommuner("20"), # Använd förslagsvis hamtakommuner och hamtaallalan
                                         fokus_lan = "20", # Måste väljas. Det län som, vid sidan om riket, fokuseras i figuren. Gäller inte vid könsuppdelat
                                         output_mapp_data = NA, # Outputmapp för data
+                                        ta_bort_diagramtitel = FALSE, # Tar bort diagramtitel
+                                        ta_bort_caption = FALSE, # Tar bort caption
                                         filnamn_data = "arbetsmarknadsstatus.xlsx", # Filnamn för datafil
                                         output_mapp_figur = "G:/Samhällsanalys/Statistik/Näringsliv/basfakta/", # Outputmapp för figur
                                         spara_figur = TRUE, # Sparar figuren till output_mapp_figur
@@ -21,7 +23,8 @@ diagram_arbetsmarknadsstatus <-function(region_vekt = hamtakommuner("20"), # Anv
   # Funkar både för län och kommuner, men bara senaste år
   # diag_arbetsloshet, diag_arbetskraftsdeltagande och diag_sysselsattningsgrad sätts till TRUE baserat på vilka variabler man vill ha
   # Senast uppdaterad av Jon Frank (2024-04-18) - Ändrat så att hämta data görs från skript på Mona. Lagt till så att data bara hämtas för figur som skall plockas ut
-  # Potentiell förbättring: Ändra så att man kan köra för utrikes/inrikes separat. Funkar nu, men diagramtitel hänger inte med.
+  # Uppdatering 2024-11-04 Lagt till parametrar som gör att man kan köra utan titel och caption 
+  #Potentiell förbättring: Ändra så att man kan köra för utrikes/inrikes separat. Funkar nu, men diagramtitel hänger inte med.
   # =================================================================================================================
   if (!require("pacman")) install.packages("pacman")
   p_load(openxlsx)
@@ -33,6 +36,7 @@ diagram_arbetsmarknadsstatus <-function(region_vekt = hamtakommuner("20"), # Anv
   gg_list <- list()  # skapa en tom lista att lägga flera ggplot-objekt i (om man skapar flera diagram)
   objektnamn <- c()
   
+  dia_titel = NULL
   # Tar bara ut data för de variabler som skal vara med
   variabel <- c()
   if(diag_sysselsattningsgrad==TRUE) variabel <- c(variabel,"sysselsättningsgrad")
@@ -76,6 +80,14 @@ diagram_arbetsmarknadsstatus <-function(region_vekt = hamtakommuner("20"), # Anv
     diagramtitel <- str_wrap(diagramtitel,50)
     objektnamn <-c(objektnamn,("sysselsattningsgrad_senastear"))
     
+    if(ta_bort_diagramtitel == TRUE){
+      diagramtitel <- dia_titel
+    }
+    
+    if(ta_bort_caption == TRUE){
+      diagram_capt <- NULL
+    }
+    
     # Skapar diagram 
     gg_obj <- SkapaStapelDiagram(skickad_df = arbetsmarknadsstatus_df %>% 
                                    filter(variabel == "sysselsättningsgrad") %>% 
@@ -113,6 +125,14 @@ diagram_arbetsmarknadsstatus <-function(region_vekt = hamtakommuner("20"), # Anv
     diagramtitel <- str_wrap(diagramtitel,50)
     objektnamn <-c(objektnamn,("arbetslosthet_senastear"))
     
+    if(ta_bort_diagramtitel == TRUE){
+      diagramtitel <- dia_titel
+    }
+    
+    if(ta_bort_caption == TRUE){
+      diagram_capt <- NULL
+    }
+    
     # Skapar diagram 
     gg_obj <- SkapaStapelDiagram(skickad_df = arbetsmarknadsstatus_df %>%
                                    filter(variabel == "arbetslöshet") %>% 
@@ -148,6 +168,14 @@ diagram_arbetsmarknadsstatus <-function(region_vekt = hamtakommuner("20"), # Anv
     diagramtitel <- paste0("Arbetskraftsdeltagande i åldersgruppen ",unique(arbetsmarknadsstatus_df$ålder), " i ",unique(arbetsmarknadsstatus_df$manad_long)," ",unique(arbetsmarknadsstatus_df$ar))
     diagramtitel <- str_wrap(diagramtitel,50)
     objektnamn <-c(objektnamn,("arbetskraftsdeltagande_senastear"))
+    
+    if(ta_bort_diagramtitel == TRUE){
+      diagramtitel <- dia_titel
+    }
+    
+    if(ta_bort_caption == TRUE){
+      diagram_capt <- NULL
+    }
     
     # Skapar diagram 
     gg_obj <- SkapaStapelDiagram(skickad_df = arbetsmarknadsstatus_df %>%
