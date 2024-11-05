@@ -41,6 +41,13 @@ diag_helarsekvivalenter <- function(
   source("https://raw.githubusercontent.com/Region-Dalarna/hamta_data/main/hamta_helarsekvivalenter_region_kon_aldersgrupp_tid_HE0000T02N2_scb.R")
   source("https://raw.githubusercontent.com/Region-Dalarna/funktioner/main/func_SkapaDiagram.R", encoding = "utf-8")
   
+  if (all(is.na(output_mapp))) {
+    if (exists("utskriftsmapp", mode = "function")) {
+      output_mapp <- utskriftsmapp()
+    } else {
+      stop("Ingen output-mapp angiven, kör funktionen igen och ge parametern output-mapp ett värde.")
+    }
+  }
   
   regionnyckel <- hamtaregtab()
   
