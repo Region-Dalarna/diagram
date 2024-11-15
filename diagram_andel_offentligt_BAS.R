@@ -17,11 +17,9 @@ diagram_andel_offentligt <- function(region_vekt = hamtakommuner("20",tamedlan =
   # Uppdaterat så att data hämtas från BAS istället för RAMS. Jag lämnar kvar det gamla skriptet diagram_andel_offentligt.R ifall det används någonstans
   # Skapat: 2024-11-15 av Jon Frank
   # ===========================================================================================================
-  
-    if(length(unique(andel_df$kön))>2){
-      stop("Går enbart att välja antingen totalt eller uppdelat på kvinnor och män (kon_klartext)")
-    }
-    
+  if(length(kon_klartext)>2){
+    stop("Går enbart att välja antingen totalt eller uppdelat på kvinnor och män (kon_klartext)")
+  }
     if (!require("pacman")) install.packages("pacman")
     p_load(pxweb,
            tidyverse,
