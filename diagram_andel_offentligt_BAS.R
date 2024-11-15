@@ -84,7 +84,7 @@ diagram_andel_offentligt <- function(region_vekt = hamtakommuner("20",tamedlan =
     }
     
     if(returnera_data == TRUE){
-      assign("andel_offentligt", alternativ_data_andel, envir = .GlobalEnv)
+      assign("andel_offentligt", andel_df, envir = .GlobalEnv)
     }
     
     diagram_titel <- paste0("Andel offentligt anställda (",alder_klartext,") i ",unique(andel_df$månad_namn)," ",unique(andel_df$år))
