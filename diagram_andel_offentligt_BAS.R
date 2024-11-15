@@ -20,13 +20,14 @@ diagram_andel_offentligt <- function(region_vekt = hamtakommuner("20",tamedlan =
   if(length(kon_klartext)>2){
     stop("Går enbart att välja antingen totalt eller uppdelat på kvinnor och män (kon_klartext)")
   }
+  
     if (!require("pacman")) install.packages("pacman")
     p_load(pxweb,
            tidyverse,
            openxlsx)
     
     gg_list <- list() # Skapa en tom lista att lägga flera ggplot-objekt i (om man skapar flera diagram)
-    list_data <- list() # Skapar en tom lista som används för att spara data 
+    #list_data <- list() # Skapar en tom lista som används för att spara data 
     objektnamn <- c() # Används för att namnge
     
     # Data som sourcas från Region Dalarna
@@ -114,7 +115,7 @@ diagram_andel_offentligt <- function(region_vekt = hamtakommuner("20",tamedlan =
     gg_list <- c(gg_list, list(gg_obj))
     
     if(!is.na(output_mapp_data) & !is.na(filnamn_data)){
-      write.xlsx(list_data,paste0(output_mapp_data,filnamn_data))
+      write.xlsx(andel_df,paste0(output_mapp_data,filnamn_data))
     }
     
     names(gg_list) <- c(objektnamn)
