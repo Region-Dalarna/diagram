@@ -100,8 +100,8 @@ diag_gymn_genomstromning_4ar_prg_skolverket <- function(
   
     facet_txt <- if (length(unique(skickad_df)) > 1) "" else glue(" i {vald_region_txt}")
   
-    diagramtitel <- glue("{chart_df$Genomströmning %>% unique()} - läsåret {lasar_txt}")
-    diagramfil <- glue("gymn_genomstr_4ar_prg_{region_kod %>% paste0(collapse = '_')}_lasar{lasar_txt}.png") %>% str_replace_all("/", "_")
+    diagramtitel <- glue("{chart_df$Genomströmning %>% unique()} - startläsår {lasar_txt}")
+    diagramfil <- glue("gymn_genomstr_4ar_prg_{skickad_df$regionkod %>% paste0(collapse = '_')}_lasar{lasar_txt}.png") %>% str_replace_all("/", "_")
   
     gg_obj <- SkapaStapelDiagram(
       skickad_df = skickad_df,
