@@ -15,6 +15,8 @@ diagram_andel_offentligt <- function(region_vekt = hamtakommuner("20",tamedlan =
   #
   # Skript som skapar diagram för andelen som arbetar inom offentlig sektor. Funkar med och utan könsuppdelning men enbart för senaste år
   # Går även att använda olika åldersspann
+  #
+  # OBS!! Förlitar sig på gammal data från RAMS. Använd istället diagram_andel_offentligt_BAS.R OBS!!
   # ===========================================================================================================
   
   if (!require("pacman")) install.packages("pacman")
