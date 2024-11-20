@@ -1,5 +1,5 @@
 diagram_fodelsenetto <- function(region_vekt = "20", # Val av kommuner
-                               output_mapp= NA, # Vart hamnar figur om den skall sparas
+                               output_mapp = NA, # Vart hamnar figur om den skall sparas
                                vald_farg = NA, # Vilken färgvektor vill man ha. Blir alltid "kon" när man väljer det diagrammet
                                spara_diagrambild = TRUE, # Sparar figuren till output_mapp
                                diag_facet = FALSE, # Skall ett facetdiagram skapas
@@ -8,6 +8,7 @@ diagram_fodelsenetto <- function(region_vekt = "20", # Val av kommuner
                                tid = "*", # Välj tid, finns från 1968 till senaste år (som skrivs "9999")
                                returnera_figur = TRUE, # Om man vill att figuren skall returneras från funktionen
                                returnera_dataframe_global_environment = FALSE, # True om användaren vill returnera data från funktionen
+                               diagram_capt = "Källa: SCB:s öppna statistikdatabas, bearbetning av Samhällsanalys, Region Dalarna.",
                                demo = FALSE             # sätts till TRUE om man bara vill se ett exempel på diagrammet i webbläsaren och inget annat
                                ) {
   
@@ -20,8 +21,7 @@ diagram_fodelsenetto <- function(region_vekt = "20", # Val av kommuner
 # om parametern demo är satt till TRUE så öppnas en flik i webbläsaren med ett exempel på hur diagrammet ser ut och därefter avslutas funktionen
 # demofilen måste läggas upp på webben för att kunna öppnas, vi lägger den på Region Dalarnas github-repo som heter utskrivna_diagram
 if (demo){
-  demo_url <- 
-c("https://region-dalarna.github.io/utskrivna_diagram/")
+  demo_url <- c("https://region-dalarna.github.io/utskrivna_diagram/fodelsenetto_Dalarna.png")
   walk(demo_url, ~browseURL(.x))
   if (length(demo_url) > 1) cat(paste0(length(demo_url), " diagram har öppnats i webbläsaren."))
   stop_tyst()
@@ -35,7 +35,6 @@ c("https://region-dalarna.github.io/utskrivna_diagram/")
   
   source("https://raw.githubusercontent.com/Region-Dalarna/hamta_data/main/hamta_fodda_moderns_alder_region_scb.R")
   source("https://raw.githubusercontent.com/Region-Dalarna/hamta_data/main/hamta_doda_alder_kon_region_scb.R")
-  diagram_capt <- "Källa: SCB:s öppna statistikdatabas, bearbetning av Samhällsanalys, Region Dalarna."
   
   # om ingen färgvektor är medskickad, kolla om funktionen diagramfärger finns, annars använd r:s defaultfärger
   if (all(is.na(vald_farg))) {
