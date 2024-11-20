@@ -63,9 +63,10 @@ diag_gymn_elever_kon_prg_skolverket <- function(
   # filtrera ut andel kvinnor, beräkna andel män utifrån andel kvinnor och lägg till i datasetet
   chart_df <- dataset_df %>% 
     mutate(variabel = ifelse(variabel == "Andel kvinnor (%)", "Kvinnor", variabel),
-           region = region %>% skapa_kortnamn_lan(),
-           region = factor(region, levels = c("Dalarna", "Gävleborg", "Värmland", "Riket")),
-           gymnasieprogram = factor(gymnasieprogram, levels = c("Yrkesprogram", "Högskoleförberedande program", "Introduktionsprogrammen" ))) %>% 
+           region = region %>% skapa_kortnamn_lan()                  #,
+           #region = factor(region, levels = c("Dalarna", "Gävleborg", "Värmland", "Riket")),
+           #gymnasieprogram = factor(gymnasieprogram, levels = c("Yrkesprogram", "Högskoleförberedande program", "Introduktionsprogrammen" ))
+           ) %>% 
     filter(variabel == "Kvinnor")
   
   chart_df <- chart_df %>%

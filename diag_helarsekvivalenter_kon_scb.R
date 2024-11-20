@@ -19,8 +19,9 @@ diag_helarsekvivalenter <- function(
     output_mapp = NA,
     skriv_diagramfil = TRUE,
     excelfil_mapp = NA,			# anges om man vill exportera en excelfil med uttaget, den mapp man vill spara excelfilen till
-    excel_filnamn = "helarsekvivalenter.xlsx"			# filnamn för excelfil som exporteras om excel_filnamn och output_mapp anges
-) {
+    excel_filnamn = "helarsekvivalenter.xlsx",			# filnamn för excelfil som exporteras om excel_filnamn och output_mapp anges
+    demo = FALSE             # sätts till TRUE om man bara vill se ett exempel på diagrammet i webbläsaren och inget annat
+    ) {
   
   # ==============================================================================================================================
   #
@@ -34,6 +35,16 @@ diag_helarsekvivalenter <- function(
   # ==============================================================================================================================
   
   
+# om parametern demo är satt till TRUE så öppnas en flik i webbläsaren med ett exempel på hur diagrammet ser ut och därefter avslutas funktionen
+# demofilen måste läggas upp på webben för att kunna öppnas, vi lägger den på Region Dalarnas github-repo som heter utskrivna_diagram
+if (demo){
+  demo_url <- 
+c("https://region-dalarna.github.io/utskrivna_diagram/helarsekvivalenter_Dalarna_ar2014M01_2024M06.png")
+  walk(demo_url, ~browseURL(.x))
+  if (length(demo_url) > 1) cat(paste0(length(demo_url), " diagram har öppnats i webbläsaren."))
+  stop_tyst()
+}
+
   if (!require("pacman")) install.packages("pacman")
   p_load(tidyverse,
      			glue)
