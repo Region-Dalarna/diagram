@@ -1,14 +1,15 @@
 diagram_fodelsenetto <- function(region_vekt = "20", # Val av kommuner
-                               output_mapp_figur= "G:/skript/jon/Figurer/", # Vart hamnar figur om den skall sparas
-                               vald_farg = diagramfarger("rus_sex"), # Vilken färgvektor vill man ha. Blir alltid "kon" när man väljer det diagrammet
-                               spara_figur = FALSE, # Sparar figuren till output_mapp_figur
+                               output_mapp= NA, # Vart hamnar figur om den skall sparas
+                               vald_farg = NA, # Vilken färgvektor vill man ha. Blir alltid "kon" när man väljer det diagrammet
+                               spara_diagrambild = TRUE, # Sparar figuren till output_mapp
                                diag_facet = FALSE, # Skall ett facetdiagram skapas
                                visa_totalvarden = TRUE, # Visa totalvärden i diagrammet. Funkar om diag_facet = FALSE
                                etiketter_xaxel = 4, # Intervall för etiketter på x-axeln
                                tid = "*", # Välj tid, finns från 1968 till senaste år (som skrivs "9999")
                                returnera_figur = TRUE, # Om man vill att figuren skall returneras från funktionen
-                               returnera_data = FALSE # True om användaren vill returnera data från funktionen
-){
+                               returnera_dataframe_global_environment = FALSE, # True om användaren vill returnera data från funktionen
+                               demo = FALSE             # sätts till TRUE om man bara vill se ett exempel på diagrammet i webbläsaren och inget annat
+                               ) {
   
   # ===========================================================================================================
   # Diagram för födelsenettot (födda - döda). Finns som facet eller enskilda diagram. Ej uppdelat på kön
@@ -16,6 +17,16 @@ diagram_fodelsenetto <- function(region_vekt = "20", # Val av kommuner
   # Förbättringsmöjligheter: Svart linje för födelsenetto funkar inte med facet.
   # ===========================================================================================================
   
+# om parametern demo är satt till TRUE så öppnas en flik i webbläsaren med ett exempel på hur diagrammet ser ut och därefter avslutas funktionen
+# demofilen måste läggas upp på webben för att kunna öppnas, vi lägger den på Region Dalarnas github-repo som heter utskrivna_diagram
+if (demo){
+  demo_url <- 
+c("https://region-dalarna.github.io/utskrivna_diagram/")
+  walk(demo_url, ~browseURL(.x))
+  if (length(demo_url) > 1) cat(paste0(length(demo_url), " diagram har öppnats i webbläsaren."))
+  stop_tyst()
+}
+
   if (!require("pacman")) install.packages("pacman")
   p_load(tidyverse)
   
@@ -25,6 +36,24 @@ diagram_fodelsenetto <- function(region_vekt = "20", # Val av kommuner
   source("https://raw.githubusercontent.com/Region-Dalarna/hamta_data/main/hamta_fodda_moderns_alder_region_scb.R")
   source("https://raw.githubusercontent.com/Region-Dalarna/hamta_data/main/hamta_doda_alder_kon_region_scb.R")
   diagram_capt <- "Källa: SCB:s öppna statistikdatabas, bearbetning av Samhällsanalys, Region Dalarna."
+  
+  # om ingen färgvektor är medskickad, kolla om funktionen diagramfärger finns, annars använd r:s defaultfärger
+  if (all(is.na(vald_farg))) {
+    if (exists("diagramfarger", mode = "function")) {
+      vald_farg <- diagramfarger("rus_sex")
+    } else {
+      vald_farg <- hue_pal()(9)
+    }
+  }
+  
+  if (all(is.na(output_mapp))) {
+    if (exists("utskriftsmapp", mode = "function")) {
+      output_mapp <- utskriftsmapp()
+    } else {
+      stop("Ingen output-mapp angiven, kör funktionen igen och ge parametern output-mapp ett värde.")
+    }
+  }
+  
   
   gg_list <- list()
   objektnamn <- c()
@@ -47,7 +76,7 @@ diagram_fodelsenetto <- function(region_vekt = "20", # Val av kommuner
                  names_to = "variabel",
                  values_to = "varde")
   
-  if(returnera_data == TRUE){
+  if(returnera_dataframe_global_environment == TRUE){
     assign("fodda_doda_df", df, envir = .GlobalEnv)
   }
   
@@ -90,7 +119,7 @@ diagram_fodelsenetto <- function(region_vekt = "20", # Val av kommuner
       diagram_titel <- paste0("Födelsenetto i ", reg_txt) 
     }
     
-    diagramfil <- paste0("Födelsenetto_", reg_txt,".png")
+    diagramfil <- paste0("fodelsenetto_", reg_txt,".png")
     objektnamn <- c(objektnamn,diagramfil %>% str_remove(".png"))
     
     gg_obj <- SkapaStapelDiagram(skickad_df = df %>%
@@ -116,7 +145,7 @@ diagram_fodelsenetto <- function(region_vekt = "20", # Val av kommuner
                                  fokusera_varden = total_list,
                                  legend_vand = TRUE,
                                  manual_color = vald_farg,
-                                 output_mapp = output_mapp_figur,
+                                 output_mapp = output_mapp,
                                  skriv_till_diagramfil = FALSE,
                                  filnamn_diagram = diagramfil)
     
@@ -126,13 +155,13 @@ diagram_fodelsenetto <- function(region_vekt = "20", # Val av kommuner
       theme(legend.key = element_rect(fill = "white"),
             legend.box.just = "bottom")
     
-    if(spara_figur == TRUE){
-      ggsave(paste0(output_mapp_figur, diagramfil), dia_med_legend, width = 8, height = 6, dpi = 300)
+    if(spara_diagrambild == TRUE){
+      ggsave(paste0(output_mapp, diagramfil), dia_med_legend, width = 8, height = 6, dpi = 300)
     }
     
     gg_list <- c(gg_list, list(dia_med_legend))
-    
     names(gg_list) <- objektnamn
+    
     return(gg_list)
   }
   
