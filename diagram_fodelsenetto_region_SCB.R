@@ -15,6 +15,7 @@ diagram_fodelsenetto <- function(region_vekt = "20", # Val av kommuner
   # ===========================================================================================================
   # Diagram för födelsenettot (födda - döda). Finns som facet eller enskilda diagram. Ej uppdelat på kön
   # Skapat 2024-04-23
+  # Ändrat: 25 nov 2024, ändrat höjd och bredd till samma mått som i vårt skapa-diagramskript 
   # Förbättringsmöjligheter: Svart linje för födelsenetto funkar inte med facet.
   # ===========================================================================================================
   
@@ -155,7 +156,7 @@ if (demo){
             legend.box.just = "bottom")
     
     if(spara_diagrambild == TRUE){
-      ggsave(paste0(output_mapp, diagramfil), dia_med_legend, width = 8, height = 6, dpi = 300)
+      ggsave(paste0(output_mapp, diagramfil), dia_med_legend, width = 12, height = 7, dpi = 300)
     }
     
     gg_list <- c(gg_list, list(dia_med_legend))
@@ -168,7 +169,7 @@ if (demo){
     diag <- skapa_diagram(df,region_vekt)
     
   } else {
-    diag <- map(region_vekt, ~ skapa_diagram(df, .x)) %>% flatten()
+    diag <- map(region_vekt, ~ skapa_diagram(df, .x)) %>% purrr::flatten()
     
   }
   
