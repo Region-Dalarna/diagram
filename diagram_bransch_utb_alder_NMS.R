@@ -22,7 +22,7 @@ diag_bransch_utb_alder <- function(output_mapp_data = NA, # Om man vill spara da
   # Utbildningsgrupper för samtliga län senaste år
   if (!require("pacman")) install.packages("pacman")
   p_load(tidyverse,
-         openxlsx) 
+         openxlsx)
   
   # Funktioner som behövs
   source("https://raw.githubusercontent.com/Region-Dalarna/funktioner/main/func_SkapaDiagram.R")

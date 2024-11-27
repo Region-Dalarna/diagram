@@ -176,4 +176,4 @@ if (demo){
   if(returnera_figur == TRUE){
     return(diag)
   }
-} 
+}
