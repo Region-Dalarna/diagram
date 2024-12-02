@@ -205,7 +205,7 @@ diag_inr_flyttnetto_inr_utr_fodda <- function(
     diag <- skapa_diagram(px_df,region_vekt)
     
   } else {
-    diag <- map(unique(region_vekt), ~skapa_diagram(px_df,.x)) %>% flatten()
+    diag <- map(unique(region_vekt), ~skapa_diagram(px_df,.x)) %>% purrr::flatten()
     
   }
   

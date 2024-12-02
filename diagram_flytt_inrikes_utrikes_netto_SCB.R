@@ -1,6 +1,6 @@
 diagram_inr_utr_flytt <- function(region_vekt = "20", # Val av kommuner
-                                  output_mapp_figur= "G:/skript/jon/Figurer/", # Vart hamnar figur om den skall sparas
-                                  vald_farg = diagramfarger("kon"), # Vilken färgvektor vill man ha. Blir alltid "kon" när man väljer det diagrammet
+                                  output_mapp_figur= NA, # Vart hamnar figur om den skall sparas
+                                  vald_farg = NA, # Vilken färgvektor vill man ha. Blir alltid "kon" när man väljer det diagrammet
                                   tid = "*", # Avsluta med 9999 för senaste år
                                   spara_figur = TRUE, # Sparar figuren till output_mapp_figur
                                   diag_facet = FALSE, # Sätts till TRUE om man istället vill ha ett facet-diagram
@@ -30,6 +30,25 @@ diagram_inr_utr_flytt <- function(region_vekt = "20", # Val av kommuner
     if (length(demo_url) > 1) cat(paste0(length(demo_url), " diagram har öppnats i webbläsaren."))
     stop_tyst()
   }
+  
+  # om ingen output-mapp anges, används en standardmapp om den finns, annars stoppas skriptet
+  if (all(is.na(output_mapp_figur))) {
+    if (exists("utskriftsmapp", mode = "function")) {
+      output_mapp_figur <- utskriftsmapp()
+    } else {
+      stop("Ingen output-mapp angiven, kör funktionen igen och ge parametern output-mapp ett värde.")
+    }
+  }
+  
+  # om ingen färgvektor är medskickad, kolla om funktionen diagramfärger finns, annars använd r:s defaultfärger
+  if (all(is.na(vald_farg))) {
+    if (exists("diagramfarger", mode = "function")) {
+      vald_farg <- diagramfarger("kon")
+    } else {
+      vald_farg <- hue_pal()(9)
+    }
+  }
+  
   
   if(diag_uppdelat == TRUE && "00" %in% region_vekt){
     stop("Region 00 (Riket) saknar inrikes flyttnetto och kan inte användas.\nÄndra region_vekt eller sätt diag_uppdelat = FALSE")
@@ -123,7 +142,7 @@ diagram_inr_utr_flytt <- function(region_vekt = "20", # Val av kommuner
                                    fokusera_varden = total_list,
                                    manual_color = vald_farg,
                                    output_mapp = output_mapp_figur,
-                                   skriv_till_diagramfil = FALSE,
+                                   skriv_till_diagramfil = spara_figur,
                                    filnamn_diagram = diagramfil)
       
       dia_med_legend <- gg_obj +
@@ -190,7 +209,7 @@ diagram_inr_utr_flytt <- function(region_vekt = "20", # Val av kommuner
         
       }
 
-      diag_uppdelning <- map(unique(df$variabel), ~ skapa_diagram_uppdelat(df , .x)) %>% flatten
+      diag_uppdelning <- map(unique(df$variabel), ~ skapa_diagram_uppdelat(df , .x)) %>% purrr::flatten()
       gg_list <- c(gg_list, diag_uppdelning)
     }
     return(gg_list)
@@ -201,7 +220,7 @@ diagram_inr_utr_flytt <- function(region_vekt = "20", # Val av kommuner
     diag <- skapa_diagram(flytt_df,region_vekt)
     
   } else {
-    diag <- map(region_vekt, ~ skapa_diagram(flytt_df, .x)) %>% flatten()
+    diag <- map(region_vekt, ~ skapa_diagram(flytt_df, .x)) %>% purrr::flatten()
     
   }
   

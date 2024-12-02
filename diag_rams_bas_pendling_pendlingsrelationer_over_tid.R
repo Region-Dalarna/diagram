@@ -14,6 +14,7 @@ diag_arbetspendling_over_tid <- function(
     diag_nettopendling = TRUE,
     diag_storsta_inpendlrelationer = TRUE,
     diag_storsta_utpendlrelationer = TRUE
+    #diag_pendling_over_grans = TRUE
   ) {
 
   # =======================================================================================================
@@ -276,45 +277,45 @@ diag_arbetspendling_over_tid <- function(
     
     } # if-sats om någon av största in- eller utpendlingsrelationskommuner är valda
     
-    # förbered dataset om man valt att skapa diagram över pendling över kommungräns eller länsgräns
-    if (diag_pendling_over_grans) {
-      
-      dagbef_df <- pendling_df %>% 
-        filter(regionkod_arb %in% regionkod) %>% 
-        group_by(år, kön, regionkod = regionkod_arb, region = arbetsställeregion) %>% 
-        summarise(dagbef = sum(antal_pendlare, na.rm = TRUE), .groups = "drop")
-      
-      nattbef_df <- pendling_df %>% 
-        filter(regionkod_bo %in% regionkod) %>% 
-        group_by(år, kön, regionkod = regionkod_bo, region = bostadsregion) %>% 
-        summarise(nattbef = sum(antal_pendlare, na.rm = TRUE), .groups = "drop")
-      
-      inpendlare_df <- pendling_df %>% 
-        filter(regionkod_arb %in% regionkod,
-               pendlingstyp == "inpendlare") %>% 
-        group_by(år, kön, regionkod = regionkod_arb, region = arbetsställeregion) %>% 
-        summarise(inpendlare = sum(antal_pendlare, na.rm = TRUE), .groups = "drop")
-      
-      utpendlare_df <- pendling_df %>% 
-        filter(regionkod_bo %in% regionkod,
-               pendlingstyp == "utpendlare") %>% 
-        group_by(år, kön, regionkod = regionkod_bo, region = bostadsregion) %>% 
-        summarise(utpendlare = sum(antal_pendlare, na.rm = TRUE), .groups = "drop")
-      
-      # Lägg ihop dataset ovan för att skapa ett över gränsöverskridande pendling
-      pendlare_grans_df <- dagbef_df %>% 
-        left_join(nattbef_df, by = c("år", "kön", "regionkod", "region")) %>%
-        left_join(inpendlare_df, by = c("år", "kön", "regionkod", "region")) %>%
-        left_join(utpendlare_df, by = c("år", "kön", "regionkod", "region")) %>% 
-        mutate(andel_inpendlare = (inpendlare/dagbef)*100,
-               andel_utpendlare = (utpendlare/nattbef)*100)
-      
-    } # slut funktion för att skapa diagram för pendling över kommun- eller länsgräns
+    # # förbered dataset om man valt att skapa diagram över pendling över kommungräns eller länsgräns
+    # if (diag_pendling_over_grans) {
+    #   
+    #   dagbef_df <- pendling_df %>% 
+    #     filter(regionkod_arb %in% regionkod) %>% 
+    #     group_by(år, kön, regionkod = regionkod_arb, region = arbetsställeregion) %>% 
+    #     summarise(dagbef = sum(antal_pendlare, na.rm = TRUE), .groups = "drop")
+    #   
+    #   nattbef_df <- pendling_df %>% 
+    #     filter(regionkod_bo %in% regionkod) %>% 
+    #     group_by(år, kön, regionkod = regionkod_bo, region = bostadsregion) %>% 
+    #     summarise(nattbef = sum(antal_pendlare, na.rm = TRUE), .groups = "drop")
+    #   
+    #   inpendlare_df <- pendling_df %>% 
+    #     filter(regionkod_arb %in% regionkod,
+    #            pendlingstyp == "inpendlare") %>% 
+    #     group_by(år, kön, regionkod = regionkod_arb, region = arbetsställeregion) %>% 
+    #     summarise(inpendlare = sum(antal_pendlare, na.rm = TRUE), .groups = "drop")
+    #   
+    #   utpendlare_df <- pendling_df %>% 
+    #     filter(regionkod_bo %in% regionkod,
+    #            pendlingstyp == "utpendlare") %>% 
+    #     group_by(år, kön, regionkod = regionkod_bo, region = bostadsregion) %>% 
+    #     summarise(utpendlare = sum(antal_pendlare, na.rm = TRUE), .groups = "drop")
+    #   
+    #   # Lägg ihop dataset ovan för att skapa ett över gränsöverskridande pendling
+    #   pendlare_grans_df <- dagbef_df %>% 
+    #     left_join(nattbef_df, by = c("år", "kön", "regionkod", "region")) %>%
+    #     left_join(inpendlare_df, by = c("år", "kön", "regionkod", "region")) %>%
+    #     left_join(utpendlare_df, by = c("år", "kön", "regionkod", "region")) %>% 
+    #     mutate(andel_inpendlare = (inpendlare/dagbef)*100,
+    #            andel_utpendlare = (utpendlare/nattbef)*100)
+    #   
+    # } # slut funktion för att skapa diagram för pendling över kommun- eller länsgräns
     
     
     return(gg_list)              # här returnerar vi listan med ggplot-diagram
     } # slut funktion för att skapa själva diagrammen
   
-    retur_list <- map(region_vekt, ~ skapa_diagram(.x)) %>% flatten()
+    retur_list <- map(region_vekt, ~ skapa_diagram(.x)) %>% purrr::flatten()
     return(retur_list)
 } # slut funktion
