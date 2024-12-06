@@ -8,6 +8,7 @@ diag_bas_syss_per_bransch_manad_jmfr_1ar_tillbaka <- function(
     tid_koder = "9999",
     ta_med_logga = TRUE,
     logga_sokvag = NA,
+    manader_diagramtitel_kortnamn = TRUE,
     jamfor_antal_manader_bakat = 12,
     skriv_till_diagramfil = TRUE,
     visa_dataetiketter = FALSE,
@@ -97,13 +98,17 @@ c("https://region-dalarna.github.io/utskrivna_diagram/bas_syss_Dalarna_augusti_a
     distinct(månad) %>% 
     dplyr::pull() %>% 
     first() %>% 
-    as.character()
+    as.character() 
+  
+  if (manader_diagramtitel_kortnamn) manad_start <- str_sub(manad_start, 1, 3)
   
   manad_slut <- bas_syss_df %>% 
     distinct(månad) %>% 
     dplyr::pull() %>% 
     last() %>% 
     as.character()
+  
+  if (manader_diagramtitel_kortnamn) manad_slut <- str_sub(manad_slut, 1, 3)
   
   ar_start <- bas_syss_df %>% 
     distinct(år) %>% 
