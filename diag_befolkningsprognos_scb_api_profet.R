@@ -12,7 +12,8 @@ SkapaBefPrognosDiagram <- function(region_vekt = "20",
                                                                          #    "https://api.scb.se/OV0104/v1/doris/sv/ssd/BE/BE0401/BE0401B/BefProgOsiktRegN20"),         # url-adresser till tabellerna med befolkningsprognoser
                                    facet_variabel = NA,                  # om TRUE och det finns flera regioner så läggs de som facet, annars skrivs ett diagram ut per region
                                    facet_x_axis_storlek = 5,             # storlek på x-axeln i facet-diagram
-                                   output_fold ="G:/Samhällsanalys/API/Fran_R/Utskrift/",        # mapp på datorn som diagrammet skrivs till
+                                   aldersgrupper_vektor = c(0, 20, 66, 80), # åldersgrupper som används i diagrammet. Första siffran är start på gruppen så c(0, 20, 65, 80) blir 0-19 år, 20-64 år, 65-79 år och 80+ år
+                                   output_fold = NA,        # mapp på datorn som diagrammet skrivs till
                                    gruppera_namn = NA,                   # ange namn om medskickade regioner ska grupperas, annars NA (= grupperas inte)
                                    logga_path = NA,       # om vi vill ha logga med, annars kan vi ta bort denna rad eller ge variabeln värdet NULL
                                    logga_storlek = 20,
@@ -51,6 +52,15 @@ SkapaBefPrognosDiagram <- function(region_vekt = "20",
   # om det inte skickats med någon färgvektor så används färgvektorn "rus_sex" från funktionen diagramfärger
   if (is.na(farger_diagram[1])) farger_diagram <- diagramfarger("rus_sex")
 
+  # hämta värde för output_fold om det inte skickats med
+  if (all(is.na(output_fold))) {
+    if (exists("utskriftsmapp", mode = "function")) {
+      output_fold <- utskriftsmapp()
+    } else {
+      stop("Ingen output-mapp angiven, kör funktionen igen och ge parametern output-mapp ett värde.")
+    }
+  }
+  
   # =============== jämförelse x år framåt från senaste tillgängliga år ==========================
   
   senaste_ar_bef <- as.numeric(max(hamta_giltiga_varden_fran_tabell("https://api.scb.se/OV0104/v1/doris/sv/ssd/BE/BE0101/BE0101A/BefolkningNy", "tid")))
@@ -111,17 +121,26 @@ SkapaBefPrognosDiagram <- function(region_vekt = "20",
   
   # Lägg ihop i åldersgrupper
   progn_bef <- progn_bef %>% 
-    mutate(aldergrp = case_when(aldernum < 20 ~ "0-19 år", 
-                                between(aldernum, 20, 64) ~ "20-64 år",
-                                between(aldernum, 65, 79) ~ "65-79 år",
-                                aldernum > 79 ~ "80+ år", 
-                                TRUE ~ "totalt"),
+    mutate(aldergrp = skapa_aldersgrupper(aldernum, aldersgrupper_vektor),
+           aldergrp = ifelse(is.na(aldergrp), "totalt", as.character(aldergrp)),
+           aldernum = ifelse(is.na(aldernum), -1, aldernum),
            start_ar = prognos_ar %>% as.numeric() %>%  "-"(1) %>% as.character(),
            slut_ar = start_ar %>% as.numeric() %>% "+"(jmfrtid) %>% as.character(),
            ar_beskr = paste0("Förändring ", start_ar, "-", slut_ar, " (prognos våren ", 
                               prognos_ar, ")"),
            Folkmängd = round(Folkmängd))
   
+  # skapa en vektor av åldrar som ligger i ordning och där totalt ligger sist
+  sort_vekt <- progn_bef %>% 
+    group_by(aldergrp) %>% 
+    summarise(sort_num = min(aldernum, na.rm = TRUE), .groups = "drop") %>% 
+    arrange(sort_num) %>% 
+    dplyr::pull(aldergrp)
+  
+  # använd sorteringesvektorn ovan för att sortera åldergrupperna i vektorn i en factor-variabel
+  progn_bef <- progn_bef %>% 
+    mutate(aldergrp = factor(aldergrp, levels = sort_vekt))
+
   # om vi inte vill ha könsuppdelad data (finns inte stöd för det än) så tar vi bort det här
   if (!konsuppdelat) {
     progn_bef <- progn_bef %>% 
@@ -149,7 +168,7 @@ SkapaBefPrognosDiagram <- function(region_vekt = "20",
     mutate(antal = (rowSums(select(., all_of(slutar)), na.rm = TRUE)) - (rowSums(select(., all_of(startar)), na.rm = TRUE)),              # beräkna antal av förändring i åldersgrupper
            andel = round(((rowSums(select(., all_of(slutar)), na.rm = TRUE)) - (rowSums(select(., all_of(startar)), na.rm = TRUE))) /     # beräkna andel av förändring i åldergrupper
                            (rowSums(select(., all_of(startar)), na.rm = TRUE)) * 100,1),
-           aldergrp = factor(aldergrp, levels = c("totalt", "0-19 år", "20-64 år", "65-79 år", "80+ år")))      # Gör om aldergrp till factor som vi lägger i den ordning vi vill plotta diagrammet
+           aldergrp = factor(aldergrp, levels = sort_vekt))      # Gör om aldergrp till factor som vi lägger i den ordning vi vill plotta diagrammet
   
   if(spara_dataframe_till_global_environment) {
     assign("bef_progn_nms_df", prognos_diff_df, envir = .GlobalEnv)
