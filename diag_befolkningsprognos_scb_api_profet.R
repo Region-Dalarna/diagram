@@ -10,7 +10,7 @@ SkapaBefPrognosDiagram <- function(region_vekt = "20",
                                                                          #  c("https://api.scb.se/OV0104/v1/doris/sv/ssd/BE/BE0401/BE0401A/BefProgOsiktRegN",
                                                                          #    "https://api.scb.se/OV0104/v1/doris/sv/ssd/BE/BE0401/BE0401B/BefProgOsiktRegN21",
                                                                          #    "https://api.scb.se/OV0104/v1/doris/sv/ssd/BE/BE0401/BE0401B/BefProgOsiktRegN20"),         # url-adresser till tabellerna med befolkningsprognoser
-                                   facet_variabel = NA,                  # om TRUE och det finns flera regioner så läggs de som facet, annars skrivs ett diagram ut per region
+                                   facet_variabel = NA,                  # "region" om man vill ha regionerna som facet, annars skrivs ett diagram ut per region
                                    facet_x_axis_storlek = 5,             # storlek på x-axeln i facet-diagram
                                    aldersgrupper_vektor = c(0, 20, 66, 80), # åldersgrupper som används i diagrammet. Första siffran är start på gruppen så c(0, 20, 65, 80) blir 0-19 år, 20-64 år, 65-79 år och 80+ år
                                    output_fold = NA,        # mapp på datorn som diagrammet skrivs till
@@ -50,7 +50,9 @@ SkapaBefPrognosDiagram <- function(region_vekt = "20",
   options(scipen = 999)
   
   # om det inte skickats med någon färgvektor så används färgvektorn "rus_sex" från funktionen diagramfärger
-  if (is.na(farger_diagram[1])) farger_diagram <- diagramfarger("rus_sex")
+  if (all(is.na(farger_diagram))) {
+    if (konsuppdelat) farger_diagram <- diagramfarger("kon") else farger_diagram <- diagramfarger("rus_sex")
+  } 
 
   # hämta värde för output_fold om det inte skickats med
   if (all(is.na(output_fold))) {
@@ -60,6 +62,10 @@ SkapaBefPrognosDiagram <- function(region_vekt = "20",
       stop("Ingen output-mapp angiven, kör funktionen igen och ge parametern output-mapp ett värde.")
     }
   }
+  
+  # om könsuppdelat så får man bara skicka med en prognos, inte flera
+  if (konsuppdelat & length(tabeller_url) > 1) stop("Om man skriver ut könsuppdelade diagram så kan endast en prognos användas. Korrigera parametern 'tabeller_url' så att den bara innehåller en url och inte flera.")
+  
   
   # =============== jämförelse x år framåt från senaste tillgängliga år ==========================
   
@@ -187,6 +193,7 @@ SkapaBefPrognosDiagram <- function(region_vekt = "20",
                                    facet_x_axis_storlek = facet_x_axis_storlek,
                                    eget_regionnamn = eget_regionnamn,
                                    farger_diagram = farger_diagram,
+                                   konsuppdelat = konsuppdelat,
                                    dataetiketter = dataetiketter,
                                    output_fold = output_fold,
                                    skapa_fil = skapa_fil,
@@ -210,6 +217,7 @@ SkapaBefPrognosDiagram <- function(region_vekt = "20",
                                          facet_x_axis_storlek = facet_x_axis_storlek,
                                          eget_regionnamn = eget_regionnamn,
                                          farger_diagram = farger_diagram,
+                                         konsuppdelat = konsuppdelat,
                                          dataetiketter = dataetiketter,
                                          output_fold = output_fold,
                                          skapa_fil = skapa_fil,
@@ -241,6 +249,7 @@ skrivut_befprognos_diagram <- function(skickad_df,
                                        facet_scale,
                                        facet_x_axis_storlek,
                                        skickad_andel, 
+                                       konsuppdelat, 
                                        x_var, 
                                        y_lbl = "", 
                                        logga_storlek,
@@ -292,6 +301,7 @@ skrivut_befprognos_diagram <- function(skickad_df,
   enhet <- if(skickad_andel) "_andel" else "_antal"
   prognos_ar_txt <- skickad_df$prognos_ar %>% unique() %>% paste0(collapse = "_")
   filnamn_pre <- paste0(filnamn_typ, region_txt, "_", prognos_ar_txt, "_", skickad_jmfrtid, "ars_sikt", ifelse(y_lbl == "", "", paste0("_", y_lbl)), etiketter_txt, enhet, pre_facet_scale)
+  if (konsuppdelat) filnamn_pre <- paste0(filnamn_pre, "_kon")
   filnamn <- paste0(filnamn_pre, ".png")
   
   # lägg till fokus på åldersgruppen totalt om det finns i datasetet
@@ -305,20 +315,26 @@ skrivut_befprognos_diagram <- function(skickad_df,
   if(length(unique(chart_df$prognos_ar)) > 1) NA else "fokus"
   } else NA
   
+  # välj om man ska ha flera grupper eller inte - antingen kön, flera prognosår eller inga alls
+  vald_xgrupp <- case_when(konsuppdelat == TRUE ~ "kön",
+                           length(unique(skickad_df$prognos_ar)) > 1 ~ "ar_beskr",
+                           TRUE ~ NA)
+  
+  
   gg_obj <- SkapaStapelDiagram(skickad_df = chart_df %>% 
                                  filter(regionkod %in% regionkoder),
                                skickad_x_var = x_var,
                                skickad_y_var = ifelse(skickad_andel, "andel", "antal"),
-                               skickad_x_grupp = if(length(unique(skickad_df$prognos_ar)) > 1) "ar_beskr" else NA,
+                               skickad_x_grupp = vald_xgrupp,
                                diagram_titel = diagramtitel,
                                output_mapp = output_fold,
                                diagram_capt = diagram_capt,
                                diagram_facet = skickad_facetinst,
                                facet_grp = facet_var,
                                facet_scale = facet_scale,
-                               facet_legend_bottom = if(length(unique(skickad_df$prognos_ar)) > 1) TRUE else skickad_facetinst,
+                               facet_legend_bottom = if(!is.na(vald_xgrupp)) TRUE else skickad_facetinst,
                                stodlinjer_avrunda_fem = stodlinjer_avrunda_fem,
-                               x_var_fokus = diagram_fokus_var,
+                               x_var_fokus = if(konsuppdelat) NA else diagram_fokus_var,
                                manual_color = farger_diagram, # if (length(unique(skickad_df$prognos_ar)) > 1) farger_diagram else farger_diagram[1],
                                logga_scaling = logga_storlek,
                                manual_y_axis_title = ifelse(skickad_andel, "procent", y_lbl_axel),
