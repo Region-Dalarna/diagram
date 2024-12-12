@@ -11,8 +11,7 @@
 #             3. diag_fokusvariabel - en eller flera variabler som man vill titta extra på i en tidsserie
 #
 # ===========================================================================================================
-
-
+ 
 source("G:/skript/hamta_data/hamta_bas_arbmarknstatus_manad.R", encoding = "utf-8", echo = FALSE)
 source("https://raw.githubusercontent.com/Region-Dalarna/funktioner/main/func_SkapaDiagram.R", encoding = "utf-8", echo = FALSE)
 source("https://raw.githubusercontent.com/Region-Dalarna/funktioner/main/func_API.R", encoding = "utf-8", echo = FALSE)
