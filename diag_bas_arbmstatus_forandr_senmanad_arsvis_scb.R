@@ -12,7 +12,7 @@ diag_bas_arbstatus_region_kon_alder_fodelseregion_prel_manad <- function(vald_re
                                                                                       #"antal totalt",
                                                                                       "antal övriga"
                                                                          ),
-                                                                         utmapp,
+                                                                         utmapp = NA,
                                                                          diag_capt = "Källa: Befolkningens arbetsmarknadsstatus (BAS), SCB\nBearbetning: Samhällsanalys, Region Dalarna",
                                                                          diag_fargvekt = NA,
                                                                          skriv_diagramfil = TRUE
@@ -29,6 +29,13 @@ diag_bas_arbstatus_region_kon_alder_fodelseregion_prel_manad <- function(vald_re
   source("https://raw.githubusercontent.com/Region-Dalarna/funktioner/main/func_SkapaDiagram.R")
   source("https://raw.githubusercontent.com/Region-Dalarna/hamta_data/main/hamta_bas_arbstatus_region_kon_alder_fodelseregion_prel_manad_ArbStatusM_scb.R")
   
+  if (all(is.na(utmapp))) {
+    if (exists("utskriftsmapp", mode = "function")) {
+      utmapp <- utskriftsmapp()
+    } else {
+      stop("Ingen output-mapp angiven, kör funktionen igen och ge parametern output-mapp ett värde.")
+    }
+  }
   
   fodelseregion_txt = c("inrikes född", "utrikes född")
   # om ingen färgvektor är medskickad, kolla om funktionen diagramfärger finns, annars använd r:s defaultfärger
