@@ -49,12 +49,15 @@ diag_utbniva_tidserie_och_lansjmfr <- function(
   # diag_andel_utbniva_jmfr_lan - diagram 4 ovan, TRUE om man vill ha med det, annars FALSE
   #                utbildningsnivå i diagram fyra styrs med parametern "vald_utb_niva", "eftergymn" är förvalt
   #
+  # 2025-01-08 - Av någon anledning har SCB ändrat bytt namn på variabeln befolkning till antal. För att slippa ändra på för många ställen i skriptet har
+  #              jag lagt till en rad som byter namn på variabeln befolkning till antal. /Jon
+  #
   # 2024-04-12 - Har ändrat revideringen nedan så att man fritt kan välja vilken utbildningsnivå man vill jämföra mellan länen i diagram 4. 
   #              Jag har ändrat i instruktionerna ovan så att det framgår hur man väljer. "eftergymn" är fortsatt förvald utbildningsnivå
   #              i länsjämförelsediagrammet. /Peter
   #
   # 2024-01-05 - Har lagt till ett val (minst_3_ar) som gör det möjligt att göra en länsjämförelse (diagram 4) även för personer med minst 3 års eftergymnasial utbildning
-  # Tidigare gick det enbart att göra denna jämförelse för alla typer av eftergymnasial utbildning. /Jon
+  #              Tidigare gick det enbart att göra denna jämförelse för alla typer av eftergymnasial utbildning. /Jon
   #
   # =======================================================================================================
   
@@ -90,7 +93,8 @@ diag_utbniva_tidserie_och_lansjmfr <- function(
                                 kon_klartext = c("män","kvinnor"),
                                 alder = c(as.character(25:64)),
                                 utbildningsniva_klartext = "*",
-                                tid = "*")
+                                tid = "*") %>% 
+    rename(Befolkning = Antal)
   
   px_df_utskrift_kon <- px_df %>%
     filter(regionkod %in% region_vekt) %>% 
