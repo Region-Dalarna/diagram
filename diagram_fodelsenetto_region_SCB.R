@@ -17,6 +17,7 @@ diagram_fodelsenetto <- function(region_vekt = "20", # Val av kommuner
   # Skapat 2024-04-23
   # Ändrat: 25 nov 2024, ändrat höjd och bredd till samma mått som i vårt skapa-diagramskript 
   # Förbättringsmöjligheter: Svart linje för födelsenetto funkar inte med facet.
+  # Ändrat 9 jan 2025, SCB verkar ha ändrat namn på variabeln döda till antal. Jag lägger till en mutate som döper tillbaka variabeln /Jon
   # ===========================================================================================================
   
 # om parametern demo är satt till TRUE så öppnas en flik i webbläsaren med ett exempel på hur diagrammet ser ut och därefter avslutas funktionen
@@ -67,7 +68,8 @@ if (demo){
                                              alder = "*",
                                              tid_koder = tid) %>% 
     filter(ålder == "totalt ålder") %>% 
-    select(-'ålder')
+    select(-'ålder') %>% 
+    mutate(Döda = Antal)
   
   df <- fodda_df %>% 
     left_join(doda_df, by = c("regionkod","region", "år")) %>% 
