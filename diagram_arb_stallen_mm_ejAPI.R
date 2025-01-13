@@ -16,7 +16,7 @@ diag_foretagarna <- function(region_vekt = "20", # Vilken region skall vi välja
   # Diagram för antal företagssamma, antal arbetsställen och andel företagssamma. Data hämtas från företagarna:
   # https://www.foretagsklimat.se/downloads
   # Enbart senaste år
-  # Data uppdaterades senast 2023-11-16
+  # Data uppdaterades senast 2025-01-13
   # ========================================== Inställningar ============================================
   
   # Nödvändiga bibliotek och funktioner
@@ -45,7 +45,7 @@ diag_foretagarna <- function(region_vekt = "20", # Vilken region skall vi välja
   
   if(diag_arbetsstallen==TRUE){
     
-    arbetsstallen_df <- read.xlsx("G:/skript/projekt/data/sarbarhetsanalys/Arbetsställen_2002-2023.xlsx",startRow=5)
+    arbetsstallen_df <- read.xlsx("G:/skript/projekt/data/sarbarhetsanalys/Arbetsställen_2002-2025.xlsx",startRow=5)
     
     # Pivoterar data och för vissa justeringar
     arbetsstallen_df<-arbetsstallen_df %>%
@@ -110,7 +110,7 @@ diag_foretagarna <- function(region_vekt = "20", # Vilken region skall vi välja
 
   if(diag_nyforetagsamma==TRUE){
     
-    nyforetagsamma_df <- read.xlsx("G:/skript/projekt/data/sarbarhetsanalys/Nyföretagsamhet_2002-2023.xlsx",startRow=5)
+    nyforetagsamma_df <- read.xlsx("G:/skript/projekt/data/sarbarhetsanalys/Nyföretagsamhet_2002-2025.xlsx",startRow=5)
     # Pivoterar data och gör vissa justeringar
     nyforetagsamma_df <- nyforetagsamma_df %>%
       select(-3) %>% 
@@ -174,7 +174,7 @@ diag_foretagarna <- function(region_vekt = "20", # Vilken region skall vi välja
 
   if(diag_foretagsamma==TRUE){
     
-    foretagsamma_df <- read.xlsx("G:/skript/projekt/data/sarbarhetsanalys/Företagsamhet_2002-2023.xlsx",startRow=5)
+    foretagsamma_df <- read.xlsx("G:/skript/projekt/data/sarbarhetsanalys/Företagsamhet_2002-2025.xlsx",startRow=5)
 
     # Pivoterar data och gör vissa justeringar
     foretagsamma_df <- foretagsamma_df %>%
