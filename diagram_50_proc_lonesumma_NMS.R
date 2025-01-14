@@ -8,7 +8,7 @@ diag_50proc_lonesumma <- function(output_mapp = "G:/Samhällsanalys/Statistik/N�
   # Hur många företag krävs för att lönesumman i en kommun skall uppgå till 50 % (kumulativt). 
   # För tillfället enbart för Dalarna. Vill man ha annat län måste data hämtas via MONA. Skript finns på:
   # P1079_Gem/Jon/Sårbarhetsanalys/Ftg_50procent_lonesumma_ny_variant
-  # Data uppdaterades senast 1 november 2023
+  # Data uppdaterades senast 14 januari 2025
   # ========================================== Inställningar ============================================
   
   # Nödvändiga bibliotek och funktioner
