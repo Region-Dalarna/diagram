@@ -27,7 +27,6 @@ diag_50proc_lonesumma <- function(output_mapp = "G:/Samhällsanalys/Statistik/N�
   # Läser in data från Excel (ursprung NMS-databasen)
   #kommun_df <- read.xlsx("G:/skript/projekt/data/sarbarhetsanalys/1_nov_23_50_procent_lonesumma.xlsx",sheet=1)
   input_mapp <- "G:/skript/projekt/data/sarbarhetsanalys/"
-  files <- list.files(input_mapp, full.names = TRUE)
   files <- list.files(input_mapp, pattern = "*50_procent_lonesumma", full.names = TRUE)
   
   file_info <- file.info(files)
