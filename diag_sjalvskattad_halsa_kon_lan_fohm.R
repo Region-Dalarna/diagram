@@ -7,8 +7,8 @@ diag_sjalvskattad_halsa_kon_lan <- function(
     kon_klartext = c("Kvinnor", "Män"),
     tid_koder = "9999",         # "9999" = senaste år
     region_sort = FALSE,        # TRUE så sorteras regionerna enligt ordningen i region_vekt
-    diagram_fargvekt = NA,
-    output_mapp = NA,
+    diagram_fargvekt = NA,      # skicka med en färgvektor om man önskar andra färger än standard
+    output_mapp = NA,           # hit skrivs png-filen
     returnera_dataframe_global_environment = FALSE,
     diagram_capt = "Källa: Folkhälsomyndighetens öppna statistikdatabas\nBearbetning: Samhällsanalys, Region Dalarna",
     visa_dataetiketter = FALSE, 
@@ -18,6 +18,16 @@ diag_sjalvskattad_halsa_kon_lan <- function(
     logga_path = NA                         # NULL för att köra utan logga             
   ) {
 
+  # ===============================================================================================
+  #
+  # Diagram för att skriva ut självskattad hälsa från Hälsa på lika villkor-enkäten hos 
+  # Folkhälsomyndigheten. Standard är att skriva ut andel med bra eller mycket bra hälsa. Skickas
+  # bara ett år med så skrivs bara ett diagram för det året, och finns fler regioner så läggs de
+  # på x-axeln. Skickas flera år och flera regioner med så skrivs ett facetdiagram med ett facet-
+  # diagram för varje region.
+  #
+  # ===============================================================================================
+  
   if (!require("pacman")) install.packages("pacman")
   p_load(tidyverse,
      			glue)
@@ -88,6 +98,7 @@ diag_sjalvskattad_halsa_kon_lan <- function(
   
   flera_ar <- if(length(unique(sjalvskattad_halsa_df$År)) > 1) TRUE else FALSE
   konsuppdelat <- if(length(unique(sjalvskattad_halsa_df$Kön)) > 1) TRUE else FALSE
+  flera_regioner <- if(length(unique(sjalvskattad_halsa_df$region)) > 1) TRUE else FALSE
   
   gg_obj <- SkapaStapelDiagram(skickad_df = sjalvskattad_halsa_df,
   			 skickad_x_var = if (flera_ar) "År" else "region",
@@ -108,13 +119,14 @@ diag_sjalvskattad_halsa_kon_lan <- function(
   			 lagg_pa_logga = if (is.null(logga_path)) FALSE else TRUE,
   			 logga_path = logga_path,
   			 output_mapp = output_mapp,
-  			 diagram_facet = if (flera_ar) TRUE else FALSE,
-  			 facet_grp = if (flera_ar) "region" else NA,
+  			 diagram_facet = if (flera_ar & flera_regioner) TRUE else FALSE,
+  			 facet_grp = if (flera_ar & flera_regioner) "region" else NA,
   			 facet_scale = "free",
   			 facet_legend_bottom = if (konsuppdelat) TRUE else FALSE
   )
   
   gg_list <- c(gg_list, list(gg_obj))
   names(gg_list)[[length(gg_list)]] <- diagramfil %>% str_remove(".png")
-  
+ 
+  return(gg_list) 
 }
