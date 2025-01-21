@@ -1,4 +1,3 @@
-
 diag_forandr_branscher_bubblor <- function(vald_geografi ="20",                               # kan vara en eller flera geografier, skicka med vektor om flera, ex: c("20", "25") 
                                            egetnamn_geografi = NA,                           # om man vill använda ett eget namn på geografin, ex. "Norra Mellansverige" för c("20", "17", "21")
                                            till_word = FALSE,                                 # om diagrammet ska användas i Word görs etiketter + diagram-caption större
@@ -11,9 +10,12 @@ diag_forandr_branscher_bubblor <- function(vald_geografi ="20",                 
                                            skapa_fil = TRUE,
                                            diagramtitel_tabort = FALSE,
                                            skapa_excelfil = FALSE,
+                                           returnera_dataframe_global_environment = FALSE,
                                            logga_path = NA                                 # ändra till NULL för att köra utan logga
                                            ) {  
 
+  # Lagt till en parameter som möjliggör att returnera data till global enviroment. Jon, 2025-01-21
+  
   if (!require("pacman")) install.packages("pacman")
   p_load(tidyverse,
          pxweb,
@@ -100,6 +102,10 @@ diag_forandr_branscher_bubblor <- function(vald_geografi ="20",                 
   if (skapa_excelfil) {
     filnamn_excel <- paste0("forandr_syss_branscher_", geo_namn, "_", start_ar, "-", slut_ar, ifelse(till_word, "_w_", ""),".xlsx")
     write.xlsx(chart_df, paste0(output_mapp, filnamn_excel))
+  }
+  
+  if(returnera_dataframe_global_environment == TRUE){
+    assign("forandring_syss_branscher_df", chart_df, envir = .GlobalEnv)
   }
   
   # ========================= Skapa själva diagrammet ==============================================================
