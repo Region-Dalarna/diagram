@@ -7,14 +7,27 @@ diag_sjalvskattad_halsa_kon_lan <- function(
     kon_klartext = c("Kvinnor", "Män"),
     tid_koder = "9999",         # "9999" = senaste år
     region_sort = FALSE,        # TRUE så sorteras regionerna enligt ordningen i region_vekt
-    diagram_fargvekt = NA,
-    output_mapp = NA,
+    diagram_fargvekt = NA,      # skicka med en färgvektor om man önskar andra färger än standard
+    output_mapp = NA,           # hit skrivs png-filen
     returnera_dataframe_global_environment = FALSE,
     diagram_capt = "Källa: Folkhälsomyndighetens öppna statistikdatabas\nBearbetning: Samhällsanalys, Region Dalarna",
     visa_dataetiketter = FALSE, 
-    diagramtitel = TRUE                    # FALSE så skrivs ingen diagramtitel ut
+    ta_bort_diagramtitel = FALSE,                    # FALSE så skrivs ingen diagramtitel ut
+    kortnamn_lan = TRUE,                    # TRUE så tas " län" bort ur länsnamnet
+    diagram_0_till_100_procent = TRUE,       # TRUE så går skalan alltid från 0 till 100 procent, annars anpassas skalan efter data
+    logga_path = NA                         # NULL för att köra utan logga             
   ) {
 
+  # ===============================================================================================
+  #
+  # Diagram för att skriva ut självskattad hälsa från Hälsa på lika villkor-enkäten hos 
+  # Folkhälsomyndigheten. Standard är att skriva ut andel med bra eller mycket bra hälsa. Skickas
+  # bara ett år med så skrivs bara ett diagram för det året, och finns fler regioner så läggs de
+  # på x-axeln. Skickas flera år och flera regioner med så skrivs ett facetdiagram med ett facet-
+  # diagram för varje region.
+  #
+  # ===============================================================================================
+  
   if (!require("pacman")) install.packages("pacman")
   p_load(tidyverse,
      			glue)
@@ -25,7 +38,7 @@ diag_sjalvskattad_halsa_kon_lan <- function(
   
   # om ingen output_mapp är vald. Kolla om standardmappen existerar, om inte ges ett felmeddelande
   if (all(is.na(output_mapp))) {
-    if (!dir.exists(utskriftsmapp())) {
+    if (dir.exists(utskriftsmapp())) {
       output_mapp <- utskriftsmapp()
     } else {
       stop("Ingen output-mapp angiven, kör funktionen igen och ge parametern output-mapp ett värde.")
@@ -52,57 +65,68 @@ diag_sjalvskattad_halsa_kon_lan <- function(
   			output_mapp = output_mapp,			# anges om man vill exportera en excelfil med uttaget, den mapp man vill spara excelfilen till
   			excel_filnamn = "test_fohm.xlsx",			# filnamn för excelfil som exporteras om excel_filnamn och output_mapp anges
   			returnera_df = TRUE			# TRUE om man vill ha en dataframe i retur från funktionen
-  
   )
+  
+  if (kortnamn_lan) sjalvskattad_halsa_df <- sjalvskattad_halsa_df %>% mutate(region = region %>% skapa_kortnamn_lan())
+  
+  # om regioner är alla kommuner i ett län eller alla län i Sverige görs revidering, annars inte
+  region_start <- unique(sjalvskattad_halsa_df$region) %>% skapa_kortnamn_lan() %>% list_komma_och()
+  region_txt <- ar_alla_kommuner_i_ett_lan(unique(sjalvskattad_halsa_df$regionkod), returnera_text = TRUE, returtext = region_start)
+  region_txt <- ar_alla_lan_i_sverige(unique(sjalvskattad_halsa_df$regionkod), returnera_text = TRUE, returtext = region_txt)
+  regionfil_txt <- region_txt %>% str_replace_all(", ", "_") %>% str_replace_all(" och ", "_") 
+  regionkod_txt <- if (region_start == region_txt) unique(sjalvskattad_halsa_df$regionkod) %>% paste0(collapse = "_") else region_txt
+  if (region_start == region_txt) regionfil_txt <- region_txt
   
   # om region_sort är TRUE sorteras regionerna enligt ordningen i region_vekt
   if (region_sort) {
     sjalvskattad_halsa_df <- sjalvskattad_halsa_df %>%
       mutate(region = factor(region, levels = unique(region[order(match(regionkod, region_vekt))])))
   } 
-    
-  
-  # om regioner är alla kommuner i ett län eller alla län i Sverige görs revidering, annars inte
-  region_start <- unique(sjalvskattad_halsa_df$region) %>% skapa_kortnamn_lan() %>% list_komma_och()
-  region_txt <- ar_alla_kommuner_i_ett_lan(unique(sjalvskattad_halsa_df$regionkod), returnera_text = TRUE, returtext = region_start)
-  region_txt <- ar_alla_lan_i_sverige(unique(sjalvskattad_halsa_df$regionkod), returnera_text = TRUE, returtext = region_txt)
-  regionfil_txt <- region_txt
-  region_txt <- paste0(" i ", region_txt)
-  regionkod_txt <- if (region_start == region_txt) unique(sjalvskattad_halsa_df$regionkod) %>% paste0(collapse = "_") else region_txt
   
   if(returnera_dataframe_global_environment == TRUE){
-    assign("sjalvskattad_halsa_df", overrep_df, envir = .GlobalEnv)
+    assign("sjalvskattad_halsa_df", sjalvskattad_halsa_df, envir = .GlobalEnv)
   }
   
+  tid_txt <- if (min(sjalvskattad_halsa_df$År) == max(sjalvskattad_halsa_df$År)){
+    max(sjalvskattad_halsa_df$År) 
+  } else {
+    glue("{min(sjalvskattad_halsa_df$År)} till {max(sjalvskattad_halsa_df$År)}") 
+  }
   
-  diagramtitel <- glue("Allmän hälsa (självrapporterat) efter region, kön och år. Andel (procent).{region_txt} År {min(sjalvskattad_halsa_df$År)} - {max(sjalvskattad_halsa_df$År)}")
-  diagramfil <- glue("test_fohm_{regionfil_txt}_ar{min(sjalvskattad_halsa_df$År)}_{max(sjalvskattad_halsa_df$År)}.png") %>% str_replace_all("__", "_")
+  diagramtitel <- glue("Andel med {tolower(svarsalterantiv_klartext) %>% str_replace('hälsa', 'självrapporterad hälsa')} i {region_txt} år {tid_txt}")
+  diagramfil <- glue("sjalvskattad_halsa_fohm_{regionfil_txt}_ar{tid_txt}.png") %>% str_replace_all("__", "_")
   
-  if ("variabel" %in% names(sjalvskattad_halsa_df)) {
-     if (length(unique(sjalvskattad_halsa_df$variabel)) > 6) chart_df <- sjalvskattad_halsa_df %>% filter(variabel == unique(sjalvskattad_halsa_df$variabel)[1]) else chart_df <- sjalvskattad_halsa_df
-  } else chart_df <- sjalvskattad_halsa_df
+  flera_ar <- if(length(unique(sjalvskattad_halsa_df$År)) > 1) TRUE else FALSE
+  konsuppdelat <- if(length(unique(sjalvskattad_halsa_df$Kön)) > 1) TRUE else FALSE
+  flera_regioner <- if(length(unique(sjalvskattad_halsa_df$region)) > 1) TRUE else FALSE
   
-  gg_obj <- SkapaStapelDiagram(skickad_df = chart_df,
-  			 skickad_x_var = "År",
-  			 skickad_y_var = if ("varde" %in% names(chart_df)) "varde" else "names(sjalvskattad_halsa_df)[length(names(sjalvskattad_halsa_df))]",
-  			 skickad_x_grupp = if ("variabel" %in% names(chart_df) & length(unique(chart_df$variabel)) > 1) "variabel" else NA,
-  			 x_axis_sort_value = FALSE,
+  gg_obj <- SkapaStapelDiagram(skickad_df = sjalvskattad_halsa_df,
+  			 skickad_x_var = if (flera_ar) "År" else "region",
+  			 skickad_y_var = "Fysisk hälsa, allmänt hälsotillstånd efter region kön och år",
+  			 skickad_x_grupp = if (konsuppdelat) "Kön" else NA,
   			 diagram_titel = diagramtitel,
+  			 utan_diagramtitel = ta_bort_diagramtitel,
   			 diagram_capt = diagram_capt,
   			 stodlinjer_avrunda_fem = TRUE,
   			 filnamn_diagram = diagramfil,
   			 dataetiketter = visa_dataetiketter,
-  			 manual_y_axis_title = "",
-  			 manual_x_axis_text_vjust = 1,
-  			 manual_x_axis_text_hjust = 1,
+  			 manual_y_axis_title = "procent",
+  			 procent_0_100_10intervaller = diagram_0_till_100_procent,
+  			 x_axis_lutning = if (flera_ar) 45 else 0,
+  			 manual_x_axis_text_vjust = if (flera_ar) 1 else 0,
+  			 manual_x_axis_text_hjust = if (flera_ar) 1 else 0.5,
   			 manual_color = diagram_fargvekt,
+  			 lagg_pa_logga = if (is.null(logga_path)) FALSE else TRUE,
+  			 logga_path = logga_path,
   			 output_mapp = output_mapp,
-  			 diagram_facet = FALSE,
-  			 facet_grp = NA,
+  			 diagram_facet = if (flera_ar & flera_regioner) TRUE else FALSE,
+  			 facet_grp = if (flera_ar & flera_regioner) "region" else NA,
   			 facet_scale = "free",
+  			 facet_legend_bottom = if (konsuppdelat) TRUE else FALSE
   )
   
   gg_list <- c(gg_list, list(gg_obj))
   names(gg_list)[[length(gg_list)]] <- diagramfil %>% str_remove(".png")
-  
+ 
+  return(gg_list) 
 }
