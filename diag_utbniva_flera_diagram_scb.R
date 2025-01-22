@@ -1,4 +1,3 @@
-
 diag_utbniva_tidserie_och_lansjmfr <- function(
                                        region_vekt = c("00", "20"),
                                        output_mapp = "G:/Samhällsanalys/API/Fran_R/utskrift/",
@@ -9,6 +8,7 @@ diag_utbniva_tidserie_och_lansjmfr <- function(
                                        diagramtitel_tabort = FALSE,
                                        ta_med_logga = TRUE,
                                        logga_sokvag = NA,
+                                       visa_var_xe_etikett = NA,
                                        sverige_istallet_for_riket = TRUE,
                                        facet_x_axis_stlk = 8,
                                        region_lagg_forst = NA,
@@ -48,6 +48,8 @@ diag_utbniva_tidserie_och_lansjmfr <- function(
   # diag_andel_alla_utbnivaer   - diagram 3 ovan, TRUE om man vill ha med det, annars FALSE
   # diag_andel_utbniva_jmfr_lan - diagram 4 ovan, TRUE om man vill ha med det, annars FALSE
   #                utbildningsnivå i diagram fyra styrs med parametern "vald_utb_niva", "eftergymn" är förvalt
+  #
+  # 2025-01-22 - Lagt till möjligheten att visa var x:e etikett för diag hog respektive lag
   #
   # 2025-01-08 - Av någon anledning har SCB ändrat bytt namn på variabeln befolkning till antal. För att slippa ändra på för många ställen i skriptet har
   #              jag lagt till en rad som byter namn på variabeln befolkning till antal. /Jon
@@ -186,6 +188,7 @@ diag_utbniva_tidserie_och_lansjmfr <- function(
                                  facet_x_axis_storlek = facet_x_axis_stlk,
                                  stodlinjer_avrunda_fem = TRUE,
                                  facet_legend_bottom = TRUE,
+                                 x_axis_visa_var_xe_etikett = visa_var_xe_etikett,
                                  #x_axis_lutning = 0, 
                                  lagg_pa_logga = ta_med_logga,
                                  logga_path = logga_sokvag,
@@ -222,6 +225,7 @@ diag_utbniva_tidserie_och_lansjmfr <- function(
                                  facet_scale = "fixed",
                                  facet_legend_bottom = TRUE,
                                  facet_x_axis_storlek = facet_x_axis_stlk,
+                                 x_axis_visa_var_xe_etikett = visa_var_xe_etikett,
                                  #x_axis_lutning = 0, 
                                  lagg_pa_logga = ta_med_logga,
                                  logga_path = logga_sokvag,
