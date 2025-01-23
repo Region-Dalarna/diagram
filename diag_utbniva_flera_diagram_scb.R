@@ -6,6 +6,7 @@ diag_utbniva_tidserie_och_lansjmfr <- function(
                                        gruppering_namn = NA,   # om man vill gruppera ihop medskickade regioner ger man denna parameter ett namn
                                        valt_ar = NA,
                                        diagramtitel_tabort = FALSE,
+                                       diagram_capt_tabort = FALSE,
                                        ta_med_logga = TRUE,
                                        logga_sokvag = NA,
                                        visa_var_xe_etikett = NA,
@@ -48,6 +49,8 @@ diag_utbniva_tidserie_och_lansjmfr <- function(
   # diag_andel_alla_utbnivaer   - diagram 3 ovan, TRUE om man vill ha med det, annars FALSE
   # diag_andel_utbniva_jmfr_lan - diagram 4 ovan, TRUE om man vill ha med det, annars FALSE
   #                utbildningsnivå i diagram fyra styrs med parametern "vald_utb_niva", "eftergymn" är förvalt
+  #
+  # 2025-01-23  - Lagt till möjligheten att ta bort diagram_capt
   #
   # 2025-01-22 - Lagt till möjligheten att visa var x:e etikett för diag hog respektive lag
   #
@@ -168,8 +171,12 @@ diag_utbniva_tidserie_och_lansjmfr <- function(
     if (diag_hogutb_over_tid) {
     diagramtitel <- paste0("Andel högutbildade invånare 25-64 år", region_titel) %>% str_wrap()
     diagramfilnamn <- paste0("hogutb_andel_ar", region_txt, "_", min(px_df_utskrift_kon$år), "_", max(px_df_utskrift_kon$år), ".png")
-    diagram_capt_hogutb <- paste0(diagram_capt, "\nDefinitionen av högutbildade är individer med minst 3 års eftergymnasial utbildning.")
     
+    if (diagram_capt_tabort == TRUE){
+      diagram_capt_hogutb <- NULL
+    }else{
+      diagram_capt_hogutb <- paste0(diagram_capt, "\nDefinitionen av högutbildade är individer med minst 3 års eftergymnasial utbildning.")
+    }
     
     gg_obj <- SkapaStapelDiagram(skickad_df = px_df_utskrift_kon %>%
                                    filter(regionkod %in% region_vekt,
@@ -206,7 +213,12 @@ diag_utbniva_tidserie_och_lansjmfr <- function(
   if (diag_lagutb_over_tid) {
     diagramtitel <- paste0("Andel lågutbildade invånare 25-64 år", region_titel) %>% str_wrap()
     diagramfilnamn <- paste0("lagutb_andel_ar", region_txt, "_", min(px_df_utskrift_kon$år), "_", max(px_df_utskrift_kon$år), ".png")
-    diagram_capt_lagutb <- paste0(diagram_capt, "\nDefinitionen av lågutbildade är individer med endast förgymnasial utbildning.")
+    
+    if (diagram_capt_tabort == TRUE){
+      diagram_capt_lagutb <- NULL
+    }else{
+      diagram_capt_lagutb <- paste0(diagram_capt, "\nDefinitionen av lågutbildade är individer med endast förgymnasial utbildning.")
+    }
     
     gg_obj <- SkapaStapelDiagram(skickad_df = px_df_utskrift_kon %>%
                                    filter(regionkod %in% region_vekt,
@@ -244,6 +256,12 @@ diag_utbniva_tidserie_och_lansjmfr <- function(
   if (diag_andel_alla_utbnivaer) {
     diagramtitel <- paste0("Utbildningsnivå för invånare 25-64 år", region_titel) %>% str_wrap()
     diagramfilnamn <- paste0("utbniva_andel_per_ar_", region_txt, "_", valt_ar, ".png")
+    
+    if (diagram_capt_tabort == TRUE){
+      diagram_capt =  NULL
+    }else{
+      diagram_capt =  diagram_capt
+    }
     
     gg_obj <- SkapaStapelDiagram(skickad_df = px_df_utskrift %>%
                                    filter(regionkod %in% region_vekt,
@@ -361,6 +379,12 @@ diag_utbniva_tidserie_och_lansjmfr <- function(
     
     diagramtitel <- glue("Andel invånare 25-64 år med {dia_titel_txt} utbildning år {valt_ar}")
     diagramfilnamn <- glue("{dia_filnamn_txt}utb_andel_ar_", valt_ar, ".png")
+    
+    if (diagram_capt_tabort == TRUE){
+      diagram_capt =  NULL
+    }else{
+      diagram_capt =  diagram_capt
+    }
     
     gg_obj <- SkapaStapelDiagram(skickad_df = px_df_jmfr_lan %>% 
                                    filter(utb_niva %in% utb_niva_vec), 
