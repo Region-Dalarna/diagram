@@ -16,7 +16,7 @@ diag_antal_utbniva_alder_kon <- function(
     skriv_diagramfil = TRUE,
     diag_fargvekt = NA
 ) {
-"*"
+
   # ======================================================================================================
   #
   # Diagram som visar utbildningsnivå bland inrikes och utrikes födda samt även kön. Tre utbildningsnivåer.
