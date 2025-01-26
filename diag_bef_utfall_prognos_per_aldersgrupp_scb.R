@@ -148,6 +148,8 @@ diag_bef_utfall_prognos_per_aldersgrupp <- function(
   
   if (skriv_till_excelfil) {
     region_xlsx <- unique(bef_folk_progn$region) %>% skapa_kortnamn_lan() %>% paste0(collapse = "_")
+    startar_utfall <- bef_folk_progn %>% filter(typ == "utfall") %>% dplyr::pull(år) %>% min()
+    slutar_prognos <- bef_folk_progn %>% filter(typ == "prognos") %>% dplyr::pull(år) %>% max() 
     excefilnamn <- glue("befolkning_utfall_progn_{region_xlsx}_ar{startar_utfall}-{slutar_prognos}.xlsx")
     write_xlsx(bef_folk_progn, paste0(output_mapp, excefilnamn))
   }
