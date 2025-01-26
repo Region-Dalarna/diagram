@@ -13,6 +13,10 @@ diag_befutv_per_komponent_ar <- function(
     skriv_till_diagramfil = TRUE
 ) {
   
+  
+  if (!require("pacman")) install.packages("pacman")
+  p_load(tidyverse)
+  
   source("https://raw.githubusercontent.com/Region-Dalarna/funktioner/main/func_text.R", encoding = "utf-8", echo = FALSE)
   source("https://raw.githubusercontent.com/Region-Dalarna/funktioner/main/func_API.R", encoding = "utf-8", echo = FALSE)
   source("https://raw.githubusercontent.com/Region-Dalarna/hamta_data/main/hamta_bef_forandringar_region_period_kon_scb.R")
@@ -30,13 +34,13 @@ diag_befutv_per_komponent_ar <- function(
   
   # om ingen output_mapp är angiven så läggs diagrammen i Region Dalarnas standardmapp för utskrifter, om den finns. Annars blir det felmeddelande
   if (skriv_till_diagramfil) {           # bara relevant om vi skriver till fil
-  if (all(is.na(output_mapp))) {
-    if (dir.exists(utskriftsmapp())) {
-      output_mapp <- utskriftsmapp()
-    } else {
-      stop("Ingen output-mapp angiven, kör funktionen igen och ge parametern output-mapp ett värde.")
+    if (all(is.na(output_mapp))) {
+      if (dir.exists(utskriftsmapp())) {
+        output_mapp <- utskriftsmapp()
+      } else {
+        stop("Ingen output-mapp angiven, kör funktionen igen och ge parametern output-mapp ett värde.")
+      }
     }
-  }
   }
   
   # hämta data
@@ -77,7 +81,7 @@ diag_befutv_per_komponent_ar <- function(
   
   # returnera datasetet till global environment, bl.a. bra när man skapar Rmarkdown-rapporter
   if(returnera_dataframe_global_environment == TRUE){
-    assign("diagram_df", befutv_per_komponent_ar_scb_df, envir = .GlobalEnv)
+    assign("befutv_per_komponent_ar_scb_df", diagram_df, envir = .GlobalEnv)
   }
   
   if (length(unique(diagram_df$förändringar)) == 4) diagram_fargvekt <- diagram_fargvekt[c(1,2,2,3)]
@@ -89,15 +93,18 @@ diag_befutv_per_komponent_ar <- function(
   
   skapa_diagram <- function(skickad_regionkod) {
     
+    skriv_diagram_df <- diagram_df %>%
+      filter(regionkod %in% skickad_regionkod)
+    
     region_txt <- hamtaregion_kod_namn(skickad_regionkod)$region %>% list_komma_och()
     region_filnamn <- hamtaregion_kod_namn(skickad_regionkod)$region %>% paste0(collapse = "_")
-    startar <- min(diagram_df$år)
-    slutar <- max(diagram_df$år)
+    startar <- min(skriv_diagram_df$år)
+    slutar <- max(skriv_diagram_df$år)
     
     diagramtitel <- glue("Befolkningsökning per komponent i {region_txt} år {startar}-{slutar}")
     diagramfil <- glue("befolkningsforandring_per_komponent_{region_filnamn}_ar{startar}-{slutar}.png")
     
-    gg_obj <- SkapaStapelDiagram(skickad_df = diagram_df,
+    gg_obj <- SkapaStapelDiagram(skickad_df = skriv_diagram_df,
                                  skickad_x_var = "år",
                                  skickad_y_var = "personer",
                                  skickad_x_grupp = "förändringar",
@@ -121,6 +128,7 @@ diag_befutv_per_komponent_ar <- function(
                                  x_axis_storlek = 7,
                                  facet_x_axis_storlek = 6
                                  )
+    
     gg_list <- c(gg_list, list(gg_obj))
     names(gg_list)[[length(gg_list)]] <- diagramfil %>% str_remove(".png")
     
