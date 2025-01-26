@@ -6,10 +6,10 @@ SkapaBefPrognosDiagram <- function(region_vekt = "20",
                                    # om man skickar med flera url:er så görs en jämförelse
                                    tabeller_url = "https://api.scb.se/OV0104/v1/doris/sv/ssd/BE/BE0401/BE0401A/BefProgOsiktRegN",  
                                                                          
-                                                                         # För att använda Profet-filer: "G:/Samhällsanalys/Statistik/Befolkningsprognoser/Profet/datafiler/",
-                                                                         #  c("https://api.scb.se/OV0104/v1/doris/sv/ssd/BE/BE0401/BE0401A/BefProgOsiktRegN",
-                                                                         #    "https://api.scb.se/OV0104/v1/doris/sv/ssd/BE/BE0401/BE0401B/BefProgOsiktRegN21",
-                                                                         #    "https://api.scb.se/OV0104/v1/doris/sv/ssd/BE/BE0401/BE0401B/BefProgOsiktRegN20"),         # url-adresser till tabellerna med befolkningsprognoser
+                                   # För att använda Profet-filer: "G:/Samhällsanalys/Statistik/Befolkningsprognoser/Profet/datafiler/",
+                                   #  c("https://api.scb.se/OV0104/v1/doris/sv/ssd/BE/BE0401/BE0401A/BefProgOsiktRegN",
+                                   #    "https://api.scb.se/OV0104/v1/doris/sv/ssd/BE/BE0401/BE0401B/BefProgOsiktRegN21",
+                                   #    "https://api.scb.se/OV0104/v1/doris/sv/ssd/BE/BE0401/BE0401B/BefProgOsiktRegN20"),         # url-adresser till tabellerna med befolkningsprognoser
                                    facet_variabel = NA,                  # "region" om man vill ha regionerna som facet, annars skrivs ett diagram ut per region
                                    facet_x_axis_storlek = 5,             # storlek på x-axeln i facet-diagram
                                    aldersgrupper_vektor = c(0, 20, 66, 80), # åldersgrupper som används i diagrammet. Första siffran är start på gruppen så c(0, 20, 65, 80) blir 0-19 år, 20-64 år, 65-79 år och 80+ år
@@ -31,7 +31,7 @@ SkapaBefPrognosDiagram <- function(region_vekt = "20",
                                    spara_excelfil = FALSE,
                                    farger_diagram = NA,
                                    diagram_capt = "Källa: SCB:s befolkningsprognos\nBearbetning: Samhällsanalys, Region Dalarna"
-                                   ) {
+) {
   
   if (!require("pacman")) install.packages("pacman")
   p_load(pxweb,
@@ -53,7 +53,7 @@ SkapaBefPrognosDiagram <- function(region_vekt = "20",
   if (all(is.na(farger_diagram))) {
     if (konsuppdelat) farger_diagram <- diagramfarger("kon") else farger_diagram <- diagramfarger("rus_sex")
   } 
-
+  
   # hämta värde för output_fold om det inte skickats med
   if (all(is.na(output_fold))) {
     if (exists("utskriftsmapp", mode = "function")) {
@@ -91,7 +91,7 @@ SkapaBefPrognosDiagram <- function(region_vekt = "20",
                                        tid_vekt = prognos_jmfr_ar,                        # ny metod, funkar? gammal: paste0("+", jmfrtid), 
                                        cont_klartext = "Folkmängd",
                                        prognos_ar = prognos_ar           # prognos_ar funkar bara för profet-uttag (för uttag från SCB:s API styr url:en vilket år som hämtas men i Profet kan flera år hämtas med samma url om det finns data för flera år i mappen)
-                                       ) 
+  ) 
   
   # Här skapar vi en rad med total folkmängd i dfmalar ==========================================
   total_df <- befprogn_df %>% 
@@ -100,7 +100,7 @@ SkapaBefPrognosDiagram <- function(region_vekt = "20",
     summarize(across(where(is.numeric), ~ sum(.x, na.rm = TRUE))) %>% 
     ungroup() %>% 
     mutate(ålder = "totalt ålder")
-
+  
   # Lägg på total_df som rad på dfmalar
   befprogn_df <- bind_rows(befprogn_df, total_df) 
   
