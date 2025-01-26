@@ -93,7 +93,9 @@ diag_bef_utfall_prognos_per_aldersgrupp <- function(
     str_replace_all("<prognos_ar>", unique(bef_prognos$prognos_ar))
   
   
-  skapa_diagram <- function(skickad_regionkod) {
+  skapa_diagram <- function(skickad_regionkod,
+                            bef_folkmangd = bef_folkmangd,
+                            bef_prognos = bef_prognos) {
     
     diagram_df <- bef_folk_progn %>%
       filter(regionkod %in% skickad_regionkod)
