@@ -93,18 +93,16 @@ diag_bef_utfall_prognos_per_aldersgrupp <- function(
     str_replace_all("<prognos_ar>", unique(bef_prognos$prognos_ar))
   
   
-  skapa_diagram <- function(skickad_regionkod,
-                            bef_folkmangd = bef_folkmangd,
-                            bef_prognos = bef_prognos) {
+  skapa_diagram <- function(skickad_regionkod) {
     
     diagram_df <- bef_folk_progn %>%
       filter(regionkod %in% skickad_regionkod)
     
     region_txt <- unique(diagram_df$region) %>% skapa_kortnamn_lan()
-    startar_utfall <- bef_folkmangd$år %>% min()
-    slutar_utfall <- bef_folkmangd$år %>% max()  
-    startar_prognos <- bef_prognos$år %>% min()  
-    slutar_prognos <- bef_prognos$år %>% max()
+    startar_utfall <- diagram_df %>% filter(typ == "utfall") %>% dplyr::pull(år) %>% min()
+    slutar_utfall <- diagram_df %>% filter(typ == "utfall") %>% dplyr::pull(år) %>% max()  
+    startar_prognos <- diagram_df %>% filter(typ == "prognos") %>% dplyr::pull(år) %>% min()
+    slutar_prognos <- diagram_df %>% filter(typ == "prognos") %>% dplyr::pull(år) %>% max()
   
     diagramtitel <- glue("Befolkning i {region_txt} år {startar_utfall}-{slutar_utfall} samt befolkningsprognos {startar_prognos}-{slutar_prognos}")
     diagramfil <- glue("befolkning_utfall_progn_{region_txt}_ar{startar_utfall}-{slutar_prognos}.png")
