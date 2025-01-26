@@ -12,7 +12,7 @@ diag_bef_utfall_prognos_per_aldersgrupp <- function(
     ta_bort_diagramtitel = FALSE,                            # FALSE så skrivs ingen diagramtitel ut
     visa_dataetiketter = FALSE,
     skriv_till_diagramfil = TRUE,
-    skriv_till_excelfil = TRUE
+    skriv_till_excelfil = FALSE
 ) {
 
   
