@@ -118,8 +118,8 @@ ar_txt <- chart_df %>%
   dplyr::pull() %>%
   list_komma_och()
 
-diagramtitel <- glue("Förädlingsvärde i {region_txt} per bransch år {ar_txt}")
-diagramfil <- glue("foradlingsvarde_bransch_{vald_region %>% paste0(collapse = '_')}_ar{ar_txt}.png")
+diagramtitel <- glue("Förädlingsvärde i {vald_region_txt} per bransch år {ar_txt}")
+diagramfil <- glue("foradlingsvarde_bransch_{region_vekt %>% paste0(collapse = '_')}_ar{ar_txt}.png")
 
 
 gg_obj <- SkapaStapelDiagram(
