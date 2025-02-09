@@ -1,6 +1,7 @@
 
 diag_befutv_per_komponent_ar <- function(
     region_vekt = "20",                                      # läns- och kommunkoder, det blir ett diagram (och en fil om man skriver bildfiler) per region
+    gruppera_namn = NA,                                     # för att skapa egna geografiska indelningar av samtliga regioner som skickas med i uttaget
     diagram_capt = "Källa: SCB:s öppna statistikdatabas\nBearbetning: Samhällsanalys, Region Dalarna",
     output_mapp = NA,                                        # här sparas 
     enbart_inrikes_flyttnetto = TRUE,                        # FALSE = inr flyttnetto delas upp på eget län och övriga Sverige, annars blir det bara en kategori för inr flyttnetto
@@ -91,13 +92,27 @@ diag_befutv_per_komponent_ar <- function(
     mutate(förändringar = förändringar %>% str_replace("Flyttningsöverskott", "Flyttnetto"),
            förändringar = factor(förändringar, levels = c("Födelseöverskott", "Inrikes flyttnetto", "Flyttnetto eget län", "Flyttnetto övriga Sverige", "Invandringsöverskott")))
   
+  # om man vill gruppera ihop flera kommuner eller län till en större geografisk indelning
+  # så anges den med namn i gruppera_namn. Lämnas den tom görs ingenting nedan
+  if (!all(is.na(gruppera_namn))) {
+    diagram_df <- diagram_df %>% 
+      group_by(across(-c(regionkod, region, personer))) %>% 
+      summarise(personer = sum(personer, na.rm = TRUE), .groups = "drop") %>% 
+      mutate(regionkod = "gg",
+             region = gruppera_namn) %>% 
+      relocate(region, .before = 1) %>% 
+      relocate(regionkod, .before = region)
+    
+    region_vekt <- "gg"
+  }
+  
   skapa_diagram <- function(skickad_regionkod) {
     
     skriv_diagram_df <- diagram_df %>%
       filter(regionkod %in% skickad_regionkod)
     
-    region_txt <- hamtaregion_kod_namn(skickad_regionkod)$region %>% list_komma_och()
-    region_filnamn <- hamtaregion_kod_namn(skickad_regionkod)$region %>% paste0(collapse = "_")
+    region_txt <- if (skickad_regionkod == "gg") gruppera_namn else hamtaregion_kod_namn(skickad_regionkod)$region %>% list_komma_och()
+    region_filnamn <- if (skickad_regionkod == "gg") gruppera_namn %>% tolower %>% str_replace_all(" ", "_") else hamtaregion_kod_namn(skickad_regionkod)$region %>% paste0(collapse = "_")
     startar <- min(skriv_diagram_df$år)
     slutar <- max(skriv_diagram_df$år)
     
