@@ -85,9 +85,9 @@ diag_sjalvskattad_halsa_kon_lan_kommun <- function(
       mutate(region = factor(region, levels = unique(region[order(match(regionkod, region_vekt))])))
   } 
   
-  if(returnera_dataframe_global_environment == TRUE){
+  if(returnera_dataframe_global_environment == TRUE & length(unique(sjalvskattad_halsa_df$region)) == 1){
     assign("sjalvskattad_halsa_df", sjalvskattad_halsa_df, envir = .GlobalEnv)
-  }
+  } 
   
   if(returnera_dataframe_global_environment == TRUE & length(unique(sjalvskattad_halsa_df$region)) > 1){
     assign("sjalvskattad_halsa_region_df", sjalvskattad_halsa_df, envir = .GlobalEnv)
