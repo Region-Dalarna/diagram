@@ -107,7 +107,7 @@ diag_sjalvskattad_halsa_kon_lan_kommun <- function(
   
   flera_ar <- if(length(unique(sjalvskattad_halsa_df$År)) > 1) TRUE else FALSE
   konsuppdelat <- if(length(unique(sjalvskattad_halsa_df$Kön)) > 1) TRUE else FALSE
-  #flera_regioner <- if(length(unique(sjalvskattad_halsa_df$region)) > 1) TRUE else FALSE
+  flera_regioner <- if(length(unique(sjalvskattad_halsa_df$region)) > 1) TRUE else FALSE
   
   gg_obj <- SkapaStapelDiagram(skickad_df = sjalvskattad_halsa_df,
                                skickad_x_var = if (flera_ar) "År" else "region",
