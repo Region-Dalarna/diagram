@@ -89,6 +89,10 @@ diag_sjalvskattad_halsa_kon_lan_kommun <- function(
     assign("sjalvskattad_halsa_df", sjalvskattad_halsa_df, envir = .GlobalEnv)
   }
   
+  if(returnera_dataframe_global_environment == TRUE & length(unique(sjalvskattad_halsa_df$region)) > 1){
+    assign("sjalvskattad_halsa_region_df", sjalvskattad_halsa_df, envir = .GlobalEnv)
+  }
+  
   if (min(sjalvskattad_halsa_df$År) == max(sjalvskattad_halsa_df$År)){
     tid_txt <- max(sjalvskattad_halsa_df$År) 
     diagramtitel <- glue("Andel med bra eller mycket bra självskattad hälsa år {tid_txt}")
