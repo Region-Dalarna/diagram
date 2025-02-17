@@ -1,11 +1,3 @@
-# Självskattad hälsa - digram
-source("https://raw.githubusercontent.com/Region-Dalarna/diagram/refs/heads/main/diag_sjalvskattad_halsa_kon_lan_kommun_fohm.R")
-gg_sjalvskattad_halsa <- diag_sjalvskattad_halsa_kon_lan_kommun(region_vekt = "20",
-                                                                #region_vekt = "20",
-                                                                tid_koder = "*",
-                                                                output_mapp = output_mapp_figur,
-                                                                returnera_dataframe_global_environment = TRUE)
-
 diag_sjalvskattad_halsa_kon_lan_kommun <- function(
     region_vekt = "20",
     andel_konfinterv_klartext = "Andel",
