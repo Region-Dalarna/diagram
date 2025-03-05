@@ -5,6 +5,7 @@ diag_etablering_diverse_scb <- function(region = "20", # Enbart ett i taget.
                                         diag_facet = TRUE,
                                         visa_logga_i_diagram = TRUE,                        # TRUE om logga ska visas i diagrammet, FALSE om logga inte ska visas i diagrammet
                                         logga_sokvag = NA,                                 # sökväg till logga som ska visas i diagrammet
+                                        startar = 2012, # Startår för tidsserien. Bör inte vara tidigare än 12 år före slutåret då färgerna inte räcker till.
                                         diagram_capt = "Källa: SCB:s öppna statistikdatabas\nBearbetning: Samhällsanalys, Region Dalarna",
                                         output_mapp = "G:/Samhällsanalys/API/Fran_R/utskrift/",                                  # mapp där diagram ska sparas, NA = sparas ingen fil
                                         skriv_diagrambildfil = FALSE,                           # TRUE om diagram ska skrivas till fil, FALSE om diagram inte ska skrivas till fil
@@ -59,7 +60,7 @@ diag_etablering_diverse_scb <- function(region = "20", # Enbart ett i taget.
                                                                                 utbniv_klartext = "samtliga utbildningsnivåer",
                                                                                 bakgrvar_klartext = c("vistelsetid 0-1 år", "vistelsetid 2-3 år", "vistelsetid 4-9 år", "vistelsetid 10- år"),
                                                                                 cont_klartext = "Andel förvärvsarbetande (ny definition från och med 2019)",
-                                                                                tid_koder = "*") %>% 
+                                                                                tid_koder = c(startar:2022)) %>% 
     rename(Andel_forvarvsarbetande = `Andel förvärvsarbetande (ny definition från och med 2019)`)
   
   # 2022 och senare
@@ -92,8 +93,7 @@ diag_etablering_diverse_scb <- function(region = "20", # Enbart ett i taget.
                                    filter(region == skapa_kortnamn_lan(hamtaregion_kod_namn(region_fokus)$region), 
                                           kön %in% c("män och kvinnor")) %>% 
                                    mutate(år = år %>% as.character(),
-                                          bakgrundsvariabel = bakgrundsvariabel %>% str_remove("vistelsetid ")) %>% 
-                                   filter(år > (max(as.integer(år))-12)),
+                                          bakgrundsvariabel = bakgrundsvariabel %>% str_remove("vistelsetid ")),
                                  skickad_x_var = "bakgrundsvariabel",
                                  skickad_y_var = "Andel_forvarvsarbetande",
                                  skickad_x_grupp = "år",
@@ -126,8 +126,7 @@ diag_etablering_diverse_scb <- function(region = "20", # Enbart ett i taget.
                                           kön %in% c("män","kvinnor")) %>% 
                                    mutate(år = år %>% as.character(),
                                           bakgrundsvariabel = bakgrundsvariabel %>% str_remove("vistelsetid "),
-                                          kön = str_to_title(kön)) %>% 
-                                   filter(år > (max(as.integer(år))-12)),
+                                          kön = str_to_title(kön)) ,
                                  skickad_x_var = "bakgrundsvariabel",
                                  skickad_y_var = "Andel_forvarvsarbetande",
                                  skickad_x_grupp = "år",
