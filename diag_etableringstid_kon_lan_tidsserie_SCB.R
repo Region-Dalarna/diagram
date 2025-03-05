@@ -1,8 +1,8 @@
 diag_etablering_diverse_scb <- function(region = "20", # Enbart ett i taget.
-                                        diag_alla_lan = TRUE, # Skapar ett diagram där länen jämförs
-                                        diag_tidsserie = TRUE,
+                                        diag_alla_lan = TRUE, # Skapar ett diagram där länen jämförs för för vald vistelsetid
+                                        vald_vistelsetid = "10- år", # Vistelsetid som ska visas i länsdiagrammet. Finns även: "0-1 år", "2-3 år", "4-9 år"
+                                        diag_tidsserie = TRUE, # Skapar ett diagram
                                         diag_facet = TRUE,
-                                        diag_fargvektor = diagramfarger("rus_sex"),                               # valbar färgvektor för diagrammet
                                         visa_logga_i_diagram = TRUE,                        # TRUE om logga ska visas i diagrammet, FALSE om logga inte ska visas i diagrammet
                                         logga_sokvag = NA,                                 # sökväg till logga som ska visas i diagrammet
                                         diagram_capt = "Källa: SCB:s öppna statistikdatabas\nBearbetning: Samhällsanalys, Region Dalarna",
@@ -155,8 +155,10 @@ diag_etablering_diverse_scb <- function(region = "20", # Enbart ett i taget.
   }
   
   if(diag_alla_lan == TRUE){
-    diagram_titel = paste0("Arbetsmarknadsetablering efter minst 10 års vistelsetid i Sverige år ",max(etablering$år))
-    diagram_capt = " Källa: SCB\n Bearbetning: Samhällsanalys, Region Dalarna\nDiagramförklaring: Andelen etablerade på arbetsmarknaden efter minst 10 års vistelsetid i landet"
+    
+    
+    diagram_titel = paste0("Arbetsmarknadsetablering med ",vald_vistelsetid, "s vistelsetid i Sverige år ",max(etablering$år))
+    diagram_capt = paste0("Källa: SCB\n Bearbetning: Samhällsanalys, Region Dalarna\nDiagramförklaring: Andelen etablerade på arbetsmarknaden efter  ",vald_vistelsetid, "s vistelsetid i landet")
     diagramfil <- ("etablering_vistelsetid_allalan.png")
     
     gg_obj <- SkapaStapelDiagram(skickad_df = etablering %>% 
@@ -166,7 +168,7 @@ diag_etablering_diverse_scb <- function(region = "20", # Enbart ett i taget.
                                            region = skapa_kortnamn_lan(region)) %>%
                                    filter(år==max(år), 
                                           kön== "män och kvinnor", 
-                                          bakgrundsvariabel == "10- år"),
+                                          bakgrundsvariabel == vald_vistelsetid),
                                  skickad_x_var = "region",
                                  skickad_y_var = "Andel_forvarvsarbetande",
                                  diagram_titel = diagram_titel,
