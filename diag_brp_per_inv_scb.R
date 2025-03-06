@@ -43,6 +43,8 @@ p_load(tidyverse,
 source("https://raw.githubusercontent.com/Region-Dalarna/hamta_data/main/hamta_brp_lan_region_tid_NR0105ENS2010T01A_scb.R")
 source("https://raw.githubusercontent.com/Region-Dalarna/funktioner/main/func_SkapaDiagram.R", encoding = "utf-8")
 source("https://raw.githubusercontent.com/Region-Dalarna/funktioner/main/func_API.R", encoding = "utf-8")
+source("https://raw.githubusercontent.com/Region-Dalarna/funktioner/main/func_text.R", encoding = "utf-8")
+
 
 # om ingen färgvektor är medskickad, kolla om funktionen diagramfärger finns, annars använd r:s defaultfärger
 if (all(is.na(diag_fargvekt))) {
