@@ -12,7 +12,8 @@ diag_storsta_yrke_per_geografi <- function(
                               returnera_dataframe_global_environment = FALSE,          
                               ta_bort_diagramtitel = FALSE,                            # FALSE så skrivs ingen diagramtitel ut
                               visa_dataetiketter = FALSE,
-                              facet_ovanpa_varandra = FALSE,
+                              facet_ovanpa_varandra = FALSE,                           # lägg facets ovanpå varandra istället för bredvid varandra
+                              storre_text = FALSE,                                     # större text, passar bättre i markdownrapporter
                               ta_med_logga = TRUE,
                               logga_sokvag = NA,
                               diagram_capt = "Källa: SCB:s öppna statistikdatabas\nBearbetning: Samhällsanalys, Region Dalarna",
@@ -180,6 +181,8 @@ diag_storsta_yrke_per_geografi <- function(
                         dataetiketter = visa_dataetiketter,
                         facet_grp = ifelse(konsuppdelat, "kön", NA),                          # kör facet, ett för varje kön om könsuppdelat, inte könsuppdelalt annars
                         facet_sort = TRUE,
+                        facet_x_axis_storlek = ifelse(storre_text, 10.5, 8),
+                        facet_y_axis_storlek = ifelse(storre_text, 10.5, 8),
                         facet_kolumner = if (facet_ovanpa_varandra) 1 else NULL,
                         facet_scale = "free_y",                                   # konstanthåller skala för antal i yrket men låter vilka yrken som är med vara "free", så att det kan bli två olika uppsättningar av yrken
                         skriv_till_diagramfil = skriv_till_diagramfil
