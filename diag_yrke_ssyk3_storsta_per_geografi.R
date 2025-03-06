@@ -181,7 +181,7 @@ diag_storsta_yrke_per_geografi <- function(
                         dataetiketter = visa_dataetiketter,
                         facet_grp = ifelse(konsuppdelat, "kön", NA),                          # kör facet, ett för varje kön om könsuppdelat, inte könsuppdelalt annars
                         facet_sort = TRUE,
-                        diagramfil_hojd = ifelse(storre_text, 9, 7),
+                        diagramfil_hojd = ifelse(storre_text, 11, 7),
                         facet_x_axis_storlek = ifelse(storre_text, 10.5, 8),
                         facet_y_axis_storlek = ifelse(storre_text, 10.5, 8),
                         facet_kolumner = if (facet_ovanpa_varandra) 1 else NULL,
