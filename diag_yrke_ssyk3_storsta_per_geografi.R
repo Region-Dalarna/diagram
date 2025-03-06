@@ -175,9 +175,8 @@ diag_storsta_yrke_per_geografi <- function(
                         diagram_facet = konsuppdelat,
                         lagg_pa_logga = ta_med_logga,
                         logga_path = logga_sokvag,
-                        returnera_dataframe_global_environment = FALSE,          
-                        ta_bort_diagramtitel = FALSE,                            # FALSE så skrivs ingen diagramtitel ut
-                        visa_dataetiketter = FALSE,
+                        utan_diagramtitel = ta_bort_diagramtitel,                            # FALSE så skrivs ingen diagramtitel ut
+                        dataetiketter = visa_dataetiketter,
                         facet_grp = ifelse(konsuppdelat, "kön", NA),                          # kör facet, ett för varje kön om könsuppdelat, inte könsuppdelalt annars
                         facet_sort = TRUE,
                         facet_scale = "free_y",                                   # konstanthåller skala för antal i yrket men låter vilka yrken som är med vara "free", så att det kan bli två olika uppsättningar av yrken
