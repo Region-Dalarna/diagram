@@ -66,7 +66,7 @@ diag_gini_SCB <- function(region_vekt = hamtaAllaLan(tamedriket = TRUE), # De re
   
   if (diag_tidsserie) {
     
-    diagramtitel <- "Gini-koefficient"
+    diagramtitel <- "Ginikoefficient"
     diagramfil <- paste0("gini_tidsserie_",paste(region_vekt_linje,collapse="_"),".png")
     
     gini_tidsserie <- gini_df %>% 
@@ -97,7 +97,7 @@ diag_gini_SCB <- function(region_vekt = hamtaAllaLan(tamedriket = TRUE), # De re
   if (diag_jmfr_senastear) {
     
     senaste_ar = max(gini_df$år)
-    diagramtitel <- glue("Gini-koefficient år {senaste_ar}")
+    diagramtitel <- glue("Ginikoefficient år {senaste_ar}")
     diagramfil <- paste0("gini_jmf_senastear.png")
     
     if(returnera_data == TRUE & diag_tidsserie == TRUE & diag_jmfr_senastear == TRUE){
