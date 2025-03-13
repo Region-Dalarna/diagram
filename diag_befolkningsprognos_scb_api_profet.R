@@ -716,13 +716,13 @@ SkapaBefPrognosDiagram_InrUtrFodda <- function(aktlan = "20",
   dfstartar <- progn_bef %>%
     filter(år %in% startar) %>% 
     group_by(år, regionkod, region, `inrikes/utrikes född`, aldergrp) %>% 
-    summarize(antal = sum(Folkmängd))
+    summarize(antal = sum(Antal))
   
   # Skapa df för målår
   dfmalar <- progn_bef %>% 
     filter(år %in% malar) %>% 
     group_by(år, regionkod, region, `inrikes/utrikes född`, aldergrp) %>% 
-    summarize(antal = sum(Folkmängd))
+    summarize(antal = sum(Antal))
   
   # Här skapar vi en rad med total folkmängd i dfmalar ==========================================
   total_df <- dfmalar %>% 
@@ -819,7 +819,7 @@ SkapaBefPrognosDiagram_InrUtrFodda <- function(aktlan = "20",
                      utan_diagramtitel = utan_diagramtitel,
                      skriv_till_diagramfil = skapa_fil,
                      lagg_pa_logga = ta_med_logga,
-                     logga_path = logga_path,
+                     #logga_path = ,
                      dataetiketter = dataetiketter,
                      filnamn_diagram = filnamn)
   
