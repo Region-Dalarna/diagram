@@ -14,12 +14,14 @@ diag_befutv_per_komponent_ar <- function(
     skriv_till_diagramfil = TRUE
 ) {
   
+  # source('https://raw.githubusercontent.com/Region-Dalarna/funktioner/main/func_SkapaDiagram.R') saknades i koden, varför jag la till den. /Jon 2025-03-17
   
   if (!require("pacman")) install.packages("pacman")
   p_load(tidyverse)
   
   source("https://raw.githubusercontent.com/Region-Dalarna/funktioner/main/func_text.R", encoding = "utf-8", echo = FALSE)
   source("https://raw.githubusercontent.com/Region-Dalarna/funktioner/main/func_API.R", encoding = "utf-8", echo = FALSE)
+  source('https://raw.githubusercontent.com/Region-Dalarna/funktioner/main/func_SkapaDiagram.R')
   source("https://raw.githubusercontent.com/Region-Dalarna/hamta_data/main/hamta_bef_forandringar_region_period_kon_scb.R")
   
   gg_list <- list()
