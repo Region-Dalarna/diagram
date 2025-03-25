@@ -3,7 +3,7 @@ diag_gini_SCB <- function(region_vekt = hamtaAllaLan(tamedriket = TRUE), # De re
                           region_vekt_linje = c("20","00"), # Vilka regioner skall jämföras i linjediagrammet. Måste vara två av de som finns ovan
                           output_mapp = "G:/Samhällsanalys/API/Fran_R/Utskrift/",
                           spara_diagrambildfil = FALSE,
-                          diagram_capt = "Källa: SCB \nBearbetning: Samhällsanalys, Region Dalarna\nDiagramförklaring: För att redovisa ojämnheten i inkomstfördelningen används gini-koefficienten.\nKoefficienten kan anta ett värde mellan 0 och 1.\nEtt högt värde på koefficienten visar på större ojämnhet än ett lågt värde",
+                          diagram_capt = "Källa: SCB, bearbetning av Samhällsanalys, Region Dalarna\nDiagramförklaring: För att redovisa ojämnheten i inkomstfördelningen används gini-koefficienten.\nKoefficienten kan anta ett värde mellan 0 och 1. Ett högt värde på koefficienten visar på större ojämnhet än ett lågt värde",
                           diag_fargvekt_linje = NA,
                           diag_fargvekt_stapel = NA,
                           inkomsttyp_klartext = "disponibel inkomst per k.e. inkl. kapitalvinst",			 #  Finns: "faktorinkomst per k.e. inkl. kapitalvinst", "faktorinkomst per k.e. exkl. kapitalvinst", "disponibel inkomst per k.e. inkl. kapitalvinst", "disponibel inkomst per k.e. exkl. kapitalvinst",
