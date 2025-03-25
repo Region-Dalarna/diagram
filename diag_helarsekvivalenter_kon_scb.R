@@ -1,6 +1,6 @@
 
 source("https://raw.githubusercontent.com/Region-Dalarna/funktioner/main/func_SkapaDiagram.R", encoding = "utf-8")
-
+source("https://raw.githubusercontent.com/Region-Dalarna/funktioner/main/func_text.R", encoding = "utf-8", echo = FALSE)  
 
 diag_helarsekvivalenter <- function(
     region_vekt = "20",			# Val av region.
