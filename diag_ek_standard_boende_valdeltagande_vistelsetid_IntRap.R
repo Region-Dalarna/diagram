@@ -1,5 +1,3 @@
-test <- diagram_diverse_vistelsetid(typ_av_val = c("Valdeltagande i val till riksdag","Valdeltagande i val till region", "Valdeltagande i val till kommun"))
-
 diagram_diverse_vistelsetid <-function(region_vekt = c("20"),# Max 1,
                                        diag_ek_standard = TRUE,
                                        alder_ek_standard = "20-64 år",			 #  Finns: "20- år", "20-64 år", "65- år", "20-29 år", "30-49 år", "50-64 år", "65-79 år", "80- år"
