@@ -13,7 +13,7 @@ diag_trangboddhet_inrikes_utrikes <- function(region = "20", # Enbart ett i tage
   # =======================================================================================================================
   #
   # Två diagram för trångboddhet uppdelat på inrikes och utrikes födda, finns som antal respektive andel
-  # Används primärt i 
+  # Används primärt i integrationsrapporten
   #
   # Alla åldrar
   # =======================================================================================================================
