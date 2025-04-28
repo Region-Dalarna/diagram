@@ -44,9 +44,10 @@ diag_fohm <- function(visa_logga_i_diagram = TRUE,                        # TRUE
                                                                                 sociala_relationer_klartext = sociala_relationer_klartext) %>%
       filter(Födelseland != "Totalt")
     
+    namn <- chartr("åäö", "aao", tolower(str_replace_all(sociala_relationer_klartext, " ", "_")))
     
     if(returnera_data_rmarkdown == TRUE){
-      assign("sociala_relationer_df", sociala_relationer_df, envir = .GlobalEnv)
+      assign(paste0(namn,"_df"), sociala_relationer_df, envir = .GlobalEnv)
     }
     
     diagram_capt <- paste0("Källa: Folkhälsomyndighetens öppna statistikdatabas, bearbetning: Samhällsanalys, Region Dalarna.\nDiagramförklaring: Enkätundersökning. Andel som svarar ja på frågan: ",unique(sociala_relationer_df$`Sociala relationer`),".")
@@ -90,7 +91,7 @@ diag_fohm <- function(visa_logga_i_diagram = TRUE,                        # TRUE
     source("https://raw.githubusercontent.com/Region-Dalarna/hamta_data/refs/heads/main/hamta_sjalvskattad_halsa_riket_halsotillstand_andel_och_konfidensintervall_fodelseland_kon_ar_halsgodcfod_fohm.R")
     
     sjalvskattad_halsa_df <- hamta_sjalvskattad_halsa_riket_alder_fodelseland_kon_ar  (alder_klartext = alder,
-                                                                                       kon_klartext = kon_klartext,
+                                                                                       kon_klartext = "*",
                                                                                        fodelseland_klartext = "*",
                                                                                        andel_och_konfidensintervall_klartext = "Andel",
                                                                                        tid_koder = "*") %>%
