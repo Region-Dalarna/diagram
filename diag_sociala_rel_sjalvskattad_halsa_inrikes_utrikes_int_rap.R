@@ -87,7 +87,7 @@ diag_fohm <- function(visa_logga_i_diagram = TRUE,                        # TRUE
   }
   
   if(diag_sjalvskattad_halsa_tid){
-    source("https://raw.githubusercontent.com/Region-Dalarna/hamta_data/refs/heads/main/hamta_sjalvskattad_halsa_riket_halsotillstand_andel_och_konfidensintervall_fodelseland_kon_ar_halsgodcfod_IntRap.R")
+    source("https://raw.githubusercontent.com/Region-Dalarna/hamta_data/refs/heads/main/hamta_sjalvskattad_halsa_riket_halsotillstand_andel_och_konfidensintervall_fodelseland_kon_ar_halsgodcfod_fohm.R")
     
     sjalvskattad_halsa_df <- hamta_sjalvskattad_halsa_riket_alder_fodelseland_kon_ar  (alder_klartext = alder,
                                                                                        kon_klartext = kon_klartext,
