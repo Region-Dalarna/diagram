@@ -4,6 +4,7 @@ diag_UVAS_bakgrund_vistelsetid <- function(region = "20", # Enbart ett i taget.
                                            visa_logga_i_diagram = TRUE,                        # TRUE om logga ska visas i diagrammet, FALSE om logga inte ska visas i diagrammet
                                            diag_senaste_ar = TRUE,
                                            diag_tidsserie = TRUE,
+                                           valda_farger = diagramfarger("rus_sex"),
                                            logga_sokvag = NA,                                 # sökväg till logga som ska visas i diagrammet
                                            output_mapp = "G:/Samhällsanalys/API/Fran_R/utskrift/",                                  # mapp där diagram ska sparas, NA = sparas ingen fil
                                            skriv_diagrambildfil = FALSE,                           # TRUE om diagram ska skrivas till fil, FALSE om diagram inte ska skrivas till fil
@@ -39,6 +40,7 @@ diag_UVAS_bakgrund_vistelsetid <- function(region = "20", # Enbart ett i taget.
   source("https://raw.githubusercontent.com/Region-Dalarna/funktioner/main/func_SkapaDiagram.R")
   source("https://raw.githubusercontent.com/Region-Dalarna/hamta_data/refs/heads/main/hamta_andel_studerande_UVAS_region_kon_bakgrund_tid_IntGr8LanKON1N_scb.R")
   
+  valt_lan <- skapa_kortnamn_lan(hamtaregion_kod_namn(region)$region)
   # if (!require("pacman")) install.packages("pacman")
   # pacman::p_load(tidyverse,
   #                pxweb,
@@ -77,8 +79,8 @@ diag_UVAS_bakgrund_vistelsetid <- function(region = "20", # Enbart ett i taget.
   
   if(diag_senaste_ar){
     
-    diagramtitel <- paste0("Unga som varken arbetar eller studerar i Dalarna"," ",max(UVAS_df$år)," efter vistelsetid")
-    diagramfilnamn <- paste0("UVAS_vistelsetid_inrikes_senastear.png")
+    diagramtitel <- glue("Unga som varken arbetar eller studerar i {valt_lan} år {max(UVAS_df$år)} efter vistelsetid")
+    diagramfilnamn <- paste0("UVAS_vistelsetid_inrikes_senastear_",valt_lan,".png")
     
     # Skapar diagram där etableringstiden jämförs mellan män och kvinnor, oavsett utbildning
     gg_obj <- SkapaStapelDiagram(skickad_df =UVAS_df %>%
@@ -112,9 +114,9 @@ diag_UVAS_bakgrund_vistelsetid <- function(region = "20", # Enbart ett i taget.
   
   if(diag_tidsserie){
     
-    diagramtitel <- paste0("Unga som varken arbetar eller studerar i Dalarna efter vistelsetid")
+    diagramtitel <- glue("Unga som varken arbetar eller studerar i {valt_lan} efter vistelsetid")
     #diagramtitel <- str_wrap(diagramtitel,60)
-    diagramfilnamn <- paste0("UVAS_vistelsetid_inrikes_tid.png")
+    diagramfilnamn <- paste0("UVAS_vistelsetid_inrikes_tid_",valt_lan,".png")
     
     # Skapar diagram där etableringstiden jämförs mellan män och kvinnor, oavsett utbildning
     gg_obj <- SkapaStapelDiagram(skickad_df =UVAS_df %>%
@@ -125,7 +127,7 @@ diag_UVAS_bakgrund_vistelsetid <- function(region = "20", # Enbart ett i taget.
                                  skickad_y_var = "varde",
                                  skickad_x_grupp = "variabel",
                                  # manual_x_axis_text_vjust=0.9,
-                                 manual_color = diagramfarger("rus_sex"),
+                                 manual_color = valda_farger,
                                  diagram_facet = TRUE,
                                  facet_grp = "sysselsattning",
                                  facet_legend_bottom = TRUE,
