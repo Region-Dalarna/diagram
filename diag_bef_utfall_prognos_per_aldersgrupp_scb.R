@@ -54,22 +54,54 @@ diag_bef_utfall_prognos_per_aldersgrupp <- function(
                                                         alder_koder = "*")
   )
   
+  # special för att hantera förändring av namn på innehållsvariable från Folkmängd till Antal
+  if ("Folkmängd" %in% names(bef_folkmangd)) bef_folkmangd <- bef_folkmangd %>% rename(Antal = Folkmängd)
+  
   # välj år för prognosen utifrån senaste år för befolkning
   start_ar <- (as.numeric(max(bef_folkmangd$år)) + 1) %>% as.character()
   slut_ar <- (as.numeric(start_ar) + 10) %>% as.character()
   
+  hamta_region <- region_vekt[region_vekt != "00"]
+  hamta_riket <- region_vekt[region_vekt == "00"]
+  
+  if (length(hamta_region) > 0) {
   bef_prognos <- funktion_upprepa_forsok_om_fel(function()
-    hamta_befprognos_data(region_vekt = region_vekt,
+    hamta_befprognos_data(region_vekt = hamta_region,
                         tid_vekt = c(start_ar:slut_ar),
                         url_prognos_vektor = c("https://api.scb.se/OV0104/v1/doris/sv/ssd/BE/BE0401/BE0401A/BefProgOsiktRegN")
-                        )
-  )
+                        ), max_forsok = 4
+  )} else bef_prognos <- NULL
+  
+  # special för att hantera förändring av namn på innehållsvariable från Folkmängd till Antal
+  if ("Folkmängd" %in% names(bef_prognos)) bef_prognos <- bef_prognos %>% rename(Antal = Folkmängd)
+   
+  if (length(hamta_riket) > 0) {
+    source("https://raw.githubusercontent.com/Region-Dalarna/hamta_data/main/hamta_befprogn_riket_inrikesutrikes_alder_kon_tid_BefolkprognRevNb_scb.R")
+    bef_prognos_riket <- funktion_upprepa_forsok_om_fel(function()
+      hamta_befprogn_riket_inrikesutrikes_alder_kon_tid_scb(tid_koder = c(start_ar:slut_ar)
+      ), max_forsok = 4
+    ) %>% 
+      mutate(regionkod = "00",
+             region = "Riket",
+             prognos_ar = as.character(as.numeric(start_ar) - 1),
+             alder_num = parse_number(ålder),
+             ålder = if_else(alder_num > 99, "100+ år", ålder)) %>% 
+      group_by(regionkod, region, kön, ålder, år, prognos_ar) %>% 
+      summarise(Antal = sum(Antal, na.rm = TRUE), .groups = "drop")
     
+  } else bef_prognos_riket <- NULL
+    
+  # lägg ihop regioner och riket, ta bara bort om en df = NULL,
+  # finns två dataframes (både region(er) och riket) så läggs de
+  # ihop med list_rbind() så resultatet blir alltid en df
+  bef_prognos <- compact(list(bef_prognos, bef_prognos_riket)) %>% 
+    list_rbind()
+  
   bef_prognos2 <- bef_prognos %>% 
     mutate(aldergrp = skapa_aldersgrupper(ålder, aldersindelning),
            typ = "prognos") %>% 
     group_by(regionkod, region, typ, aldergrp, år) %>% 
-    summarise(Folkmängd = round(sum(Folkmängd, na.rm = TRUE)), .groups = "drop")
+    summarise(Antal = round(sum(Antal, na.rm = TRUE)), .groups = "drop")
   
   
   bef_folk_progn <- bef_folkmangd %>%
@@ -77,10 +109,10 @@ diag_bef_utfall_prognos_per_aldersgrupp <- function(
     mutate(aldergrp = skapa_aldersgrupper(ålder, aldersindelning),
            typ = "utfall") %>% 
     group_by(regionkod, region, typ, aldergrp, år) %>% 
-    summarise(Folkmängd = round(sum(Folkmängd, na.rm = TRUE)), .groups = "drop") %>% 
+    summarise(Antal = round(sum(Antal, na.rm = TRUE)), .groups = "drop") %>% 
     bind_rows(bef_prognos2) %>% 
     arrange(regionkod, region, aldergrp, år) %>% 
-    mutate(Befolkningsökning = Folkmängd - lag(Folkmängd, 1)) %>% 
+    mutate(Befolkningsökning = Antal - lag(Antal, 1)) %>% 
     filter(år != min(år))
   
   # returnera datasetet till global environment, bl.a. bra när man skapar Rmarkdown-rapporter
@@ -110,7 +142,7 @@ diag_bef_utfall_prognos_per_aldersgrupp <- function(
   
     gg_obj <- SkapaStapelDiagram(skickad_df = diagram_df,
                                  skickad_x_var = "år",
-                                 skickad_y_var = "Folkmängd",
+                                 skickad_y_var = "Antal",
                                  skickad_x_grupp = "typ",
                                  #x_axis_sort_value = TRUE,
                                  diagram_titel = diagramtitel,
