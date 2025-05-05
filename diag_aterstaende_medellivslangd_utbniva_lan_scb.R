@@ -7,7 +7,10 @@ diag_aterstaende_medellivslangd_utbniva_lan_scb <- function(
     diag_fargvektor = NA,                               # valbar färgvektor för diagrammet
     visa_logga_i_diagram = TRUE,                        # TRUE om logga ska visas i diagrammet, FALSE om logga inte ska visas i diagrammet
     logga_sokvag = NA,                                 # sökväg till logga som ska visas i diagrammet
+    diagramtitel_tabort = FALSE,                     # TRUE om diagramtitel ska tas bort, FALSE om diagramtitel ska visas
     diagram_capt = "Källa: Demografisk analys - Befolkning, SCB:s öppna statistikdatabas\nBearbetning: Samhällsanalys, Region Dalarna",
+    x_axel_stlk = 10.5,                              # storlek på x-axelns text
+    y_axel_stlk = 12,                                # storlek på y-axelns text
     skriv_diagramfil = TRUE,                           # TRUE om diagram ska skrivas till fil, FALSE om diagram inte ska skrivas till fil
     excel_mapp = NA,                                   # mapp där excelfil ska sparas, NA = sparas ingen fil
     demo = FALSE,             # sätts till TRUE om man bara vill se ett exempel på diagrammet i webbläsaren och inget annat
@@ -79,7 +82,7 @@ c("https://region-dalarna.github.io/utskrivna_diagram/medellivslangd_aterstaende
   			 skickad_x_var = "årsintervall",
   			 skickad_y_var = cont_var_klartext,
   			 skickad_x_grupp = "utbildningsnivå",
-  			 diagram_titel = diagramtitel,
+  			 diagram_titel = if(diagramtitel_tabort) NULL else diagramtitel,
   			 diagram_capt = diagram_capt,
   			 y_axis_borjar_pa_noll = FALSE,
   			 filnamn_diagram = diagramfil,
@@ -87,6 +90,8 @@ c("https://region-dalarna.github.io/utskrivna_diagram/medellivslangd_aterstaende
   			 manual_x_axis_title = "årsintervall",
   			 manual_color = diag_fargvektor,
   			 lagg_pa_logga = visa_logga_i_diagram,
+  			 facet_x_axis_storlek = x_axel_stlk,
+  			 facet_y_axis_storlek = y_axel_stlk,
   			 logga_path = logga_sokvag,
   			 output_mapp = utmapp,
   			 diagram_facet = TRUE,
