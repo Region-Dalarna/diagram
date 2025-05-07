@@ -4,7 +4,7 @@ diagram_diverse_vistelsetid <-function(region_vekt = c("20"),# Max 1,
                                        jmf_ar = 2017, # År att jämföra senaste år med (för diagrammet med ekonomisk standard)
                                        diag_boendetyp = TRUE,
                                        diag_valdeltagande = TRUE,
-                                       typ_av_val = "Valdeltagande i val till riksdag",# Finns även: "Valdeltagande i val till region", "Valdeltagande i val till kommun",
+                                       typ_av_val = "Valdeltagande i val till riksdag, procent",# Finns även: "Valdeltagande i val till region, procent", "Valdeltagande i val till kommun, procent",
                                        output_mapp_figur = "G:/Samhällsanalys/Statistik/Näringsliv/basfakta/", # Outputmapp för figur
                                        skriv_diagrambildfil = FALSE, # Sparar figuren till output_mapp_figur
                                        returnera_figur = TRUE, # Returnerar en figur
@@ -17,6 +17,8 @@ diagram_diverse_vistelsetid <-function(region_vekt = c("20"),# Max 1,
   # - Ekonomisk Ett standard: Facet-diagram (stapel) som jämför andel personer med låg ekonomisk standard i olika grupper
   # - Boendeform: Ett Stapeldiagram som visar boendeform baserat på vistelsetid (och inrikes födda)
   # - Valdeltagande: Upp till tre Stapeldiagram som visar valdeltagande i olika val (riksdag, region och kommun) baserat på vistelsetid (och inrikes födda)
+  #
+  # 2025-05-07: Felaktighet då variabeln val inte längre skapas. Ändrat i skriptet så nu funkar det (det sista diagrammet). /Jon
   # =================================================================================================================
   # Skript som skapar tre diagram kopplade till låg ekonomisk standard
   
@@ -214,9 +216,11 @@ diagram_diverse_vistelsetid <-function(region_vekt = c("20"),# Max 1,
         variabel == "födelseregion: Sverige" ~ "Inrikes född",
         TRUE ~ variabel
       )) %>%
-      mutate(region = skapa_kortnamn_lan(region),
-             val = str_extract(val, "^[^,]+"))
+      mutate(region = skapa_kortnamn_lan(region))
     
+    # Tidigare
+    # mutate(region = skapa_kortnamn_lan(region),
+    #        val = str_extract(val, "^[^,]+"))
     
     if(returnera_dataframe_global_environment == TRUE){
       assign("valdeltagande_df", valdeltagande_df, envir = .GlobalEnv)
@@ -232,14 +236,14 @@ diagram_diverse_vistelsetid <-function(region_vekt = c("20"),# Max 1,
     
     skapa_diagram <- function(val_vilket){
       
-      diagramtitel <- paste0(val_vilket," i ",unique(valdeltagande_df$region)," efter vistelsetid")
+      val_utan_procent <- str_extract(val_vilket, "^[^,]+")
+      diagramtitel <- paste0(val_utan_procent," i ",unique(valdeltagande_df$region)," efter vistelsetid")
       #diagramtitel <- str_wrap(diagramtitel,60)
-      diagramfilnamn <- paste0(gsub(" ", "_", val_vilket),".png")
+      diagramfilnamn <- paste0(gsub(" ", "_", val_utan_procent),".png")
       
-      gg_obj <- SkapaStapelDiagram(skickad_df =valdeltagande_df %>%
-                                     filter(val == val_vilket),
+      gg_obj <- SkapaStapelDiagram(skickad_df =valdeltagande_df,
                                    skickad_x_var = "variabel",
-                                   skickad_y_var = "varde",
+                                   skickad_y_var = val_vilket,
                                    skickad_x_grupp = "år",
                                    # manual_x_axis_text_vjust=0.9,
                                    manual_color = diag_fargvekt,
