@@ -1,5 +1,4 @@
-# Diagramskript för att skriva ut födelsetal som hämtas från Wikipedia, där källan är Världsbanken
-# (borde det gå att hämta direkt därifrån?).
+# Diagramskript för att skriva ut födelsetal som hämtas från Världsbanken och landskoder från Wikipedia
 # Man kan styra diagrambeskrivning, färgvektor (måste vara minst 8 färger), om det ska skrivas en 
 # bildfil och vart diagrammet i så fall ska sparas. 
 # Man kan spara en dataframe till global environment om man vill (kan vara bra ibland när man skapar RMarkdown-
