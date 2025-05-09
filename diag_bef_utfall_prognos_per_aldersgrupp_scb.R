@@ -1,7 +1,7 @@
 
 diag_bef_utfall_prognos_per_aldersgrupp <- function(
     region_vekt = "20",                                      # läns- och kommunkoder, det blir ett diagram (och en fil om man skriver bildfiler) per region
-    aldersindelning = c(0, 1, 6, 16, 20, 65, 80),
+    aldersindelning = c(0, 1, 6, 16, 20, 66, 80),
     diagram_capt = "Källa: SCB:s öppna statistikdatabas, befolkningsframskrivning från år <prognos_ar>\nBearbetning: Samhällsanalys, Region Dalarna",
         # om <prognos_ar> ligger med i diagram_capt så byts det ut mot det år prognosen gjordes
     output_mapp = NA,                                        # här sparas diagramet
