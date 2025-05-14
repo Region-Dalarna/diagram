@@ -76,20 +76,20 @@ diag_bas_syss_per_bransch_manad_jmfr_1ar_tillbaka <- function(
   ) %>% 
     manader_bearbeta_scbtabeller()
   
-  nyckel_bransch <- read_xlsx("G:/skript/nycklar/Bransch_Gxx_farger.xlsx")
+  nyckel_bransch <- readxl::read_xlsx("G:/skript/nycklar/Bransch_Gxx_farger.xlsx")
   
   manad_nu <- last(bas_syss_df$tid) %>% as.character()
   manad_da <- first(bas_syss_df$tid) %>% as.character()
   
   chart_df <- bas_syss_df %>%
-    select(-c(år, månad, månad_år, år_månad)) %>% 
+    dplyr::select(-c(år, månad, månad_år, år_månad)) %>% 
     pivot_wider(names_from = tid, values_from = {{variabel_dag_nattbefolkning}}) %>% 
     mutate(diff = .[[manad_nu]] - .[[manad_da]]) %>% 
     filter(kön != "totalt",
            `näringsgren SNI 2007` != "Total",
            födelseregion != "totalt") %>% 
     left_join(nyckel_bransch %>% 
-                select(Br15kod, Bransch), by = c("sni2007kod" = "Br15kod")) %>% 
+                dplyr::select(Br15kod, Bransch), by = c("sni2007kod" = "Br15kod")) %>% 
     mutate(Bransch = ifelse(is.na(Bransch), str_to_sentence(`näringsgren SNI 2007`), Bransch))
   
   # returnera datasetet till global environment, bl.a. bra när man skapar Rmarkdown-rapporter
