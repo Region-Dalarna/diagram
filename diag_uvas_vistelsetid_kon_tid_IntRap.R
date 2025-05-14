@@ -99,6 +99,7 @@ diag_UVAS_bakgrund_vistelsetid <- function(region = "20", # Enbart ett i taget.
                                  manual_y_axis_title = "procent",
                                  manual_x_axis_title = "Vistelsetid i Sverige",
                                  facet_scale = "fixed",
+                                 facet_legend_bottom = TRUE,
                                  y_axis_100proc = TRUE,
                                  x_axis_lutning = 0,
                                  output_mapp = output_mapp,
