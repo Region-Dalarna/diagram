@@ -20,6 +20,7 @@ SkapaBefPrognosDiagram <- function(region_vekt = "20",
                                    facet_scale = "free",
                                    ta_med_logga = TRUE,                 # TRUE om vi vill ha med logga, annars FALSE
                                    skapa_fil = TRUE,
+                                   filformat = "png",                   # format på diagrammet
                                    konsuppdelat = FALSE,                # data kommer könsuppdelat, har ingen lösning idag för att använda könsuppdelad data men den finns där om vi vill framöver
                                    utan_diagramtitel = FALSE,           # TRUE om vi vill ha diagram utan diagramtitel, annars FALSE (vilket vi brukar vilja ha)
                                    anvand_senaste_befar = FALSE,        # TRUE om vi vill använda senaste tillgängliga år för befolkningsstatistik, annars används första tillgängliga befolkningsprognosår
@@ -48,6 +49,8 @@ SkapaBefPrognosDiagram <- function(region_vekt = "20",
   
   options(dplyr.summarise.inform = FALSE)
   options(scipen = 999)
+  
+  if (str_sub(filformat,1,1) != ".") filformat <- filformat %>% paste0(".", .)
   
   # om det inte skickats med någon färgvektor så används färgvektorn "rus_sex" från funktionen diagramfärger
   if (all(is.na(farger_diagram))) {
@@ -197,6 +200,7 @@ SkapaBefPrognosDiagram <- function(region_vekt = "20",
                                    dataetiketter = dataetiketter,
                                    output_fold = output_fold,
                                    skapa_fil = skapa_fil,
+                                   filformat = filformat,
                                    spara_excelfil = spara_excelfil,
                                    logga_storlek = logga_storlek, 
                                    ta_med_logga = ta_med_logga,
@@ -221,6 +225,7 @@ SkapaBefPrognosDiagram <- function(region_vekt = "20",
                                          dataetiketter = dataetiketter,
                                          output_fold = output_fold,
                                          skapa_fil = skapa_fil,
+                                         filformat = filformat,
                                          spara_excelfil = spara_excelfil,
                                          logga_storlek = logga_storlek,
                                          ta_med_logga = ta_med_logga,
@@ -262,6 +267,7 @@ skrivut_befprognos_diagram <- function(skickad_df,
                                        output_fold,
                                        utan_diagramtitel,
                                        skapa_fil, 
+                                       filformat,
                                        spara_excelfil, 
                                        diagram_capt,
                                        filnamn_typ) {
@@ -302,7 +308,7 @@ skrivut_befprognos_diagram <- function(skickad_df,
   prognos_ar_txt <- skickad_df$prognos_ar %>% unique() %>% paste0(collapse = "_")
   filnamn_pre <- paste0(filnamn_typ, region_txt, "_", prognos_ar_txt, "_", skickad_jmfrtid, "ars_sikt", ifelse(y_lbl == "", "", paste0("_", y_lbl)), etiketter_txt, enhet, pre_facet_scale)
   if (konsuppdelat) filnamn_pre <- paste0(filnamn_pre, "_kon")
-  filnamn <- paste0(filnamn_pre, ".png")
+  filnamn <- paste0(filnamn_pre, filformat)
   
   # lägg till fokus på åldersgruppen totalt om det finns i datasetet
   if ("aldergrp" %in% names(skickad_df)) {
@@ -347,12 +353,13 @@ skrivut_befprognos_diagram <- function(skickad_df,
                                logga_path = logga_path,
                                dataetiketter = dataetiketter,
                                filnamn_diagram = filnamn,
+                               diagram_bildformat = str_sub(filformat, -3),
                                skriv_till_diagramfil = skapa_fil)
   
   retur_list <- list(gg_obj)
-  names(retur_list)[length(retur_list)] <- filnamn  %>% str_remove(".png")
+  names(retur_list)[length(retur_list)] <- filnamn  %>% str_remove(filformat)
   
-  if (spara_excelfil) write_xlsx(skickad_df, paste0(output_fold, filnamn %>% str_replace(".png", ".xlsx")))
+  if (spara_excelfil) write_xlsx(skickad_df, paste0(output_fold, filnamn %>% str_replace(filformat, ".xlsx")))
   
   return(retur_list)
   
