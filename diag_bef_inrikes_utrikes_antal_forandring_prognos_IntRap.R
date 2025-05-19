@@ -8,6 +8,8 @@ diagram_utrikes_fodda_tidsserie <-function(region_vekt = c("20"),# Max 1, län
                                            spara_figur = FALSE, # Sparar figuren till output_mapp_figur
                                            fodelseregion_klartext = "*", # NA = tas inte med i uttaget,  Finns: "Född i Sverige", "Utrikes född"
                                            tid_koder = "*", # Finns från 2000 och framåt
+                                           ta_bort_diagramtitel = FALSE,
+                                           ta_bort_caption = FALSE,
                                            alder_grupp = c(16,65), # Spann som skall användas i diagrammen diag_forandring_lan respektive _prognos. Vill man ha 16-64 år skriv c(16,65)
                                            prognos_ar = 2034, # Prognosår
                                            returnera_figur = TRUE, # Returnerar en figur
@@ -54,6 +56,14 @@ diagram_utrikes_fodda_tidsserie <-function(region_vekt = c("20"),# Max 1, län
     diagram_titel = paste0("Antal utrikes födda i ",region_namn)
     diagramfilnamn <- paste0("utrikes_fodda_antal_",region_namn,".png")
     
+    if(ta_bort_diagramtitel){
+      diagram_titel = ""
+    }
+    
+    if(ta_bort_caption){
+      diagram_capt = ""
+    }
+    
     gg_obj <- SkapaStapelDiagram(skickad_df = antal_utrikes_region_df ,
                                  skickad_x_var = "år",
                                  skickad_y_var = "Antal",
@@ -99,6 +109,14 @@ diagram_utrikes_fodda_tidsserie <-function(region_vekt = c("20"),# Max 1, län
     diagram_capt = "Källa: SCB:s öppna statistikdatabas\nBearbetning: Samhällsanalys, Region Dalarna"
     diagram_titel = paste0("Befolkningsförändring ",first_year,"-",last_year," i ",region_namn)
     diagramfilnamn <- paste0("befolkningsforandring_",region_namn,".png")
+    
+    if(ta_bort_diagramtitel){
+      diagram_titel = ""
+    }
+    
+    if(ta_bort_caption){
+      diagram_capt = ""
+    }
     
     gg_obj <- SkapaStapelDiagram(skickad_df = antal_forandring_df %>%
                                    filter((region != region_namn)),
@@ -160,6 +178,14 @@ diagram_utrikes_fodda_tidsserie <-function(region_vekt = c("20"),# Max 1, län
     diagram_titel = paste0("Befolkningsförändring ",unique(antal_inrikes_utrikes_df$alder_grupper), " i ",region_namn)
     diagramfilnamn <- paste0("befolkningsforandring_lan_",region_namn,".png")
     
+    if(ta_bort_diagramtitel){
+      diagram_titel = ""
+    }
+    
+    if(ta_bort_caption){
+      diagram_capt = ""
+    }
+    
     gg_obj <- SkapaStapelDiagram(skickad_df = antal_forandring_lan_kumulativ,
                                  skickad_x_var = "år",
                                  skickad_y_var = "kumulativ_summa",
@@ -219,6 +245,14 @@ diagram_utrikes_fodda_tidsserie <-function(region_vekt = c("20"),# Max 1, län
     diagram_capt = "Källa: SCB:s öppna statistikdatabas\nBearbetning: Samhällsanalys, Region Dalarna\nDiagramförklaring: Kumulativ förändring, dvs förändringen summeras varje år"
     diagram_titel = paste0("Befolkningsprognos ",unique(befprognos_df$alder_grupper), " i ",unique(antal_forandring_prognos_kumulativ$region))
     diagramfilnamn <- paste0("befolkningsprognos_lan_",unique(antal_forandring_prognos_kumulativ$region),".png")
+    
+    if(ta_bort_diagramtitel){
+      diagram_titel = ""
+    }
+    
+    if(ta_bort_caption){
+      diagram_capt = ""
+    }
     
     gg_obj <- SkapaStapelDiagram(skickad_df = antal_forandring_prognos_kumulativ %>% 
                                    filter(år <= prognos_ar),
