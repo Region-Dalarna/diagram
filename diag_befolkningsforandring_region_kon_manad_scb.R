@@ -21,7 +21,7 @@ diag_befolkningsforandring_manad_scb <- function(region_vekt = "20",
   source("https://raw.githubusercontent.com/Region-Dalarna/funktioner/main/func_API.R", encoding = "utf-8", echo = FALSE)
   source("https://raw.githubusercontent.com/Region-Dalarna/hamta_data/main/hamta_bef_forandringar_region_kon_manad_scb.R" )
   options(dplyr.summarise.inform = FALSE)
-  
+  gg_list <- list()
   
   beffor_df <- hamta_befolkningsforandringar_manad(region_vekt = region_vekt,
                                                    befforandr_klartext = befforandr_klartext,
@@ -92,6 +92,12 @@ diag_befolkningsforandring_manad_scb <- function(region_vekt = "20",
     gg_list <- c(gg_list, list(gg_obj))
     names(gg_list)[length(gg_list)] <- diagramfil %>% str_remove(".png")
   } # slut skapa_diagram
+  
+  
+  arglist <- list(beftyp = unique(beffor_df$förändringar) %>% as.character(), reg = unique(beffor_df$regionkod) %>% as.character())                               # skapa lista med de två variabler vi vill göra diagram med
+  crossarg <- expand.grid(arglist, stringsAsFactors = FALSE)
+  retur_list <- map2(crossarg$beftyp, crossarg$reg, ~ skapa_diagram(beffor_val = .x,
+                                                                   region_val = .y)) %>% purrr::flatten()
   
   
   return(gg_list)
