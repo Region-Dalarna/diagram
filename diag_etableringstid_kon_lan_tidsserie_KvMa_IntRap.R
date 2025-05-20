@@ -1,7 +1,9 @@
 diag_etablering_utb_kon_scb <- function(region = "20", # Enbart ett i taget.
-                                        diag_kon = TRUE, # Skapar ett diagram där länen jämförs för för vald vistelsetid
-                                        diag_utbildning = TRUE,
-                                        diag_tidsserie = TRUE, # Skapar ett diagram
+                                        diag_kon = TRUE, # Jämför kvinnor/män för senaste år
+                                        diag_utbildning = TRUE, # Jämför olika utbildningsnivåer för senaste år
+                                        utbildningsniva_jmf = c("utbildningsnivå: eftergymnasial utbildning","utbildningsnivå: gymnasial utbildning" ), # Finns även "samtliga utbildningsnivåer", "utbildningsnivå: förgymnasial utbildning", Skriv i den ordning de skall visas i diagram
+                                        facet_kolumner = NULL,# Välj antalet kolumner som skall visas i Facet-diagramet (diag_utbildning)
+                                        diag_tidsserie = TRUE, # Undersöker etableringstiden över tid (baserat på vistelsetid)
                                         visa_logga_i_diagram = TRUE,                        # TRUE om logga ska visas i diagrammet, FALSE om logga inte ska visas i diagrammet
                                         logga_sokvag = NA,                                 # sökväg till logga som ska visas i diagrammet
                                         output_mapp = "G:/Samhällsanalys/API/Fran_R/utskrift/",                                  # mapp där diagram ska sparas, NA = sparas ingen fil
@@ -117,6 +119,8 @@ diag_etablering_utb_kon_scb <- function(region = "20", # Enbart ett i taget.
   
   if(diag_utbildning == TRUE){
     
+    etablering_df$utbildningsnivå <- factor(etablering_df$utbildningsnivå, levels = utbildningsniva_jmf)
+    
     diagram_capt <- "Källa: SCB:s öppna statistikdatabas, BAS.\nBearbetning: Samhällsanalys, Region Dalarna."
     diagramtitel <- paste0("Andel förvärvsarbetande 20-65 år bland utrikes födda i Dalarna"," ",max(etablering_df$år))
     #diagramtitel <- str_wrap(diagramtitel,60)
@@ -125,7 +129,7 @@ diag_etablering_utb_kon_scb <- function(region = "20", # Enbart ett i taget.
     gg_obj <- SkapaStapelDiagram(skickad_df =etablering_df %>%
                                    filter(år == max(år),
                                           kön != "män och kvinnor",
-                                          utbildningsnivå %in% c("utbildningsnivå: gymnasial utbildning" ,"utbildningsnivå: eftergymnasial utbildning")),
+                                          utbildningsnivå %in% utbildningsniva_jmf),
                                  skickad_x_var = "bakgrundsvariabel",
                                  skickad_y_var = "andel",
                                  skickad_x_grupp = "kön",
@@ -137,6 +141,7 @@ diag_etablering_utb_kon_scb <- function(region = "20", # Enbart ett i taget.
                                  facet_grp = "utbildningsnivå",
                                  facet_legend_bottom = TRUE,
                                  facet_scale = "fixed",
+                                 facet_kolumner = facet_kolumner,
                                  x_axis_sort_value = FALSE,
                                  y_axis_100proc = TRUE,
                                  x_axis_lutning = 0,
