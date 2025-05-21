@@ -32,6 +32,8 @@ diag_gymnasiebehorighet_mm <- function(region = "20", # Enbart ett i taget.
   
   
   gg_list <- list()
+  diagram_capt <- "Källa: SCB:s öppna statistikdatabas.\nBearbetning: Samhällsanalys, Region Dalarna."
+  
   
   source("https://raw.githubusercontent.com/Region-Dalarna/funktioner/main/func_API.R")
   source("https://raw.githubusercontent.com/Region-Dalarna/funktioner/main/func_SkapaDiagram.R")
@@ -67,9 +69,7 @@ diag_gymnasiebehorighet_mm <- function(region = "20", # Enbart ett i taget.
   }
   
   if(diag_kon_gym){
-    
-    diagram_capt <- "Källa: SCB:s öppna statistikdatabas, BAS.\nBearbetning: Samhällsanalys, Region Dalarna."
-    
+
     # Skapar en faktorvariabel för att få tid sedan etablering i "rätt" ordning i figuren
     # syssgrad_df$bakgrundsvariabel <- factor(syssgrad_df$bakgrundsvariabel, levels = c("0-1 år","2-3 år",
     #                                                                                   "4-9 år","10- år",
@@ -109,9 +109,7 @@ diag_gymnasiebehorighet_mm <- function(region = "20", # Enbart ett i taget.
   }
   
   if(diag_vistelsetid_gym){
-    
-    diagram_capt <- "Källa: SCB:s öppna statistikdatabas, BAS.\nBearbetning: Samhällsanalys, Region Dalarna."
-    
+
     behorighet_gym_df <- behorighet_gym_df %>%
       filter(variabel != "Utrikes född",
              region != "Riket")
@@ -165,7 +163,6 @@ diag_gymnasiebehorighet_mm <- function(region = "20", # Enbart ett i taget.
              )) %>%
       rename(Andel_behoriga = `Andel behöriga till högskola, procent`)
     
-    diagram_capt <- "Källa: SCB:s öppna statistikdatabas, BAS.\nBearbetning: Samhällsanalys, Region Dalarna."
     
     if(returnera_data_rmarkdown == TRUE){
       assign("behorighet_hogskola_df", behorighet_hogskola_df, envir = .GlobalEnv)
