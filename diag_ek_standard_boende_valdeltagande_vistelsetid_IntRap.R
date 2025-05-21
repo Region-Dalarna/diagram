@@ -65,8 +65,7 @@ diagram_diverse_vistelsetid <-function(region_vekt = c("20"),# Max 1,
     if(returnera_dataframe_global_environment == TRUE){
       assign("lag_ek_standard_bakgrund_df", ekonomisk_standard_bakgrund_df, envir = .GlobalEnv)
     }
-    diagram_capt = "Källa: SCB:s öppna statistikdatabas\nBearbetning: Samhällsanalys, Region Dalarna"
-    
+
     ekonomisk_standard_bakgrund_df$sysselsättning <- factor(ekonomisk_standard_bakgrund_df$sysselsättning,
                                                             levels = c("Samtliga personer","Förvärvsarbetande","Icke förvärvsarbetande"))
     
@@ -160,7 +159,7 @@ diagram_diverse_vistelsetid <-function(region_vekt = c("20"),# Max 1,
     
     
     
-    diagram_capt <- "Källa: SCB:s öppna statistikdatabas, BAS.\nBearbetning: Samhällsanalys, Region Dalarna."
+    diagram_capt <- "Källa: SCB:s öppna statistikdatabas.\nBearbetning: Samhällsanalys, Region Dalarna."
     
     # Skapar en faktorvariabel för att få tid sedan etablering i "rätt" ordning i figuren
     boende_df$variabel <- factor(boende_df$variabel, levels = c("0-1 år","2-3 år",
@@ -226,9 +225,7 @@ diagram_diverse_vistelsetid <-function(region_vekt = c("20"),# Max 1,
       assign("valdeltagande_df", valdeltagande_df, envir = .GlobalEnv)
     }
     
-    
-    
-    diagram_capt <- "Källa: SCB:s öppna statistikdatabas, BAS.\nBearbetning: Samhällsanalys, Region Dalarna."
+    diagram_capt <- "Källa: SCB:s öppna statistikdatabas.\nBearbetning: Samhällsanalys, Region Dalarna."
     
     # Skapar en faktorvariabel för att få tid sedan etablering i "rätt" ordning i figuren
     valdeltagande_df$variabel <- factor(valdeltagande_df$variabel, levels = c("< 10 år","10- år",
