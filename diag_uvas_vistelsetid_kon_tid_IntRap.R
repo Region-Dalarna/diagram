@@ -35,6 +35,7 @@ diag_UVAS_bakgrund_vistelsetid <- function(region = "20", # Enbart ett i taget.
   
   
   gg_list <- list()
+  diagram_capt <- "Källa: SCB:s öppna statistikdatabas.\nBearbetning: Samhällsanalys, Region Dalarna."
   
   source("https://raw.githubusercontent.com/Region-Dalarna/funktioner/main/func_API.R")
   source("https://raw.githubusercontent.com/Region-Dalarna/funktioner/main/func_SkapaDiagram.R")
@@ -67,10 +68,6 @@ diag_UVAS_bakgrund_vistelsetid <- function(region = "20", # Enbart ett i taget.
   if(returnera_data_rmarkdown == TRUE){
     assign("UVAS_df", UVAS_df, envir = .GlobalEnv)
   }
-  
-  
-  
-  diagram_capt <- "Källa: SCB:s öppna statistikdatabas, BAS.\nBearbetning: Samhällsanalys, Region Dalarna."
   
   # Skapar en faktorvariabel för att få tid sedan etablering i "rätt" ordning i figuren
   UVAS_df$variabel <- factor(UVAS_df$variabel, levels = c("0-1 år","2-3 år",
