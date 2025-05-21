@@ -74,7 +74,7 @@ diag_trangboddhet_inrikes_utrikes <- function(region = "20", # Enbart ett i tage
   
   
   
-  diagram_capt <- "Källa: SCB:s öppna statistikdatabas, BAS.\nBearbetning: Samhällsanalys, Region Dalarna.\nDiagramförklaring: Trångbodd enligt norm 2. Norm två infördes på 1960-talet och definieras\nsom högst två personer per rum och dessutom ska det finnas ett kök och ett vardagsrum."
+  diagram_capt <- "Källa: SCB:s öppna statistikdatabas.\nBearbetning: Samhällsanalys, Region Dalarna.\nDiagramförklaring: Trångbodd enligt norm 2. Norm två infördes på 1960-talet och definieras\nsom högst två personer per rum och dessutom ska det finnas ett kök och ett vardagsrum."
   
   # Skapar en faktorvariabel för att få tid sedan etablering i "rätt" ordning i figuren
   trangboddhet_df$trångboddhet <- factor(trangboddhet_df$trångboddhet, levels = rev(c("Trångbodda","Ej trångbodda",
