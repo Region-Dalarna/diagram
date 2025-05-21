@@ -118,9 +118,7 @@ diag_etablering_utb_kon_scb <- function(region = "20", # Enbart ett i taget.
   }
   
   if(diag_utbildning == TRUE){
-    
-    #etablering_df$utbildningsnivå <- factor(etablering_df$utbildningsnivå, levels = utbildningsniva_jmf)
-    
+
     diagram_capt <- "Källa: SCB:s öppna statistikdatabas, BAS.\nBearbetning: Samhällsanalys, Region Dalarna."
     diagramtitel <- paste0("Andel förvärvsarbetande 20-65 år bland utrikes födda i Dalarna"," ",max(etablering_df$år))
     #diagramtitel <- str_wrap(diagramtitel,60)
