@@ -79,6 +79,21 @@ diag_gymnasiebehorighet_mm <- function(region = "20", # Enbart ett i taget.
     #diagramtitel <- str_wrap(diagramtitel,60)
     diagramfilnamn <- paste0("behorighet_gymnasiet_jmf_ar.png")
     
+    aldersgrupp_saknas <- behorighet_gym_df %>% filter(kön != "pojkar och flickor",
+                                                        år %in% c(jmf_ar,max(år)),
+                                                        variabel %in% c("Utrikes född","Inrikes född"),
+                                                        is.na(Andel_behoriga)) %>% .$variabel
+    
+    if(length(aldersgrupp_saknas)> 0){
+      
+      aldersgrupp_saknas = paste(aldersgrupp_saknas, collapse = ", ")
+      
+      diagram_capt <- glue("Källa: SCB:s öppna statistikdatabas.\nBearbetning: Samhällsanalys, Region Dalarna.\nDiagramförklaring: Data saknas för vistelsetid {aldersgrupp_saknas}.")
+      
+    }else{
+      diagram_capt <- "Källa: SCB:s öppna statistikdatabas.\nBearbetning: Samhällsanalys, Region Dalarna."
+    }
+    
     # Skapar diagram där etableringstiden jämförs mellan män och kvinnor, oavsett utbildning
     gg_obj <- SkapaStapelDiagram(skickad_df = behorighet_gym_df %>%
                                    filter(kön != "pojkar och flickor",
@@ -122,6 +137,21 @@ diag_gymnasiebehorighet_mm <- function(region = "20", # Enbart ett i taget.
     diagramtitel <- paste0("Andel behöriga till gymnasiet i Dalarna"," ",max(behorighet_gym_df$år)," uppdelat på vistelsetid")
     #diagramtitel <- str_wrap(diagramtitel,60)
     diagramfilnamn <- paste0("behorighet_gymnasiet_vistelsetid.png")
+    
+    aldersgrupp_saknas <- behorighet_gym_df %>% filter(kön == "pojkar och flickor",
+                                                       år == max(år),
+                                                       is.na(Andel_behoriga)) %>% .$variabel
+    
+    if(length(aldersgrupp_saknas)> 0){
+    
+      
+      aldersgrupp_saknas = paste(aldersgrupp_saknas, collapse = ", ")
+      
+      diagram_capt <- glue("Källa: SCB:s öppna statistikdatabas.\nBearbetning: Samhällsanalys, Region Dalarna.\nDiagramförklaring: Data saknas för vistelsetid {aldersgrupp_saknas}.")
+      
+    } else{
+      diagram_capt <- "Källa: SCB:s öppna statistikdatabas.\nBearbetning: Samhällsanalys, Region Dalarna."
+    }
     
     # Skapar diagram där etableringstiden jämförs mellan män och kvinnor, oavsett utbildning
     gg_obj <- SkapaStapelDiagram(skickad_df = behorighet_gym_df %>%
@@ -168,6 +198,22 @@ diag_gymnasiebehorighet_mm <- function(region = "20", # Enbart ett i taget.
       assign("behorighet_hogskola_df", behorighet_hogskola_df, envir = .GlobalEnv)
     }
     
+    aldersgrupp_saknas <- behorighet_hogskola_df %>% filter(kön != "män och kvinnor",
+                                                             variabel %in% c("Utrikes född","Inrikes född"),
+                                                             år %in% c(jmf_ar,max(år)),
+                                                             is.na(Andel_behoriga)) %>% .$variabel
+    
+    if(length(aldersgrupp_saknas)> 0){
+      
+      aldersgrupp_saknas = paste(aldersgrupp_saknas, collapse = ", ")
+      
+      diagram_capt <- glue("Källa: SCB:s öppna statistikdatabas.\nBearbetning: Samhällsanalys, Region Dalarna.\nDiagramförklaring: Data saknas för vistelsetid {aldersgrupp_saknas}.")
+      
+    } else{
+      diagram_capt <- "Källa: SCB:s öppna statistikdatabas.\nBearbetning: Samhällsanalys, Region Dalarna."
+    }
+    
+    diagram_capt <- "Källa: SCB:s öppna statistikdatabas.\nBearbetning: Samhällsanalys, Region Dalarna."
     diagramtitel <- paste0("Andel behöriga till högskola i ",unique(behorighet_hogskola_df$region))
     #diagramtitel <- str_wrap(diagramtitel,60)
     diagramfilnamn <- "behorighet_högksola_jmf_ar.png"
