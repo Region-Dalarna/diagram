@@ -71,7 +71,7 @@ diag_inkomst_bakgrund_scb <- function(region = "20", # Enbart ett i taget.
   gg_list <- list()
   
   
-  diagram_capt <- "Källa: SCB:s öppna statistikdatabas, BAS.\nBearbetning: Samhällsanalys, Region Dalarna.\nSammanräknad förvärvsinkomst, dvs. alla skattepliktiga inkomster före skatt (dock ej kapitalinkomster)."
+  diagram_capt <- "Källa: SCB:s öppna statistikdatabas.\nBearbetning: Samhällsanalys, Region Dalarna.\nSammanräknad förvärvsinkomst, dvs. alla skattepliktiga inkomster före skatt (dock ej kapitalinkomster)."
   
   # Skapar en faktorvariabel för att få tid sedan etablering i "rätt" ordning i figuren
   forvarvsinkomst_df$vistelsetid <- factor(forvarvsinkomst_df$vistelsetid, levels = c("1-2 år","3-4 år",
