@@ -5,6 +5,7 @@ diagram_arbetsmarknadsstatus_tidsserie <-function(region_vekt = "20", # Max 1 re
                                         spara_figur = TRUE, # Sparar figuren till output_mapp_figur
                                         returnera_figur = TRUE, # Returnerar en figur
                                         fodelseregion_klartext = "totalt", # Finns även c("inrikes född", "utrikes född"). Bara 1 åt gången
+                                        diagram_ej_upp = TRUE, # Diagram som inte är uppdelat (facet). Antingen totalt, eller inrikes/utrikes födda.
                                         diagram_facet = FALSE, # Dela upp diagrammet på födelseregion
                                         marginal_yaxis_facet = c(0,0), # Marginaler för y-axeln i facet-diagram
                                         alder_klartext = "20-64 år", #Välj enbart 1. Finns: 15-19 år, 16-19 år, 20-24 år, 25-29 år, 30-34 år, 35-39 år, 40-44 år, 45-49 år, 50-54 år, 55-59 år, 60-64 år, 65-69 år, 70-74 år, 15-74 år, 16-64 år, 16-65 år, 20-64 år, 20-65 år
@@ -63,39 +64,42 @@ diagram_arbetsmarknadsstatus_tidsserie <-function(region_vekt = "20", # Max 1 re
     assign(data_namm, arbetsmarknadsstatus_df, envir = .GlobalEnv)
   }
     
-    
-    if(fodelseregion_klartext == "totalt") diagram_titel <- paste0("Arbetslöshet i åldersgruppen " ,alder_klartext," i ",unique(arbetsmarknadsstatus_df$region))
-    if(fodelseregion_klartext == "inrikes född")  diagram_titel <- paste0("Arbetslöshet för inrikes födda i åldersgruppen " ,alder_klartext," i ",unique(arbetsmarknadsstatus_df$region))
-    if(fodelseregion_klartext == "utrikes född")  diagram_titel <- paste0("Arbetslöshet för utrikes födda i åldersgruppen " ,alder_klartext," i ",unique(arbetsmarknadsstatus_df$region))
-   
-    diagram_capt = "Källa: SCB:s öppna statistikdatabas, Befolkningens arbetsmarknadsstatus (BAS)\nBearbetning: Samhällsanalys, Region Dalarna" 
-    
-    diagramfilnamn <- paste0("arbetslöshet_tidsserie_",fodelseregion_klartext,"_",unique(arbetsmarknadsstatus_df$region),".png")
-    objektnamn <- c(objektnamn,str_remove(diagramfilnamn,".png"))
-    
-    # arbetsmarknadsstatus_tidsserie$manad_long <- factor(arbetsmarknadsstatus_tidsserie$manad_long,levels  =c("januari","februari","mars","april","maj","juni","juli","augusti","september","oktober","november","december"))
-    
-    arb_df = arbetsmarknadsstatus_df %>% 
-        mutate(region = ifelse(region=="Riket","Sverige",region),
-               manad_long = str_to_title(manad_long)) %>% 
-          mutate(manad_long = factor(.$manad_long,levels =c("Januari","Februari","Mars","April","Maj","Juni","Juli","Augusti","September","Oktober","November","December")))
-    
-    gg_obj <- SkapaLinjeDiagram(skickad_df = arb_df %>% 
-                                  filter(födelseregion == fodelseregion_klartext),
-                                            skickad_x_var = "manad_long", 
-                                            skickad_y_var = "varde", 
-                                            skickad_x_grupp = "ar",
-                                            manual_color = valda_farger,
-                                            lagga_till_punkter = TRUE,
-                                            diagram_titel = diagram_titel,
-                                            diagram_capt =  diagram_capt,
-                                            output_mapp = output_mapp_figur,
-                                            stodlinjer_avrunda_fem = TRUE,
-                                            manual_y_axis_title = "procent",
-                                            filnamn_diagram = diagramfilnamn,
-                                            skriv_till_diagramfil = spara_figur)
-    
-    gg_list <- c(gg_list, list(gg_obj))
+    if(diagram_ej_upp){
+      
+      if(fodelseregion_klartext == "totalt") diagram_titel <- paste0("Arbetslöshet i åldersgruppen " ,alder_klartext," i ",unique(arbetsmarknadsstatus_df$region))
+      if(fodelseregion_klartext == "inrikes född")  diagram_titel <- paste0("Arbetslöshet för inrikes födda i åldersgruppen " ,alder_klartext," i ",unique(arbetsmarknadsstatus_df$region))
+      if(fodelseregion_klartext == "utrikes född")  diagram_titel <- paste0("Arbetslöshet för utrikes födda i åldersgruppen " ,alder_klartext," i ",unique(arbetsmarknadsstatus_df$region))
+     
+      diagram_capt = "Källa: SCB:s öppna statistikdatabas, Befolkningens arbetsmarknadsstatus (BAS)\nBearbetning: Samhällsanalys, Region Dalarna" 
+      
+      diagramfilnamn <- paste0("arbetslöshet_tidsserie_",fodelseregion_klartext,"_",unique(arbetsmarknadsstatus_df$region),".png")
+      objektnamn <- c(objektnamn,str_remove(diagramfilnamn,".png"))
+      
+      # arbetsmarknadsstatus_tidsserie$manad_long <- factor(arbetsmarknadsstatus_tidsserie$manad_long,levels  =c("januari","februari","mars","april","maj","juni","juli","augusti","september","oktober","november","december"))
+      
+      arb_df = arbetsmarknadsstatus_df %>% 
+          mutate(region = ifelse(region=="Riket","Sverige",region),
+                 manad_long = str_to_title(manad_long)) %>% 
+            mutate(manad_long = factor(.$manad_long,levels =c("Januari","Februari","Mars","April","Maj","Juni","Juli","Augusti","September","Oktober","November","December")))
+      
+      gg_obj <- SkapaLinjeDiagram(skickad_df = arb_df %>% 
+                                    filter(födelseregion == fodelseregion_klartext),
+                                              skickad_x_var = "manad_long", 
+                                              skickad_y_var = "varde", 
+                                              skickad_x_grupp = "ar",
+                                              manual_color = valda_farger,
+                                              lagga_till_punkter = TRUE,
+                                              diagram_titel = diagram_titel,
+                                              diagram_capt =  diagram_capt,
+                                              output_mapp = output_mapp_figur,
+                                              stodlinjer_avrunda_fem = TRUE,
+                                              manual_y_axis_title = "procent",
+                                              filnamn_diagram = diagramfilnamn,
+                                              skriv_till_diagramfil = spara_figur)
+      
+        gg_list <- c(gg_list, list(gg_obj))
+      
+    }
     
     if(diagram_facet == TRUE){
       
