@@ -63,6 +63,12 @@ diagram_arbetsmarknadsstatus_tidsserie <-function(region_vekt = "20", # Max 1 re
   if(returnera_data == TRUE){
     assign(data_namm, arbetsmarknadsstatus_df, envir = .GlobalEnv)
   }
+  
+  arb_df = arbetsmarknadsstatus_df %>% 
+    mutate(region = ifelse(region=="Riket","Sverige",region),
+           manad_long = str_to_title(manad_long)) %>% 
+    mutate(manad_long = factor(.$manad_long,levels =c("Januari","Februari","Mars","April","Maj","Juni","Juli","Augusti","September","Oktober","November","December")))
+  
     
     if(diagram_ej_upp){
       
@@ -76,11 +82,6 @@ diagram_arbetsmarknadsstatus_tidsserie <-function(region_vekt = "20", # Max 1 re
       objektnamn <- c(objektnamn,str_remove(diagramfilnamn,".png"))
       
       # arbetsmarknadsstatus_tidsserie$manad_long <- factor(arbetsmarknadsstatus_tidsserie$manad_long,levels  =c("januari","februari","mars","april","maj","juni","juli","augusti","september","oktober","november","december"))
-      
-      arb_df = arbetsmarknadsstatus_df %>% 
-          mutate(region = ifelse(region=="Riket","Sverige",region),
-                 manad_long = str_to_title(manad_long)) %>% 
-            mutate(manad_long = factor(.$manad_long,levels =c("Januari","Februari","Mars","April","Maj","Juni","Juli","Augusti","September","Oktober","November","December")))
       
       gg_obj <- SkapaLinjeDiagram(skickad_df = arb_df %>% 
                                     filter(födelseregion == fodelseregion_klartext),
