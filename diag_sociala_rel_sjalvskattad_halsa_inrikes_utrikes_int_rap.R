@@ -50,7 +50,7 @@ diag_fohm <- function(visa_logga_i_diagram = TRUE,                        # TRUE
       assign(paste0(namn,"_df"), sociala_relationer_df, envir = .GlobalEnv)
     }
     
-    diagram_capt <- paste0("Källa: Folkhälsomyndighetens öppna statistikdatabas, bearbetning: Samhällsanalys, Region Dalarna.\nDiagramförklaring: Enkätundersökning. Andel som svarar ja på frågan: ",unique(sociala_relationer_df$`Sociala relationer`),".")
+    diagram_capt <- paste0("Källa: Folkhälsomyndighetens öppna statistikdatabas, bearbetning: Samhällsanalys, Region Dalarna.\nDiagramförklaring: Enkätundersökning. Andel som svarar ja på frågan: ",unique(sociala_relationer_df$`Sociala relationer`))
     
     sociala_relationer_df$Födelseland<- factor(sociala_relationer_df$Födelseland, levels = c("Sverige","Övriga Norden","Övriga Europa","Övriga världen"))
     
@@ -105,7 +105,7 @@ diag_fohm <- function(visa_logga_i_diagram = TRUE,                        # TRUE
     }
     
     
-    diagram_capt <- paste0("Källa: Folkhälsomyndighetens öppna statistikdatabas, bearbetning: Samhällsanalys, Region Dalarna.\nDiagramförklaring: Enkätundersökning. Andel som svarar ja på frågan: ",unique(sjalvskattad_halsa_df$Hälsotillstånd),".")
+    diagram_capt <- paste0("Källa: Folkhälsomyndighetens öppna statistikdatabas, bearbetning: Samhällsanalys, Region Dalarna.\nDiagramförklaring: Enkätundersökning. Andel som svarar ja på frågan: ",unique(sjalvskattad_halsa_df$Hälsotillstånd))
     
     sjalvskattad_halsa_df$Födelseland<- factor(sjalvskattad_halsa_df$Födelseland, levels = c("Sverige","Övriga Norden","Övriga Europa","Övriga världen"))
     
