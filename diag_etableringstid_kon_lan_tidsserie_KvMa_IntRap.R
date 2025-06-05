@@ -110,6 +110,7 @@ diag_etablering_utb_kon_scb <- function(region = "20", # Enbart ett i taget.
                                  output_mapp = output_mapp,
                                  filnamn_diagram = diagramfilnamn,
                                  lagg_pa_logga = visa_logga_i_diagram,
+                                 logga_path = logga_sokvag,
                                  skriv_till_diagramfil = skriv_diagrambildfil)
     
     
@@ -148,6 +149,7 @@ diag_etablering_utb_kon_scb <- function(region = "20", # Enbart ett i taget.
                                  output_mapp = output_mapp,
                                  filnamn_diagram = diagramfilnamn,
                                  lagg_pa_logga = visa_logga_i_diagram,
+                                 logga_path = logga_sokvag,
                                  skriv_till_diagramfil = skriv_diagrambildfil)
     
     gg_list <- c(gg_list, list(gg_obj))
@@ -188,6 +190,7 @@ diag_etablering_utb_kon_scb <- function(region = "20", # Enbart ett i taget.
                                  output_mapp = output_mapp,
                                  filnamn_diagram = diagramfilnamn,
                                  lagg_pa_logga = visa_logga_i_diagram,
+                                 logga_path = logga_sokvag,
                                  skriv_till_diagramfil = skriv_diagrambildfil)
     
     gg_list <- c(gg_list, list(gg_obj))

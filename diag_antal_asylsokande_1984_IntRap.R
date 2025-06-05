@@ -1,5 +1,7 @@
 diagram_asylsokande_tidsserie <-function(output_mapp_figur = "G:/Samhällsanalys/Statistik/Näringsliv/basfakta/", # Outputmapp för figur
                                          spara_figur = FALSE, # Sparar figuren till output_mapp_figur
+                                         visa_logga_i_diagram = FALSE,                        # TRUE om logga ska visas i diagrammet, FALSE om logga inte ska visas i diagrammet
+                                         logga_sokvag = NA,                               # sökväg till logga som ska visas i diagrammet. 
                                          start_ar = 1984, # Välj ett startår, s
                                          returnera_figur = TRUE, # Returnerar en figur
                                          valda_farger = diagramfarger("rus_sex"),
@@ -69,6 +71,8 @@ diagram_asylsokande_tidsserie <-function(output_mapp_figur = "G:/Samhällsanalys
                                output_mapp = output_mapp_figur,
                                stodlinjer_avrunda_fem = TRUE,
                                x_axis_visa_var_xe_etikett = 2,
+                               lagg_pa_logga = visa_logga_i_diagram,
+                               logga_path = logga_sokvag,
                                manual_y_axis_title = "",
                                filnamn_diagram = diagramfilnamn,
                                skriv_till_diagramfil = spara_figur)

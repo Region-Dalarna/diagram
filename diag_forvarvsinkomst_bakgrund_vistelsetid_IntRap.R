@@ -1,5 +1,5 @@
 diag_inkomst_bakgrund_scb <- function(region = "20", # Enbart ett i taget.
-                                      visa_logga_i_diagram = TRUE,                        # TRUE om logga ska visas i diagrammet, FALSE om logga inte ska visas i diagrammet
+                                      visa_logga_i_diagram = FALSE,                        # TRUE om logga ska visas i diagrammet, FALSE om logga inte ska visas i diagrammet
                                       logga_sokvag = NA,                                 # sökväg till logga som ska visas i diagrammet
                                       output_mapp = "G:/Samhällsanalys/API/Fran_R/utskrift/",                                  # mapp där diagram ska sparas, NA = sparas ingen fil
                                       inkomst_typ = "Medianinkomst, tkr", # Finns "Medianinkomst, tkr", "Medelinkomst, tkr". Max 1 åt gången
@@ -98,6 +98,7 @@ diag_inkomst_bakgrund_scb <- function(region = "20", # Enbart ett i taget.
                                output_mapp = output_mapp,
                                filnamn_diagram = diagramfilnamn,
                                lagg_pa_logga = visa_logga_i_diagram,
+                               logga_path = logga_sokvag,
                                skriv_till_diagramfil = skriv_diagrambildfil)
   
   

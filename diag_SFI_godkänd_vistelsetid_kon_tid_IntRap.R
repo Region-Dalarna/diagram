@@ -1,7 +1,7 @@
 diag_SFI_bakgrund <- function(region = "20", # Enbart ett i taget.
                               diag_vistelsetid_senaste_ar = TRUE,
                               diag_vistelsetid_tidsserie = TRUE,
-                              visa_logga_i_diagram = TRUE,                        # TRUE om logga ska visas i diagrammet, FALSE om logga inte ska visas i diagrammet
+                              visa_logga_i_diagram = FALSE,                        # TRUE om logga ska visas i diagrammet, FALSE om logga inte ska visas i diagrammet
                               logga_sokvag = NA,                                 # sökväg till logga som ska visas i diagrammet
                               valda_farger = diagramfarger("rus_sex"),
                               output_mapp = "G:/Samhällsanalys/API/Fran_R/utskrift/",                                  # mapp där diagram ska sparas, NA = sparas ingen fil
@@ -81,17 +81,15 @@ diag_SFI_bakgrund <- function(region = "20", # Enbart ett i taget.
                                  skickad_x_var = "variabel",
                                  skickad_y_var = last(names(SFI_df)),
                                  skickad_x_grupp = "kön",
-                                 # manual_x_axis_text_vjust=0.9,
                                  manual_color = diagramfarger("kon"),
                                  diagram_titel = diagramtitel,
                                  diagram_capt =  diagram_capt,
-                                 #manual_y_axis_title = "procent",
                                  facet_scale = "fixed",
-                                 #y_axis_100proc = TRUE,
                                  x_axis_lutning = 0,
                                  output_mapp = output_mapp,
                                  filnamn_diagram = diagramfilnamn,
                                  lagg_pa_logga = visa_logga_i_diagram,
+                                 logga_path = logga_sokvag,
                                  skriv_till_diagramfil = skriv_diagrambildfil)
     
     
@@ -110,7 +108,6 @@ diag_SFI_bakgrund <- function(region = "20", # Enbart ett i taget.
                                  skickad_x_var = "år",
                                  skickad_y_var = last(names(SFI_df)),
                                  skickad_x_grupp = "variabel",
-                                 # manual_x_axis_text_vjust=0.9,
                                  manual_color = valda_farger,
                                  diagram_titel = diagramtitel,
                                  diagram_capt =  diagram_capt,
@@ -120,6 +117,7 @@ diag_SFI_bakgrund <- function(region = "20", # Enbart ett i taget.
                                  output_mapp = output_mapp,
                                  filnamn_diagram = diagramfilnamn,
                                  lagg_pa_logga = visa_logga_i_diagram,
+                                 logga_path = logga_sokvag,
                                  skriv_till_diagramfil = skriv_diagrambildfil)
     
     

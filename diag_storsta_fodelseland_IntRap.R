@@ -6,6 +6,8 @@ diagram_storsta_fodelseland <-function(region_vekt = "20",# Max 1, län
                                        jmf_ar = 2010, # Första och sista år i tid_koder jämförs med detta år
                                        antal_lander = 10, # Antal länder som skall visas i diagrammet
                                        valda_farger = diagramfarger("rus_sex"),
+                                       visa_logga_i_diagram = FALSE,                        # TRUE om logga ska visas i diagrammet, FALSE om logga inte ska visas i diagrammet
+                                       logga_sokvag = NA,                               # sökväg till logga som ska visas i diagrammet.
                                        returnera_data = FALSE) # Skall data returneras)
 {
   
@@ -77,7 +79,8 @@ diagram_storsta_fodelseland <-function(region_vekt = "20",# Max 1, län
                                diagram_capt =  diagram_capt,
                                output_mapp = output_mapp_figur,
                                stodlinjer_avrunda_fem = TRUE,
-                               #x_axis_visa_var_xe_etikett = 2,
+                               lagg_pa_logga = visa_logga_i_diagram,
+                               logga_path = logga_sokvag,
                                manual_y_axis_title = "",
                                filnamn_diagram = diagramfilnamn,
                                skriv_till_diagramfil = spara_figur)

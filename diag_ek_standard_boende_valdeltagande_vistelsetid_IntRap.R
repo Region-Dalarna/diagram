@@ -6,6 +6,8 @@ diagram_diverse_vistelsetid <-function(region_vekt = c("20"),# Max 1,
                                        diag_valdeltagande = TRUE,
                                        typ_av_val = "Valdeltagande i val till riksdag, procent",# Finns även: "Valdeltagande i val till region, procent", "Valdeltagande i val till kommun, procent",
                                        output_mapp_figur = "G:/Samhällsanalys/Statistik/Näringsliv/basfakta/", # Outputmapp för figur
+                                       visa_logga_i_diagram = FALSE,                        # TRUE om logga ska visas i diagrammet, FALSE om logga inte ska visas i diagrammet
+                                       logga_sokvag = NA,                               # sökväg till logga som ska visas i diagrammet. 
                                        skriv_diagrambildfil = FALSE, # Sparar figuren till output_mapp_figur
                                        returnera_figur = TRUE, # Returnerar en figur
                                        diag_fargvekt = NA, # Gäller samtliga diagram
@@ -84,8 +86,6 @@ diagram_diverse_vistelsetid <-function(region_vekt = c("20"),# Max 1,
                                  diagram_capt = diagram_capt,
                                  diagram_titel = diagram_titel,
                                  diagram_facet = TRUE,
-                                 # manual_x_axis_text_vjust = 1,
-                                 # manual_x_axis_text_hjust = 1,
                                  facet_grp =  "bakgrund",
                                  x_axis_lutning = 0,
                                  facet_scale = "fixed",
@@ -93,7 +93,8 @@ diagram_diverse_vistelsetid <-function(region_vekt = c("20"),# Max 1,
                                  facet_legend_bottom = TRUE,
                                  manual_color = diag_fargvekt,
                                  manual_y_axis_title = "procent",
-                                 lagg_pa_logga = FALSE,
+                                 lagg_pa_logga = visa_logga_i_diagram,
+                                 logga_path = logga_sokvag,
                                  skriv_till_diagramfil = skriv_diagrambildfil)
     
     gg_list <- c(gg_list, list(gg_obj))
@@ -188,9 +189,10 @@ diagram_diverse_vistelsetid <-function(region_vekt = c("20"),# Max 1,
                                  legend_vand_ordning = TRUE,
                                  y_axis_100proc = TRUE,
                                  x_axis_lutning = 0,
+                                 lagg_pa_logga = visa_logga_i_diagram,
+                                 logga_path = logga_sokvag,
                                  output_mapp = output_mapp_figur,
                                  filnamn_diagram = diagramfilnamn,
-                                 lagg_pa_logga = visa_logga_i_diagram,
                                  skriv_till_diagramfil = skriv_diagrambildfil)
     
     
@@ -253,6 +255,7 @@ diagram_diverse_vistelsetid <-function(region_vekt = c("20"),# Max 1,
                                    output_mapp = output_mapp_figur,
                                    filnamn_diagram = diagramfilnamn,
                                    lagg_pa_logga = visa_logga_i_diagram,
+                                   logga_path = logga_sokvag,
                                    skriv_till_diagramfil = skriv_diagrambildfil)
       
       
