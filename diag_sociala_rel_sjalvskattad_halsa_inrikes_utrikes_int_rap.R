@@ -1,5 +1,4 @@
-diag_fohm <- function(visa_logga_i_diagram = TRUE,                        # TRUE om logga ska visas i diagrammet, FALSE om logga inte ska visas i diagrammet
-                      alder = "16- år", # Finns även "16-84 år"
+diag_fohm <- function(alder = "16- år", # Finns även "16-84 år"
                       diag_soc_rel = TRUE,                                 # TRUE om diagram för sociala relationer ska skapas
                       sociala_relationer_klartext = "Låg tillit till samhällets institutioner",			 #  Finns: "Avstått från att gå ut ensam på grund av rädsla", "Utsatt för fysiskt våld eller hot om våld", "Utsatt för fysiskt våld", "Utsatt för hot om våld", "Saknar emotionellt stöd", "Saknar praktiskt stöd", "Lågt socialt deltagande", "Svårt att lita på andra", "Utsatt för kränkande behandling eller bemötande", "Låg tillit till samhällets institutioner"
                       diag_sjalvskattad_halsa_tid = TRUE,
