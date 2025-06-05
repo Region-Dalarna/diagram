@@ -1,11 +1,11 @@
 diag_UVAS_bakgrund_vistelsetid <- function(region = "20", # Enbart ett i taget.
                                            diag_vistelsetid = TRUE,
                                            diag_utbniva = TRUE,
-                                           visa_logga_i_diagram = FALSE,                        # TRUE om logga ska visas i diagrammet, FALSE om logga inte ska visas i diagrammet
+                                           #visa_logga_i_diagram = FALSE,                        # TRUE om logga ska visas i diagrammet, FALSE om logga inte ska visas i diagrammet
                                            diag_senaste_ar = TRUE,
                                            diag_tidsserie = TRUE,
                                            valda_farger = diagramfarger("rus_sex"),
-                                           logga_sokvag = NA,                               # sökväg till logga som ska visas i diagrammet. Krävs om visa_logga_i_diagram är TRUE. Om NA så blir det en konstig prick i diagrammet.
+                                           #logga_sokvag = NA,                               # sökväg till logga som ska visas i diagrammet. Krävs om visa_logga_i_diagram är TRUE. Om NA så blir det en konstig prick i diagrammet.
                                            output_mapp = "G:/Samhällsanalys/API/Fran_R/utskrift/",                                  # mapp där diagram ska sparas, NA = sparas ingen fil
                                            skriv_diagrambildfil = FALSE,                           # TRUE om diagram ska skrivas till fil, FALSE om diagram inte ska skrivas till fil
                                            returnera_data_rmarkdown = FALSE,
@@ -101,8 +101,6 @@ diag_UVAS_bakgrund_vistelsetid <- function(region = "20", # Enbart ett i taget.
                                  x_axis_lutning = 0,
                                  output_mapp = output_mapp,
                                  filnamn_diagram = diagramfilnamn,
-                                 lagg_pa_logga = visa_logga_i_diagram,
-                                 logga_path = logga_sokvag,
                                  skriv_till_diagramfil = skriv_diagrambildfil)
     
     
@@ -142,8 +140,6 @@ diag_UVAS_bakgrund_vistelsetid <- function(region = "20", # Enbart ett i taget.
                                  manual_x_axis_text_hjust = 1,
                                  output_mapp = output_mapp,
                                  filnamn_diagram = diagramfilnamn,
-                                 lagg_pa_logga = visa_logga_i_diagram,
-                                 logga_path = logga_sokvag,
                                  skriv_till_diagramfil = skriv_diagrambildfil)
     
     
