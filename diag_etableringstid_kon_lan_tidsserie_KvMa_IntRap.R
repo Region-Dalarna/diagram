@@ -129,7 +129,7 @@ diag_etablering_utb_kon_scb <- function(region = "20", # Enbart ett i taget.
                                    filter(år == max(år),
                                           kön != "män och kvinnor",
                                           utbildningsnivå %in% utbildningsniva_jmf) %>% 
-                                   mutate(utbildningsnivå <- factor(utbildningsnivå, levels = utbildningsniva_jmf)),
+                                   mutate(utbildningsnivå = factor(utbildningsnivå, levels = utbildningsniva_jmf)),
                                  skickad_x_var = "bakgrundsvariabel",
                                  skickad_y_var = "andel",
                                  skickad_x_grupp = "kön",
