@@ -4,7 +4,7 @@ SkapaBefPrognosDiagram <- function(region_vekt = "20",
                                    jmfrtid = 10,                         # antal år i jämförelsen, alltså hur många års sikt vi vill titta på beräknat från sista året med befolkningsstatistik, alltså ett år före första prognosår
                                    #JmfrFleraPrognoser = FALSE,           # TRUE om vi vill jämföra med äldre prognoser, FALSE om vi bara vill se den senaste prognosen
                                    # om man skickar med flera url:er så görs en jämförelse
-                                   tabeller_url = "https://api.scb.se/OV0104/v1/doris/sv/ssd/BE/BE0401/BE0401A/BefProgOsiktRegN",  
+                                   tabeller_url = "G:/Samhällsanalys/Statistik/Befolkningsprognoser/Profet/datafiler/",  
                                                                          
                                    # För att använda Profet-filer: "G:/Samhällsanalys/Statistik/Befolkningsprognoser/Profet/datafiler/",
                                    #  c("https://api.scb.se/OV0104/v1/doris/sv/ssd/BE/BE0401/BE0401A/BefProgOsiktRegN",
@@ -31,7 +31,8 @@ SkapaBefPrognosDiagram <- function(region_vekt = "20",
                                    dataetiketter = FALSE,
                                    spara_excelfil = FALSE,
                                    farger_diagram = NA,
-                                   diagram_capt = "Källa: SCB:s befolkningsprognos\nBearbetning: Samhällsanalys, Region Dalarna"
+                                   #diagram_capt = "Källa: SCB:s befolkningsprognos\nBearbetning: Samhällsanalys, Region Dalarna"
+                                   diagram_capt = "auto"
 ) {
   
   if (!require("pacman")) install.packages("pacman")
@@ -66,6 +67,13 @@ SkapaBefPrognosDiagram <- function(region_vekt = "20",
     }
   }
   
+  # om mappen för datafiler från Profet eller Hallands befolkningsprognosskript inte finns så 
+  # används SCB:s API istället
+  if (tabeller_url == "G:/Samhällsanalys/Statistik/Befolkningsprognoser/Profet/datafiler/" &
+    !dir.exists("G:/Samhällsanalys/Statistik/Befolkningsprognoser/Profet/datafiler/")) {
+    tabeller_url <- "https://api.scb.se/OV0104/v1/doris/sv/ssd/BE/BE0401/BE0401A/BefProgOsiktRegN"
+  } 
+  
   # om könsuppdelat så får man bara skicka med en prognos, inte flera
   if (konsuppdelat & length(tabeller_url) > 1) stop("Om man skriver ut könsuppdelade diagram så kan endast en prognos användas. Korrigera parametern 'tabeller_url' så att den bara innehåller en url och inte flera.")
   
@@ -95,6 +103,18 @@ SkapaBefPrognosDiagram <- function(region_vekt = "20",
                                        cont_klartext = "Folkmängd",
                                        prognos_ar = prognos_ar           # prognos_ar funkar bara för profet-uttag (för uttag från SCB:s API styr url:en vilket år som hämtas men i Profet kan flera år hämtas med samma url om det finns data för flera år i mappen)
   ) 
+  
+  # hantera diagram_capt
+  if (diagram_capt == "auto") {
+    diagram_capt <- case_when(
+      str_detect(tabeller_url, "api.scb.se") & str_detect(tabeller_url, "Profet/datafiler") ~ 
+        "Källa: SCB:s befolkningsprognos och Region Dalarnas egna befolkningsprognos, bearbetning av Samhällsanalys, Region Dalarna\nI Region Dalarnas befolkningsprognos baseras prognosen för Ludvika kommun på ett scenario som i allt väsentligt liknar det som Ludvika kommun\nsjälva tagit fram i deras scenario med medelstark tillväxt.",
+      str_detect(tabeller_url, "api.scb.se") ~ 
+        "Källa: SCB:s befolkningsprognos\nBearbetning: Samhällsanalys, Region Dalarna",
+      str_detect(tabeller_url, "Profet/datafiler") ~ 
+        "Källa: Region Dalarnas egna befolkningsprognos, bearbetning av Samhällsanalys, Region Dalarna\nPrognosen för Ludvika kommun baseras på ett scenario som i allt väsentligt liknar den som Ludvika kommun\nsjälva tagit fram i deras scenario med medelstark tillväxt."
+    )
+  }
   
   # Här skapar vi en rad med total folkmängd i dfmalar ==========================================
   total_df <- befprogn_df %>% 
