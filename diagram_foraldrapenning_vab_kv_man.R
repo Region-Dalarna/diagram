@@ -112,8 +112,7 @@ diag_foraldrapenning_vab <- function(region_vekt = "20", # Enbart ett län åt g
                                                 Kön != "Kvinnor och män",
                                                 År == max(År)) %>% 
                                          mutate(Kön = tolower(Kön),
-                                                Andel = as.numeric(Andel),
-                                                Kommun = stri_extract_last(Kommun, regex='\\S+')), 
+                                                Andel = as.numeric(Andel)), 
                                        skickad_x_var = "Kommun", 
                                        skickad_y_var = "Andel", 
                                        skickad_x_grupp = "Kön",
