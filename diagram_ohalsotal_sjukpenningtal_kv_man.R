@@ -1,6 +1,6 @@
 diag_ohalsotal_sjukpenningtal <- function(region_vekt = "20", # Enbart ett län åt gången, inte Sverige
                                           diag_ohalsotal = TRUE,
-                                          diag_diag_sjukpenningtal = TRUE,
+                                          diag_sjukpenningtal = TRUE,
                                           output_mapp = "G:/Samhällsanalys/Statistik/Näringsliv/basfakta/",
                                           spara_diagrambildfil = FALSE,
                                           spara_dataframe_till_global_environment = FALSE){
