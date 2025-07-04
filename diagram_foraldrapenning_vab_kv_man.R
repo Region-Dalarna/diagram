@@ -67,7 +67,7 @@ diag_foraldrapenning_vab <- function(region_vekt = "20", # Enbart ett län åt g
                                  stodlinjer_avrunda_fem = TRUE,
                                  diagram_titel = diagramtitel,
                                  diagram_capt =  diagram_capt,
-                                 output_mapp = outputmapp,
+                                 output_mapp = output_mapp,
                                  filnamn_diagram = diagramfilnamn,
                                  skriv_till_diagramfil = spara_diagrambildfil)
     
@@ -95,7 +95,7 @@ diag_foraldrapenning_vab <- function(region_vekt = "20", # Enbart ett län åt g
                                        manual_y_axis_title = "",
                                        diagram_titel = diagramtitel,
                                        diagram_capt =  diagram_capt,
-                                       output_mapp = outputmapp,
+                                       output_mapp = output_mapp,
                                        filnamn_diagram = diagramfilnamn,
                                        skriv_till_diagramfil = spara_diagrambildfil)
     
@@ -128,7 +128,7 @@ diag_foraldrapenning_vab <- function(region_vekt = "20", # Enbart ett län åt g
                                        vand_sortering = FALSE,
                                        diagram_titel = diagramtitel,
                                        diagram_capt =  diagram_capt,
-                                       output_mapp = outputmapp,
+                                       output_mapp = output_mapp,
                                        filnamn_diagram = diagramfilnamn,
                                        skriv_till_diagramfil = spara_diagrambildfil)
     
@@ -175,7 +175,7 @@ diag_foraldrapenning_vab <- function(region_vekt = "20", # Enbart ett län åt g
                                   diagram_titel = diagramtitel,
                                   diagram_capt =  diagram_capt,
                                   stodlinjer_avrunda_fem = TRUE,
-                                  output_mapp = outputmapp,
+                                  output_mapp = output_mapp,
                                   filnamn_diagram = diagramfilnamn,
                                   skriv_till_diagramfil = spara_diagrambildfil)
     
@@ -201,7 +201,7 @@ diag_foraldrapenning_vab <- function(region_vekt = "20", # Enbart ett län åt g
                                        diagram_titel = diagramtitel,
                                        diagram_capt =  diagram_capt,
                                        stodlinjer_avrunda_fem = TRUE,
-                                       output_mapp = outputmapp,
+                                       output_mapp = output_mapp,
                                        filnamn_diagram = diagramfilnamn,
                                        skriv_till_diagramfil = spara_diagrambildfil)
     
