@@ -1,4 +1,4 @@
-diag_inkomst_scb <- function(regionvekt = "20", # Enbart ett i taget.
+diag_inkomst_scb <- function(regionvekt = "20", # Enbart ett i taget. går även att välja kommuner, men då genereras inget kommundiagram
                              visa_logga_i_diagram = FALSE,                        # TRUE om logga ska visas i diagrammet, FALSE om logga inte ska visas i diagrammet
                              logga_sokvag = NA,                                 # sökväg till logga som ska visas i diagrammet
                              output_mapp = "G:/Samhällsanalys/API/Fran_R/utskrift/",                                  # mapp där diagram ska sparas, NA = sparas ingen fil
@@ -7,22 +7,19 @@ diag_inkomst_scb <- function(regionvekt = "20", # Enbart ett i taget.
                              diag_linje = TRUE,
                              diag_kommun = TRUE,
                              skriv_diagrambildfil = FALSE,                           # TRUE om diagram ska skrivas till fil, FALSE om diagram inte ska skrivas till fil
-                             alder_klartext = c("20-64 år","65+ år"),			 #  Finns: "20+ år", "20-64 år", "20-65 år", "65+ år", "66+ år". OBS!! Funkar ej med "*"
+                             alder_klartext = c("20-64 år"),			 #  Finns: "20+ år", "20-64 år", "20-65 år", "65+ år", "66+ år". OBS!! Funkar ej med "*"
                              returnera_data_rmarkdown = FALSE
 ) {
   
   
   # =======================================================================================================================
   #
-  # Ett diagram för förvärvsinkomst kopplad till bakgrund (vistelsetid)
-  # Från integrationsrapporten (därav IntRap i namnet)
+  # Tre diagram per åldersgrupp för inkomst. Finns på såväl län som kommunnivå. Används i första hand rapporten "Kvinnor och män i Dalarna".
   #
   #
   # =======================================================================================================================
   
-  # om parametern demo är satt till TRUE så öppnas en flik i webbläsaren med ett exempel på hur diagrammet ser ut och därefter avslutas funktionen
-  # demofilen måste läggas upp på webben för att kunna öppnas, vi lägger den på Region Dalarnas github-repo som heter utskrivna_diagram
-  
+ 
   if (!require("pacman")) install.packages("pacman")
   p_load(tidyverse,
          glue)
@@ -114,7 +111,7 @@ diag_inkomst_scb <- function(regionvekt = "20", # Enbart ett i taget.
       gg_list <- c(gg_list, list(gg_obj))
     }
     
-    if(diag_kommun){
+    if(diag_kommun && nchar(regionvekt)<3){
       df_kommun <- df %>%
         filter(ålder == vald_aldersgrupp)
       
