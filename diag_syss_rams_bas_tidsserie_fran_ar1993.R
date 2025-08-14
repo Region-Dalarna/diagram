@@ -1,5 +1,4 @@
 
-
 diag_syss_rams_bas_tidssserie_fran_ar1993 <- function(
   region_vekt = "20",
   inrikesutrikes_klartext = "*",      #  NA = tas inte med i uttaget,  Finns: "inrikes födda", "utrikes födda", "inrikes och utrikes födda"

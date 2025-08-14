@@ -1,4 +1,3 @@
-
 diag_befutv_per_komponent_ar <- function(
     region_vekt = "20",                                      # läns- och kommunkoder, det blir ett diagram (och en fil om man skriver bildfiler) per region
     gruppera_namn = NA,                                     # för att skapa egna geografiska indelningar av samtliga regioner som skickas med i uttaget
@@ -6,6 +5,9 @@ diag_befutv_per_komponent_ar <- function(
     output_mapp = NA,                                        # här sparas 
     enbart_inrikes_flyttnetto = TRUE,                        # FALSE = inr flyttnetto delas upp på eget län och övriga Sverige, annars blir det bara en kategori för inr flyttnetto
     diagram_fargvekt = NA,
+    x_axis_storlek = 7, # Ändra storleken på x-axeln
+    facet_x_axis_storlek = 6, # Ändra storleken på x-axeln i facet. Standardvärde är 8
+    x_axis_visa_var_xe_etikett = NA, # Möjlighet att visa var x:e etikett på x-axeln
     ta_med_logga = TRUE,
     logga_sokvag = NA,
     returnera_dataframe_global_environment = FALSE,          
@@ -14,12 +16,14 @@ diag_befutv_per_komponent_ar <- function(
     skriv_till_diagramfil = TRUE
 ) {
   
-  
+  # source('https://raw.githubusercontent.com/Region-Dalarna/funktioner/main/func_SkapaDiagram.R') saknades i koden, varför jag la till den. /Jon 2025-03-17
+  # Har även lagt till möjligheten att visa var x:te etikett och dessutom möjligheten att ändra storlek på etiketterna. Blev för litet i ett diagram. /Jon 2025-03-17
   if (!require("pacman")) install.packages("pacman")
   p_load(tidyverse)
   
   source("https://raw.githubusercontent.com/Region-Dalarna/funktioner/main/func_text.R", encoding = "utf-8", echo = FALSE)
   source("https://raw.githubusercontent.com/Region-Dalarna/funktioner/main/func_API.R", encoding = "utf-8", echo = FALSE)
+  source('https://raw.githubusercontent.com/Region-Dalarna/funktioner/main/func_SkapaDiagram.R')
   source("https://raw.githubusercontent.com/Region-Dalarna/hamta_data/main/hamta_bef_forandringar_region_period_kon_scb.R")
   
   gg_list <- list()
@@ -140,8 +144,9 @@ diag_befutv_per_komponent_ar <- function(
                                  diagram_facet = TRUE,
                                  facet_grp = "förändringar",
                                  facet_scale = "fixed",
-                                 x_axis_storlek = 7,
-                                 facet_x_axis_storlek = 6
+                                 x_axis_storlek = x_axis_storlek,
+                                 facet_x_axis_storlek = facet_x_axis_storlek,
+                                 x_axis_visa_var_xe_etikett = x_axis_visa_var_xe_etikett,
                                  )
     
     gg_list <- c(gg_list, list(gg_obj))

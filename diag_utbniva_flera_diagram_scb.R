@@ -333,7 +333,7 @@ diag_utbniva_tidserie_och_lansjmfr <- function(
         utb_niva = factor(utb_niva, levels = c("Eftergymnasial utbildning, 3 år eller mer","Eftergymnasial utbildning, mindre än 3 år","Gymnasial utbildning","Förgymnasial utbildning"))) %>% 
       filter(utb_niva != "Uppgift saknas") %>% 
       group_by(år, regionkod, region, kön, utb_niva) %>% 
-      summarize(antal = sum(Befolkning, na.rm = TRUE)) %>% 
+      summarize(antal = sum(Antal, na.rm = TRUE)) %>% 
       mutate(andel = (antal/sum(antal)) * 100) %>% 
       ungroup()
 

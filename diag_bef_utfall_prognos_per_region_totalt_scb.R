@@ -1,10 +1,10 @@
 
-diag_bef_utfall_prognos_per_aldersgrupp <- function(
+diag_bef_utfall_prognos_per_region_totalt <- function(
     region_vekt = "20",                                      # läns- och kommunkoder, det blir ett diagram (och en fil om man skriver bildfiler) per region
-    aldersindelning = c(0, 1, 6, 16, 20, 66, 80),
     diagram_capt = "Källa: SCB:s öppna statistikdatabas, befolkningsframskrivning från år <prognos_ar>\nBearbetning: Samhällsanalys, Region Dalarna",
         # om <prognos_ar> ligger med i diagram_capt så byts det ut mot det år prognosen gjordes
     output_mapp = NA,                                        # här sparas diagramet
+    #region_txt = NA,                                      # om NA så används regionnamnet i datasetet, annars detta namn
     diagram_fargvekt = NA,
     ta_med_logga = TRUE,
     logga_sokvag = NA,
@@ -51,7 +51,7 @@ diag_bef_utfall_prognos_per_aldersgrupp <- function(
   bef_folkmangd <- funktion_upprepa_forsok_om_fel(function()
     hamta_bef_folkmangd_alder_kon_ar_scb(region_vekt = region_vekt, 
                                                         kon_klartext = NA,
-                                                        alder_koder = "*")
+                                                        alder_koder = NA)
   )
   
   # special för att hantera förändring av namn på innehållsvariable från Folkmängd till Antal
@@ -83,10 +83,8 @@ diag_bef_utfall_prognos_per_aldersgrupp <- function(
     ) %>% 
       mutate(regionkod = "00",
              region = "Riket",
-             prognos_ar = as.character(as.numeric(start_ar) - 1),
-             alder_num = parse_number(ålder),
-             ålder = if_else(alder_num > 99, "100+ år", ålder)) %>% 
-      group_by(regionkod, region, kön, ålder, år, prognos_ar) %>% 
+             prognos_ar = as.character(as.numeric(start_ar) - 1)) %>% 
+      group_by(regionkod, region, kön, år, prognos_ar) %>% 
       summarise(Antal = sum(Antal, na.rm = TRUE), .groups = "drop")
     
   } else bef_prognos_riket <- NULL
@@ -98,21 +96,20 @@ diag_bef_utfall_prognos_per_aldersgrupp <- function(
     list_rbind()
   
   bef_prognos2 <- bef_prognos %>% 
-    mutate(aldergrp = skapa_aldersgrupper(ålder, aldersindelning),
-           typ = "prognos") %>% 
-    group_by(regionkod, region, typ, aldergrp, år) %>% 
+    mutate(typ = "prognos") %>% 
+    group_by(regionkod, region, typ, år) %>% 
     summarise(Antal = round(sum(Antal, na.rm = TRUE)), .groups = "drop")
   
   
   bef_folk_progn <- bef_folkmangd %>%
-    filter(ålder != "totalt ålder") %>%
-    mutate(aldergrp = skapa_aldersgrupper(ålder, aldersindelning),
-           typ = "utfall") %>% 
-    group_by(regionkod, region, typ, aldergrp, år) %>% 
+    #filter(ålder != "totalt ålder") %>%
+    mutate(typ = "utfall") %>% 
+    group_by(regionkod, region, typ, år) %>% 
     summarise(Antal = round(sum(Antal, na.rm = TRUE)), .groups = "drop") %>% 
     bind_rows(bef_prognos2) %>% 
-    arrange(regionkod, region, aldergrp, år) %>% 
-    mutate(Befolkningsökning = Antal - lag(Antal, 1)) %>% 
+    arrange(regionkod, region, år) %>% 
+    mutate(Befolkningsökning = Antal - lag(Antal, 1),
+           bef_okning_rel = Befolkningsökning / lag(Antal) * 100) %>% 
     filter(år != min(år))
   
   # returnera datasetet till global environment, bl.a. bra när man skapar Rmarkdown-rapporter
@@ -130,19 +127,25 @@ diag_bef_utfall_prognos_per_aldersgrupp <- function(
     diagram_df <- bef_folk_progn %>%
       filter(regionkod %in% skickad_regionkod)
     
-    region_txt <- unique(diagram_df$region) %>% skapa_kortnamn_lan()
+    if (any(c("03", "19" ) %in% diagram_df$regionkod)) {
+      diagram_df <- diagram_df %>% 
+        mutate(bef_okning_rel = if_else(regionkod %in% c("03", "19") & år == "2006", 0, lag(bef_okning_rel)))
+    }
+    
+    #region_txt <- unique(diagram_df$region) %>% skapa_kortnamn_lan()
+    region_filnamn <- unique(diagram_df$regionkod) %>% paste0(collapse = "_")
     startar_utfall <- diagram_df %>% filter(typ == "utfall") %>% dplyr::pull(år) %>% min()
     slutar_utfall <- diagram_df %>% filter(typ == "utfall") %>% dplyr::pull(år) %>% max()  
     startar_prognos <- diagram_df %>% filter(typ == "prognos") %>% dplyr::pull(år) %>% min()
     slutar_prognos <- diagram_df %>% filter(typ == "prognos") %>% dplyr::pull(år) %>% max()
   
-    diagramtitel <- glue("Befolkning i {region_txt} år {startar_utfall}-{slutar_utfall} samt befolkningsprognos {startar_prognos}-{slutar_prognos}")
-    diagramfil <- glue("befolkning_utfall_progn_{region_txt}_ar{startar_utfall}-{slutar_prognos}.png")
+    diagramtitel <- glue("Relativ befolkningsförändring år {startar_utfall}-{slutar_utfall} samt befolkningsprognos {startar_prognos}-{slutar_prognos}")
+    diagramfil <- glue("rel_befforandring_utfall_progn_{region_filnamn}_ar{startar_utfall}-{slutar_prognos}.png")
   
   
     gg_obj <- SkapaStapelDiagram(skickad_df = diagram_df,
                                  skickad_x_var = "år",
-                                 skickad_y_var = "Antal",
+                                 skickad_y_var = "bef_okning_rel",
                                  skickad_x_grupp = "typ",
                                  #x_axis_sort_value = TRUE,
                                  diagram_titel = diagramtitel,
@@ -153,6 +156,7 @@ diag_bef_utfall_prognos_per_aldersgrupp <- function(
                                  #x_axis_lutning = 0,
                                  manual_x_axis_text_vjust = 1,
                                  manual_x_axis_text_hjust = 1,
+                                 manual_y_axis_title = "procent",
                                  manual_color = diagram_fargvekt,
                                  output_mapp = output_mapp,
                                  lagg_pa_logga = ta_med_logga,
@@ -160,10 +164,10 @@ diag_bef_utfall_prognos_per_aldersgrupp <- function(
                                  dataetiketter = visa_dataetiketter,
                                  legend_vand_ordning = TRUE,
                                  diagram_facet = TRUE,
-                                 facet_grp = "aldergrp",
-                                 facet_scale = "free",
+                                 facet_grp = "region",
+                                 facet_scale = "free_x",
                                  x_axis_storlek = 7,
-                                 facet_x_axis_storlek = 6,
+                                 facet_x_axis_storlek = 5,
                                  x_axis_visa_var_xe_etikett = 3,
                                  facet_legend_bottom = TRUE
                                  #diagram_spara_annat_format = "eps"
@@ -176,7 +180,9 @@ diag_bef_utfall_prognos_per_aldersgrupp <- function(
     
   } # slut funktion som skapar diagrammet
   
-  retur_list <- map(region_vekt, ~skapa_diagram(skickad_regionkod = .x)) %>% purrr::flatten()
+  #retur_list <- map(region_vekt, ~skapa_diagram(skickad_regionkod = .x)) %>% purrr::flatten()
+  
+  retur_list <- skapa_diagram(skickad_regionkod = region_vekt)
   
   if (skriv_till_excelfil) {
     region_xlsx <- unique(bef_folk_progn$region) %>% skapa_kortnamn_lan() %>% paste0(collapse = "_")

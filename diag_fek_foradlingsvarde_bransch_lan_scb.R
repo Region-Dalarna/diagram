@@ -74,7 +74,7 @@ foradl_df <- hamta_fek_lve_region_sni2007_tid_scb(
   returnera_df = TRUE      # TRUE om man vill ha en dataframe i retur från funktionen
 ))
 
-branschnyckel <- read_xlsx("g:/skript/nycklar/Bransch_FEK.xlsx") %>% 
+branschnyckel <- readxl::read_xlsx("g:/skript/nycklar/Bransch_FEK.xlsx") %>% 
   select(Avdelning, Grupp_kod, Branschgrupp) %>% 
   distinct()
 
