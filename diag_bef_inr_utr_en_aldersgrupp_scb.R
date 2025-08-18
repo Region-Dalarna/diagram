@@ -59,7 +59,7 @@ diag_bef_inr_utr_en_aldersgrupp <- function(
       group_by(år, regionkod, region, bakgrund = födelseregion) %>% 
       summarise(antal = sum(Antal, na.rm = TRUE), .groups = "drop") %>% 
       mutate(aldersgrupp = aldersgrupp_txt,
-             bakgrund = ifelse(bakgrund == "Utrikes född", "Utrikes födda", "Inrikes födda"),
+             bakgrund = ifelse(bakgrund == "utrikes född", "Utrikes födda", "Inrikes födda"),
              bakgrund = factor(bakgrund, levels = c("Utrikes födda", "Inrikes födda")),
              region = region %>% skapa_kortnamn_lan())
   
