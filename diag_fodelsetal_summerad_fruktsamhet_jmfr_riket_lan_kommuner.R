@@ -81,7 +81,7 @@ diag_fodelsetal_summerad_fruktsamhet_jmfr_riket_lan_kommuner <- function(
                                manual_x_axis_text_hjust = 1,
                                manual_color = diagramfarger("rus_sex")[c(3, 2, 1)],
                                fokusera_varden = list(list(geom = "rect", ymin=2.097, ymax=2.103, xmin=0, xmax=Inf, alpha=1, fill="black")),
-                               output_mapp = utmapp,
+                               output_mapp = output_fold,
                                skriv_till_diagramfil = FALSE,
                                diagram_facet = TRUE,
                                facet_grp = "region",
