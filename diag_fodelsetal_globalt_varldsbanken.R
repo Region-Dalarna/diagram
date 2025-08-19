@@ -24,6 +24,7 @@ c("https://region-dalarna.github.io/utskrivna_diagram/fodelsetal_globalt_ar_ar20
   stop_tyst()
 }
 
+  library(data.table)
   library(tidyverse)
   library(httr)
   library(readxl)
@@ -51,11 +52,11 @@ c("https://region-dalarna.github.io/utskrivna_diagram/fodelsetal_globalt_ar_ar20
   }
   
   # hämta nyckel för länder och världsdelar 
-  url_nyckelfil <- "https://raw.githubusercontent.com/Region-Dalarna/depot/main/Landskod.xlsx"
-  tempfile <- tempfile(fileext = ".xlsx")
-  download.file(url_nyckelfil, destfile = tempfile, mode = "wb")
-  nyckel_df <- read_xlsx(tempfile) %>%
-    select(Landskod, Världsdel)
+  url_nyckelfil <- "https://raw.githubusercontent.com/Region-Dalarna/depot/main/landskoder_varldsdelar_nyckel.csv"
+  tempfile <- tempfile(fileext = ".csv")
+  httr::GET(url_nyckelfil, write_disk(tempfile, overwrite = TRUE))
+  nyckel_df <- fread(tempfile) %>%
+    select(Landskod, varldsdel)
   
   # hämta nyckel för länder med 2- respektive 3-siffrig landskod
   iso_lander_url <- "https://en.wikipedia.org/wiki/List_of_ISO_3166_country_codes"
@@ -106,9 +107,9 @@ c("https://region-dalarna.github.io/utskrivna_diagram/fodelsetal_globalt_ar_ar20
                              TRUE ~ 0)) %>% 
     relocate(`Fertility Rate`, .after = `Country Name`) %>% 
     left_join(nyckel_join, by = c("Country Code" = "id_A3")) %>% 
-    filter(!is.na(Världsdel)) %>%
-    mutate(Världsdel = ifelse(`Country Name` == "Sweden", "Sverige", Världsdel),
-           Världsdel = Världsdel %>% factor(levels = c(unique(Världsdel[Världsdel != "Sverige"]), "Sverige")))
+    filter(!is.na(varldsdel)) %>%
+    mutate(varldsdel = ifelse(`Country Name` == "Sweden", "Sverige", varldsdel),
+           varldsdel = varldsdel %>% factor(levels = c(unique(varldsdel[varldsdel != "Sverige"]), "Sverige")))
   
   # returnera datasetet till global environment, bl.a. bra när man skapar Rmarkdown-rapporter
   if(returnera_dataframe_global_environment == TRUE){
@@ -121,7 +122,7 @@ c("https://region-dalarna.github.io/utskrivna_diagram/fodelsetal_globalt_ar_ar20
   gg_obj <- SkapaStapelDiagram(skickad_df = diagram_df,
                                skickad_x_var = "Country Name",
                                skickad_y_var = "Fertility Rate",
-                               skickad_x_grupp = "Världsdel",
+                               skickad_x_grupp = "varldsdel",
                                x_axis_sort_value = TRUE,
                                #x_var_fokus = "fokus",
                                y_axis_storlek = 3,
