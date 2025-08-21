@@ -8,6 +8,7 @@ diag_bef_utfall_prognos_per_region_totalt <- function(
     diagram_fargvekt = NA,
     ta_med_logga = TRUE,
     logga_sokvag = NA,
+    jmfr_tid = 10,                                           # hur många år framåt från befolkningsprognosen vi ska ta med
     returnera_dataframe_global_environment = FALSE,          
     ta_bort_diagramtitel = FALSE,                            # FALSE så skrivs ingen diagramtitel ut
     visa_dataetiketter = FALSE,
@@ -59,7 +60,7 @@ diag_bef_utfall_prognos_per_region_totalt <- function(
   
   # välj år för prognosen utifrån senaste år för befolkning
   start_ar <- (as.numeric(max(bef_folkmangd$år)) + 1) %>% as.character()
-  slut_ar <- (as.numeric(start_ar) + 10) %>% as.character()
+  slut_ar <- (as.numeric(start_ar) + jmfr_tid) %>% as.character()
   
   hamta_region <- region_vekt[region_vekt != "00"]
   hamta_riket <- region_vekt[region_vekt == "00"]
