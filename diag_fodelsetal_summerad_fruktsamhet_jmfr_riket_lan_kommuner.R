@@ -107,7 +107,7 @@ diag_fodelsetal_summerad_fruktsamhet_jmfr_riket_lan_kommuner <- function(
   if (skriv_diagramfil) {
   suppressMessages(
   skriv_till_diagramfil(dia_med_legend,
-                        output_mapp = utmapp,
+                        output_mapp = output_fold,
                         filnamn_diagram = diagramfil)
   )}
   return(dia_med_legend)
