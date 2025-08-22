@@ -105,7 +105,7 @@ diag_fodelsetal_summerad_fruktsamhet_jmfr_riket_lan_kommuner <- function(
     ) + guides(fill = "none")
   
   gg_list <- list(dia_med_legend)
-  names(gg_list)[[length(gg_list)]] <- diagramfil %>% str_remove(".png")
+  names(gg_list)[[length(gg_list)]] <- diagramfil %>% str_remove("\\.[^.]+$")
   
   if (skriv_diagramfil) {
   suppressMessages(
