@@ -175,7 +175,7 @@ diag_bef_utfall_prognos_per_region_totalt <- function(
     ) # slut skriv ggplot_objekt
     
     gg_list <- c(gg_list, list(gg_obj))
-    names(gg_list)[[length(gg_list)]] <- diagramfil %>% str_remove(".png")
+    names(gg_list)[[length(gg_list)]] <- diagramfil %>% str_remove("\\.[^.]+$")
     
     return(gg_list) 
     
