@@ -235,7 +235,7 @@ diag_inr_flyttnetto_inr_utr_fodda <- function(
     #ar_alla_kommuner_i_ett_lan(vald_regionkod)
     
     diagram_titel <- glue("Inrikes {relativt_txt}flyttnetto {diagtitel_txt}")
-    diagramfil <- paste0("Flyttnetto_", relativt_filnamn, unika_reg_txt %>% paste0(collapse = "_"), "_ar", min(chart_df$år), "_", max(chart_df$år), ".png")
+    diagramfil <- paste0("Flyttnetto_", relativt_filnamn, unika_reg_txt %>% paste0(collapse = "_"), "_ar", min(chart_df$år), "_", max(chart_df$år), ".png") %>% str_replace_all("__", "_")
     
     gg_obj <- SkapaStapelDiagram(skickad_df = chart_df, 
                        skickad_x_var = "år", 
@@ -261,7 +261,7 @@ diag_inr_flyttnetto_inr_utr_fodda <- function(
     if (visa_totalvarden){
       suppressMessages(
       dia_med_utan_legend <- gg_obj +
-        geom_line(aes(color="line"))+
+        geom_line(aes(group = 1, color="line"), alpha = 0)+
         scale_color_manual(name = "", values = c("line" = "black"), labels = "inrikes flyttnetto totalt")+
         theme(legend.key = element_rect(fill = "white"),
               legend.box.just = "bottom")
@@ -269,7 +269,7 @@ diag_inr_flyttnetto_inr_utr_fodda <- function(
     } else dia_med_utan_legend <- gg_obj # slut if-sats visa_totalvarden  
     
     retur_list <- c(retur_list, list(dia_med_utan_legend))
-    names(retur_list)[length(retur_list)] <- diagramfil %>% str_remove(".png")
+    names(retur_list)[length(retur_list)] <- diagramfil %>% str_remove("\\.[^.]+$")
     
       if (skriv_diagram) {                           # skriv en diagramfil om så önskas
         suppressMessages(
@@ -279,6 +279,7 @@ diag_inr_flyttnetto_inr_utr_fodda <- function(
                             filnamn_diagram = diagramfil)
         ))
       } # slut if-sats
+    return(retur_list)
   } # slut skapa diagram-funktion för varje region
   
   if (length(region_vekt) == 1) facet_diagram <- FALSE 
@@ -286,7 +287,7 @@ diag_inr_flyttnetto_inr_utr_fodda <- function(
   if (facet_diagram) {
     gg_list <- skapa_diagram(region_vekt)
   } else {
-    gg_list <- map(unique(region_vekt), ~skapa_diagram(.x))
+    gg_list <- map(unique(region_vekt), ~skapa_diagram(.x)) %>% purrr::list_flatten()
   }
 
   return(gg_list)
