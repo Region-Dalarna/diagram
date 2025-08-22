@@ -104,11 +104,14 @@ diag_fodelsetal_summerad_fruktsamhet_jmfr_riket_lan_kommuner <- function(
       legend.margin = margin(t = 10)
     ) + guides(fill = "none")
   
+  gg_list <- list(dia_med_legend)
+  names(gg_list)[[length(gg_list)]] <- diagramfil %>% str_remove(".png")
+  
   if (skriv_diagramfil) {
   suppressMessages(
   skriv_till_diagramfil(dia_med_legend,
                         output_mapp = output_fold,
                         filnamn_diagram = diagramfil)
   )}
-  return(dia_med_legend)
+  return(gg_list)
 }
