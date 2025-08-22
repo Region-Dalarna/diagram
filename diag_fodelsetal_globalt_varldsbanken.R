@@ -142,5 +142,9 @@ c("https://region-dalarna.github.io/utskrivna_diagram/fodelsetal_globalt_ar_ar20
                                diagramfil_hojd = 10,
                                output_mapp = output_mapp
   )
-  return(gg_obj)
+  
+  gg_list <- list(gg_obj)
+  names(gg_list)[[length(gg_list)]] <- diagramfil %>% str_remove("\\.[^.]+$")
+  return(gg_list)
+
 } # slut funktion
