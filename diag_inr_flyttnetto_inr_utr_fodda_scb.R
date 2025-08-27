@@ -65,8 +65,8 @@ diag_inr_flyttnetto_inr_utr_fodda <- function(
     
     # om 999 är medskickat (= högsta ålder) så byts det ut till 99 för att kunna skapa vektor
     if (any(map_lgl(alder_grp, ~ "999" %in% .x))) {
-       alder_vekt <- alder_vekt %>% 
-         map(~ replace(.x, .x == "999", "99"))
+      alder_vekt <- alder_vekt %>% 
+        map(~ replace(.x, .x == "999", "99"))
     }
     
     # skapa åldersgrupper för varje vektor i listan och lägg ihop i en vektor
