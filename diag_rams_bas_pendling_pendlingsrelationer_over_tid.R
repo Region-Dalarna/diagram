@@ -3,12 +3,13 @@ diag_arbetspendling_over_tid <- function(
     region_vekt = "20", 
     skriv_ut_dataetiketter_diagram = FALSE,
     skriv_till_diagramfil = TRUE,
+    skriv_till_excelfil = FALSE,
     output_mapp = NA,
     fargvekt_tre = NA,
     fargvekt_atta = NA,
     lagg_till_logga = TRUE,
     logga_sokvag = NA,
-    diagram_capt = "Källa: SCB:s öppna statistikdatabas\nBearbetning: Samhällsanalys, Region Dalarna",
+    diagram_capt = "Källa: SCB:s öppna statistikdatabas, bearbetning av: Samhällsanalys, Region Dalarna\nPendlingsstatistiken har tidsseriebrott år 2003-2004, 2018-2019 och 2019-2020, så jämförelser mellan dessa perioder bör göras med viss försiktighet.",
     diag_in_ut_sammma = TRUE,
     diag_in_ut = TRUE,
     diag_nettopendling = TRUE,
@@ -30,6 +31,7 @@ diag_arbetspendling_over_tid <- function(
   library(tidyverse)
   library(pxweb)
   library(openxlsx)
+  library(writexl)
   library(RColorBrewer)
   
   source("https://raw.githubusercontent.com/Region-Dalarna/funktioner/main/func_API.R", encoding = "utf-8", echo = FALSE)
@@ -63,7 +65,8 @@ diag_arbetspendling_over_tid <- function(
   }
   
   gg_list <- list()               # skapa lista för att lägga diagrammen i
-  
+  flikar_list <- list()
+
   dataetiketter_txt <- ifelse(skriv_ut_dataetiketter_diagram, "_dataetiketter", "")
   
   px_df <- funktion_upprepa_forsok_om_fel( function() hamta_pendling_rams_bas_scb(region_vekt = region_vekt))
@@ -80,7 +83,13 @@ diag_arbetspendling_over_tid <- function(
       mutate(pendlingstyp = case_when(regionkod_bo == regionkod_arb ~ paste0("bor och arbetar i samma ", regiontyp),
                                       regionkod_bo %in% regionkod ~ "utpendlare",
                                       regionkod_arb %in% regionkod ~ "inpendlare")) %>% 
-      rename(antal_pendlare = pendlare)
+      rename(antal_pendlare = pendlare) %>% 
+      relocate(år, pendlingstyp, .before = 1)
+    
+    if (skriv_till_excelfil) {
+      flikar_list <- c(flikar_list, list(pendling_df))
+      names(flikar_list)[length(flikar_list)] <- "pendling_in_ut"
+    } 
     
     # =================== diagram för in- och utpendlng över kommungräns samt även de som bor och arbetar i samma kommun =========================
     
@@ -147,13 +156,21 @@ diag_arbetspendling_over_tid <- function(
     if (diag_nettopendling){
     
       nettopendling_df <- pendling_df %>%
-        group_by(år, kön, pendlingstyp) %>% 
+        mutate(regionkod = if_else(pendlingstyp == "inpendlare", regionkod_arb, regionkod_bo),
+               region = if_else(pendlingstyp == "inpendlare", arbetsställeregion, bostadsregion)) %>% 
+        group_by(år, regionkod, region, kön, pendlingstyp) %>% 
         summarise(antal_pendlare = sum(antal_pendlare, na.rm = TRUE)) %>% 
         ungroup() %>% 
         pivot_wider(names_from = pendlingstyp, 
                     values_from = antal_pendlare) %>% 
         mutate(nettopendling = inpendlare - utpendlare) %>% 
         rename(ar = år)
+      
+      # skriv till excelfil om man valt det
+      if (skriv_till_excelfil) {
+        flikar_list <- c(flikar_list, list(nettopendling_df))
+        names(flikar_list)[length(flikar_list)] <- "nettopendling"
+      }
       
       diagram_titel <- paste0("Nettopendling i ", region_txt, " ", min(pendling_df$år), "-", max(pendling_df$år))
       diagramfil <- paste0("nettopendling_", region_txt, "_", min(pendling_df$år), "-", max(pendling_df$år), dataetiketter_txt, ".png")
@@ -176,7 +193,7 @@ diag_arbetspendling_over_tid <- function(
                          filnamn_diagram = diagramfil)
       
       gg_list <- c(gg_list, list(gg_obj))
-      names(gg_list)[length(gg_list)] <- "diag_in_ut_sammma"
+      names(gg_list)[length(gg_list)] <- "diag_nettopendling"
     
     } # slut if-sats för diag_nettopendling
     
@@ -187,7 +204,13 @@ diag_arbetspendling_over_tid <- function(
     
       bara_pendlare_df <- pendling_df %>%
         filter(pendlingstyp != paste0("bor och arbetar i samma ", regiontyp))
-      
+     
+      # skriv till excelfil om man valt det
+      if (skriv_till_excelfil) {
+        flikar_list <- c(flikar_list, list(bara_pendlare_df))
+        names(flikar_list)[length(flikar_list)] <- "pendling_relationer"
+      }
+       
       # ta ut de sex största inpendlingskommunerna och lägg i en vektor
       storsta_inpendl_regioner <-  bara_pendlare_df %>% 
         filter(pendlingstyp == "inpendlare") %>% 
@@ -197,8 +220,8 @@ diag_arbetspendling_over_tid <- function(
         arrange(desc(antal_pendlare)) %>% 
         slice(1:6) %>% 
         select(regionkod_bo) %>% 
-        dplyr::pull()
-      
+        dplyr::pull() 
+        
       
       # ta ut de sex största utpendlingskommunerna och lägg i en vektor
       storsta_utpendl_regioner <-  bara_pendlare_df %>% 
@@ -312,6 +335,12 @@ diag_arbetspendling_over_tid <- function(
     #   
     # } # slut funktion för att skapa diagram för pendling över kommun- eller länsgräns
     
+    if (skriv_till_excelfil) {
+      start_ar <- min(pendling_df$år)
+      slut_ar <- max(pendling_df$år)
+      pendling_excelflikar <- compact(flikar_list)
+      write_xlsx(pendling_excelflikar, paste0(output_mapp, "arbetspendling_", start_ar, "-", slut_ar, "_", regionkod, ".xlsx"))
+    }
     
     return(gg_list)              # här returnerar vi listan med ggplot-diagram
     } # slut funktion för att skapa själva diagrammen
