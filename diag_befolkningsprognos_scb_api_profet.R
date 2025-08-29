@@ -111,8 +111,10 @@ SkapaBefPrognosDiagram <- function(region_vekt = "20",
         "Källa: SCB:s befolkningsprognos och Region Dalarnas egna befolkningsprognos, bearbetning av Samhällsanalys, Region Dalarna\nI Region Dalarnas befolkningsprognos baseras prognosen för Ludvika kommun på ett scenario som i allt väsentligt liknar det som Ludvika kommun\nsjälva tagit fram i deras scenario med medelstark tillväxt.",
       str_detect(tabeller_url, "api.scb.se") ~ 
         "Källa: SCB:s befolkningsprognos\nBearbetning: Samhällsanalys, Region Dalarna",
+      str_detect(tabeller_url, "Profet/datafiler") & region_vekt %in% c("20", "2085") ~ 
+        "Källa: Region Dalarnas egna befolkningsprognos, bearbetning av Samhällsanalys, Region Dalarna\nPrognosen för Ludvika kommun baseras på ett scenario som i allt väsentligt liknar den som Ludvika kommun\nsjälva tagit fram i deras scenario med medelstark tillväxt.",
       str_detect(tabeller_url, "Profet/datafiler") ~ 
-        "Källa: Region Dalarnas egna befolkningsprognos, bearbetning av Samhällsanalys, Region Dalarna\nPrognosen för Ludvika kommun baseras på ett scenario som i allt väsentligt liknar den som Ludvika kommun\nsjälva tagit fram i deras scenario med medelstark tillväxt."
+        "Källa: Region Dalarnas egna befolkningsprognos\nBearbetning: Samhällsanalys, Region Dalarna"
     )
   }
   
