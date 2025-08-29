@@ -2,7 +2,7 @@
 diag_bef_utfall_prognos_per_aldersgrupp <- function(
     region_vekt = "20",                                      # läns- och kommunkoder, det blir ett diagram (och en fil om man skriver bildfiler) per region
     aldersindelning = c(0, 1, 6, 16, 20, 66, 80),
-    diagram_capt = "Källa: SCB:s öppna statistikdatabas, befolkningsframskrivning från år <prognos_ar>\nBearbetning: Samhällsanalys, Region Dalarna",
+    diagram_capt = "auto",           # diagram_capt skapa automatiskt och blir olika beroende på vilken tabell som används
         # om <prognos_ar> ligger med i diagram_capt så byts det ut mot det år prognosen gjordes
     output_mapp = NA,                                        # här sparas diagramet
     diagram_fargvekt = NA,
@@ -29,6 +29,15 @@ diag_bef_utfall_prognos_per_aldersgrupp <- function(
   
   
   gg_list <- list()
+  
+  # Om url_befprognos_tabell är NA och förinställd mapp inte finns på datorn används SCB:s tabell för det senaste året som finns
+  if (is.na(url_befprognos_tabell)) {
+    url_befprognos_tabell <- if (!dir.exists("G:/Samhällsanalys/Statistik/Befolkningsprognoser/Profet/datafiler/")) {
+      "https://api.scb.se/OV0104/v1/doris/sv/ssd/BE/BE0401/BE0401A/BefProgOsiktRegN"
+    } else {
+      "G:/Samhällsanalys/Statistik/Befolkningsprognoser/Profet/datafiler/"
+    }
+  }
   
   # om ingen färgvektor är medskickad, kolla om funktionen diagramfärger finns, annars använd r:s defaultfärger
   if (all(is.na(diagram_fargvekt))) {
@@ -122,9 +131,24 @@ diag_bef_utfall_prognos_per_aldersgrupp <- function(
     assign("bef_utfall_prognos_per_aldersgrupp", bef_folk_progn, envir = .GlobalEnv)
   }
   
+  # hantera diagram_capt
+  if (diagram_capt == "auto") {
+    diagram_capt <- case_when(
+      str_detect(url_befprognos_tabell, "api.scb.se") & str_detect(url_befprognos_tabell, "Profet/datafiler") ~ 
+        "Källa: SCB:s befolkningsprognos och Region Dalarnas egna befolkningsprognos från år <prognos_ar>, bearbetning av Samhällsanalys, Region Dalarna\nI Region Dalarnas befolkningsprognos baseras prognosen för Ludvika kommun på ett scenario som i allt väsentligt liknar det som Ludvika kommun\nsjälva tagit fram i deras scenario med medelstark tillväxt.",
+      str_detect(url_befprognos_tabell, "api.scb.se") ~ 
+        "Källa: SCB:s befolkningsprognos från år <prognos_ar>\nBearbetning: Samhällsanalys, Region Dalarna",
+      str_detect(url_befprognos_tabell, "Profet/datafiler") & region_vekt %in% c("20", "2085") ~ 
+        "Källa: Region Dalarnas egna befolkningsprognos från år <prognos_ar>, bearbetning av Samhällsanalys, Region Dalarna\nPrognosen för Ludvika kommun baseras på ett scenario som i allt väsentligt liknar den som Ludvika kommun\nsjälva tagit fram i deras scenario med medelstark tillväxt.",
+      str_detect(url_befprognos_tabell, "Profet/datafiler") ~ 
+        "Källa: Region Dalarnas egna befolkningsprognos från år <prognos_ar>\nBearbetning: Samhällsanalys, Region Dalarna"
+    )
+  }
+  
   # byt ut <prognos_ar> mot året som prognosen är från om det finns i textsträngen
   diagram_capt <- diagram_capt %>%
-    str_replace_all("<prognos_ar>", unique(bef_prognos$prognos_ar))
+    str_replace_all("<prognos_ar>", unique(bef_prognos$prognos_ar)) %>% 
+    list_komma_och()
   
   
   skapa_diagram <- function(skickad_regionkod) {
@@ -156,6 +180,7 @@ diag_bef_utfall_prognos_per_aldersgrupp <- function(
                                  manual_x_axis_text_vjust = 1,
                                  manual_x_axis_text_hjust = 1,
                                  manual_color = diagram_fargvekt,
+                                 manual_y_axis_title = "antal invånare",
                                  output_mapp = output_mapp,
                                  lagg_pa_logga = ta_med_logga,
                                  logga_path = logga_sokvag,
