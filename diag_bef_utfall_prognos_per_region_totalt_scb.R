@@ -12,6 +12,7 @@ diag_bef_utfall_prognos_per_region_totalt <- function(
     returnera_dataframe_global_environment = FALSE,          
     ta_bort_diagramtitel = FALSE,                            # FALSE så skrivs ingen diagramtitel ut
     visa_dataetiketter = FALSE,
+    url_befprognos_tabell = NA,                              # om NA så väljs standardtabell, annars kan man skicka med vilken tabell man vill använda (SCB eller sökväg till egna datafiler), SCB:s senaste: "https://api.scb.se/OV0104/v1/doris/sv/ssd/BE/BE0401/BE0401A/BefProgOsiktRegN"
     skriv_till_diagramfil = TRUE,
     skriv_till_excelfil = FALSE
 ) {
@@ -28,6 +29,11 @@ diag_bef_utfall_prognos_per_region_totalt <- function(
   
   
   gg_list <- list()
+  
+  if (is.na(url_befprognos_tabell)) {
+    if (!dir.exists("G:/Samhällsanalys/Statistik/Befolkningsprognoser/Profet/datafiler/")) stop("Parametern url_befprognos_tabell måste anges för att diagrammet ska kunna skrivas ut.")
+    url_befprognos_tabell <- "G:/Samhällsanalys/Statistik/Befolkningsprognoser/Profet/datafiler/"
+  }
   
   # om ingen färgvektor är medskickad, kolla om funktionen diagramfärger finns, annars använd r:s defaultfärger
   if (all(is.na(diagram_fargvekt))) {
@@ -69,7 +75,7 @@ diag_bef_utfall_prognos_per_region_totalt <- function(
   bef_prognos <- funktion_upprepa_forsok_om_fel(function()
     hamta_befprognos_data(region_vekt = hamta_region,
                         tid_vekt = c(start_ar:slut_ar),
-                        url_prognos_vektor = c("https://api.scb.se/OV0104/v1/doris/sv/ssd/BE/BE0401/BE0401A/BefProgOsiktRegN")
+                        url_prognos_vektor = url_befprognos_tabell
                         ), max_forsok = 4
   )} else bef_prognos <- NULL
   
@@ -115,7 +121,7 @@ diag_bef_utfall_prognos_per_region_totalt <- function(
   
   # returnera datasetet till global environment, bl.a. bra när man skapar Rmarkdown-rapporter
   if(returnera_dataframe_global_environment == TRUE){
-    assign("bef_utfall_prognos_per_aldersgrupp", bef_folk_progn, envir = .GlobalEnv)
+    assign("bef_utfall_prognos_per_region_tot", bef_folk_progn, envir = .GlobalEnv)
   }
   
   # byt ut <prognos_ar> mot året som prognosen är från om det finns i textsträngen
@@ -133,8 +139,9 @@ diag_bef_utfall_prognos_per_region_totalt <- function(
         mutate(bef_okning_rel = if_else(regionkod %in% c("03", "19") & år == "2006", 0, lag(bef_okning_rel)))
     }
     
-    #region_txt <- unique(diagram_df$region) %>% skapa_kortnamn_lan()
-    region_filnamn <- unique(diagram_df$regionkod) %>% paste0(collapse = "_")
+    regionkoder <- unique(diagram_df$regionkod)
+    region_filnamn <- regionkoder %>% paste0(collapse = "_")
+    region_filnamn <- ar_alla_kommuner_i_ett_lan(regionkoder, returnera_text = TRUE, returtext = region_filnamn)
     startar_utfall <- diagram_df %>% filter(typ == "utfall") %>% dplyr::pull(år) %>% min()
     slutar_utfall <- diagram_df %>% filter(typ == "utfall") %>% dplyr::pull(år) %>% max()  
     startar_prognos <- diagram_df %>% filter(typ == "prognos") %>% dplyr::pull(år) %>% min()
