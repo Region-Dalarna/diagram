@@ -12,6 +12,7 @@ diag_bef_utfall_prognos_per_aldersgrupp <- function(
     returnera_dataframe_global_environment = FALSE,          
     ta_bort_diagramtitel = FALSE,                            # FALSE så skrivs ingen diagramtitel ut
     visa_dataetiketter = FALSE,
+    url_befprognos_tabell = NA,                              # om NA så väljs standardtabell, annars kan man skicka med vilken tabell man vill använda (SCB eller sökväg till egna datafiler), SCB:s senaste: "https://api.scb.se/OV0104/v1/doris/sv/ssd/BE/BE0401/BE0401A/BefProgOsiktRegN"
     skriv_till_diagramfil = TRUE,
     skriv_till_excelfil = FALSE
 ) {
@@ -69,7 +70,7 @@ diag_bef_utfall_prognos_per_aldersgrupp <- function(
   bef_prognos <- funktion_upprepa_forsok_om_fel(function()
     hamta_befprognos_data(region_vekt = hamta_region,
                         tid_vekt = c(start_ar:slut_ar),
-                        url_prognos_vektor = c("https://api.scb.se/OV0104/v1/doris/sv/ssd/BE/BE0401/BE0401A/BefProgOsiktRegN")
+                        url_prognos_vektor = url_befprognos_tabell
                         ), max_forsok = 4
   )} else bef_prognos <- NULL
   
