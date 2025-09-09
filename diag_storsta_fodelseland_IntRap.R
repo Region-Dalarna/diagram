@@ -55,10 +55,10 @@ diagram_storsta_fodelseland <-function(region_vekt = "20",# Max 1, län
   diagram_capt = "Källa: SCB:s öppna statistikdatabas\nBearbetning: Samhällsanalys, Region Dalarna"
   
   if(length(unique(storsta_fodelseland_df$år)) == 1){
-    diagram_titel = paste0("Största födelseland bland utrikes födda i ",region_namn, " år ",unique(storsta_fodelseland_df$år))
+    diagram_titel = paste0("Vanligaste födelseland bland utrikes födda i ",region_namn, " år ",unique(storsta_fodelseland_df$år))
     diagramfilnamn <- paste0("storsta_fodelseland_",region_namn,"_",unique(storsta_fodelseland_df$år),".png")
   } else {
-    diagram_titel = paste0("Största födelseland bland utrikes födda i ",region_namn)
+    diagram_titel = paste0("Vanligaste födelseland bland utrikes födda i ",region_namn)
     diagramfilnamn <- paste0("storsta_fodelseland_",region_namn,".png")
   }
   
