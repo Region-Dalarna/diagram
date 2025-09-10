@@ -18,6 +18,9 @@ diag_befutv_per_komponent_ar <- function(
   
   # source('https://raw.githubusercontent.com/Region-Dalarna/funktioner/main/func_SkapaDiagram.R') saknades i koden, varför jag la till den. /Jon 2025-03-17
   # Har även lagt till möjligheten att visa var x:te etikett och dessutom möjligheten att ändra storlek på etiketterna. Blev för litet i ett diagram. /Jon 2025-03-17
+  #
+  # Ändrat rubrik till Befolkningsutveckling i Dalarna år xxxx-xxxx. Justering i region_txt <- if... /Jon 2025-09-10
+  
   if (!require("pacman")) install.packages("pacman")
   p_load(tidyverse)
   
@@ -115,12 +118,12 @@ diag_befutv_per_komponent_ar <- function(
     skriv_diagram_df <- diagram_df %>%
       filter(regionkod %in% skickad_regionkod)
     
-    region_txt <- if (skickad_regionkod == "gg") gruppera_namn else hamtaregion_kod_namn(skickad_regionkod)$region %>% list_komma_och()
+    region_txt <- if (skickad_regionkod == "gg") gruppera_namn else skapa_kortnamn_lan(hamtaregion_kod_namn(skickad_regionkod)$region) %>% list_komma_och()
     region_filnamn <- if (skickad_regionkod == "gg") gruppera_namn %>% tolower %>% str_replace_all(" ", "_") else hamtaregion_kod_namn(skickad_regionkod)$region %>% paste0(collapse = "_")
     startar <- min(skriv_diagram_df$år)
     slutar <- max(skriv_diagram_df$år)
     
-    diagramtitel <- glue("Befolkningsökning per komponent i {region_txt} år {startar}-{slutar}")
+    diagramtitel <- glue("Befolkningsutveckling i {region_txt} {startar}-{slutar}")
     diagramfil <- glue("befolkningsforandring_per_komponent_{region_filnamn}_ar{startar}-{slutar}.png")
     
     gg_obj <- SkapaStapelDiagram(skickad_df = skriv_diagram_df,
