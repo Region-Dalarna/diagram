@@ -10,6 +10,7 @@ karta_befolkningsprognos <- function(
     skriv_karta_html = TRUE,           # skriver en leaflet-karta till en html-fil
     filnamns_prefix = NA,              # om man vill döpa filerna själv ges möjlighet här, NA = de döps automatiskt
     kommuner_egetnamn = NA,            # om man vill döpa en samling kommuner själv, annars sker det automatiskt
+    output_mapp = NA,                  # om man sparar filer så behövs anges en sökväg här
     prognosskapare = "Region Dalarna", # ändras till SCB om deras prognos används
     karta_capt_gg = "Källa: <prognosskapare>s befolkningsprognos från år <prognos_ar>\nBearbetning: Samhällsanalys, Region Dalarna",          # <prognos_ar> byts ut till prognosåret om det finns ett sådant
     karta_capt_leaflet = "Källa: <prognosskapare>s befolkningsprognos från år <prognos_ar>, bearbetning av Samhällsanalys, Region Dalarna"
@@ -27,6 +28,16 @@ karta_befolkningsprognos <- function(
   source("https://raw.githubusercontent.com/Region-Dalarna/funktioner/main/func_API.R", encoding = "utf-8", echo = FALSE)
   source("https://raw.githubusercontent.com/Region-Dalarna/funktioner/main/func_GIS.R", encoding = "utf-8", echo = FALSE)
   
+  # om ingen output_mapp är angiven så läggs diagrammen i Region Dalarnas standardmapp för utskrifter, om den finns. Annars blir det felmeddelande
+  if (skriv_karta_png | skriv_karta_html) {           # bara relevant om vi skriver till fil
+    if (all(is.na(output_mapp))) {
+      if (dir.exists(utskriftsmapp())) {
+        output_mapp <- utskriftsmapp()
+      } else {
+        stop("Ingen output-mapp angiven, kör funktionen igen och ge parametern output-mapp ett värde.")
+      }
+    }
+  }
   
   kommunnyckel <- hamtaregtab() %>%                              # hämta alla kommunkoder
     filter(nchar(regionkod) == 4) %>% 
@@ -137,7 +148,7 @@ karta_befolkningsprognos <- function(
            caption = karta_capt_gg)   
     
     if (skriv_karta_png) {
-      ggsave(paste0(utskriftsmapp(), filnamn_pre, ".png"),
+      ggsave(paste0(output_mapp, filnamn_pre, ".png"),
              width = 6,
              height = 7)
     }
@@ -186,7 +197,7 @@ karta_befolkningsprognos <- function(
         position = "bottomleft"
       )
     
-    saveWidget(befprognos_leaflet, paste0(utskriftsmapp(), filnamn_pre, ".html"), selfcontained = TRUE)
+    saveWidget(befprognos_leaflet, paste0(output_mapp, filnamn_pre, ".html"), selfcontained = TRUE)
   }
   
   if (returnera_ggobj) return(befprognos_gg)
