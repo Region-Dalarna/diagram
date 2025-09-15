@@ -4,6 +4,7 @@ diagram_utrikes_fodda_tidsserie <-function(region_vekt = c("20"),# Max 1, län
                                            diag_forandring_kommuner = TRUE, # Hela populationen
                                            diag_forandring_lan = TRUE, # Förändring för valt åldersspann
                                            diag_forandring_prognos = TRUE, # Prognos för valt åldersspann, enbart län och enbart båda könen
+                                           diag_antal_uppdelat = TRUE,
                                            output_mapp_figur = "G:/Samhällsanalys/Statistik/Näringsliv/basfakta/", # Outputmapp för figur
                                            spara_figur = FALSE, # Sparar figuren till output_mapp_figur
                                            fodelseregion_klartext = "*", # NA = tas inte med i uttaget,  Finns: "Född i Sverige", "Utrikes född"
@@ -21,7 +22,7 @@ diagram_utrikes_fodda_tidsserie <-function(region_vekt = c("20"),# Max 1, län
 {
   
   ## =================================================================================================================
-  # Funktion som skapar fyra diagram, ett för antal utrikes födda i valt län, ett för förändring i utrikes födda mellan första och sista år i länets kommuner,
+  # Funktion som skapar fem diagram, två för antal utrikes födda i valt län (enbart utrikes eller utrikes och inrikes), ett för förändring i utrikes födda mellan första och sista år i länets kommuner,
   # ett för förändring i utrikes födda i valt län och ett för förändring i utrikes födda i valt län för åldersgruppen 16-64 år.
   # =================================================================================================================
   if (!require("pacman")) install.packages("pacman")
@@ -67,10 +68,53 @@ diagram_utrikes_fodda_tidsserie <-function(region_vekt = c("20"),# Max 1, län
       diagram_capt = ""
     }
     
-    gg_obj <- SkapaStapelDiagram(skickad_df = antal_utrikes_region_df ,
+    gg_obj <- SkapaStapelDiagram(skickad_df = antal_inrikes_utrikes_df ,
                                  skickad_x_var = "år",
                                  skickad_y_var = "Antal",
                                  manual_color = valda_farger,
+                                 diagram_titel = diagram_titel,
+                                 manual_x_axis_text_vjust = 1,
+                                 manual_x_axis_text_hjust = 1,
+                                 diagram_capt =  diagram_capt,
+                                 output_mapp = output_mapp_figur,
+                                 x_axis_storlek = x_axis_storlek,
+                                 stodlinjer_avrunda_fem = TRUE,
+                                 lagg_pa_logga = visa_logga_i_diagram,
+                                 logga_path = logga_sokvag,
+                                 manual_y_axis_title = "",
+                                 filnamn_diagram = diagramfilnamn,
+                                 skriv_till_diagramfil = spara_figur)
+    
+    gg_list <- c(gg_list, list(gg_obj))
+    names(gg_list)[[length(gg_list)]] <- diagramfilnamn %>% str_remove(".png")
+  }
+  
+  if(diag_antal_uppdelat){
+    
+    if(returnera_data == TRUE){
+      assign("antal_inrikes_utrikes_df", antal_inrikes_utrikes_df, envir = .GlobalEnv)
+    }
+    
+    diagram_capt = "Källa: SCB:s öppna statistikdatabas\nBearbetning: Samhällsanalys, Region Dalarna"
+    diagram_titel = paste0("Folkmängd i ",region_namn," ",min(antal_inrikes_utrikes_df$år),"-",max(antal_inrikes_utrikes_df$år))
+    diagramfilnamn <- paste0("utrikes_inrikes_antal_",region_namn,".png")
+    
+    if(ta_bort_diagramtitel){
+      diagram_titel = ""
+    }
+    
+    if(ta_bort_caption){
+      diagram_capt = ""
+    }
+    
+    gg_obj <- SkapaStapelDiagram(skickad_df = antal_inrikes_utrikes_df %>%
+                                   filter(region == region_namn) %>% 
+                                   mutate(födelseregion = factor(födelseregion, c("utrikes född","född i Sverige"))),
+                                 skickad_x_var = "år",
+                                 skickad_y_var = "Antal",
+                                 skickad_x_grupp = "födelseregion",
+                                 geom_position_stack = TRUE,
+                                 manual_color = rev(valda_farger[1:2]),
                                  diagram_titel = diagram_titel,
                                  manual_x_axis_text_vjust = 1,
                                  manual_x_axis_text_hjust = 1,
@@ -226,9 +270,9 @@ diagram_utrikes_fodda_tidsserie <-function(region_vekt = c("20"),# Max 1, län
       mutate(region = skapa_kortnamn_lan(region),
              alder_grupper = skapa_aldersgrupper(ålder,alder_grupp)) %>%
       rename(födelseregion = `inrikes/utrikes född`) %>% 
-        group_by(region,år,födelseregion,alder_grupper) %>%
-          summarise(Antal = sum(Antal)) %>%
-            ungroup()
+      group_by(region,år,födelseregion,alder_grupper) %>%
+      summarise(Antal = sum(Antal)) %>%
+      ungroup()
     
     befprognos_df <- befprognos_df %>%           
       filter(alder_grupper == unique(befprognos_df$alder_grupper)[2])
