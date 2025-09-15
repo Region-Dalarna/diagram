@@ -50,7 +50,7 @@ diagram_utrikes_fodda_tidsserie <-function(region_vekt = c("20"),# Max 1, län
   
   
   if(diag_antal){
-    antal_utrikes_region_df <- antal_inrikes_utrikes_df %>% filter(födelseregion == "Utrikes född",region == region_namn)
+    antal_utrikes_region_df <- antal_inrikes_utrikes_df %>% filter(födelseregion == "utrikes född",region == region_namn)
     
     if(returnera_data == TRUE){
       assign("antal_utrikes_region_df", antal_utrikes_region_df, envir = .GlobalEnv)
@@ -68,7 +68,7 @@ diagram_utrikes_fodda_tidsserie <-function(region_vekt = c("20"),# Max 1, län
       diagram_capt = ""
     }
     
-    gg_obj <- SkapaStapelDiagram(skickad_df = antal_inrikes_utrikes_df ,
+    gg_obj <- SkapaStapelDiagram(skickad_df = antal_utrikes_region_df ,
                                  skickad_x_var = "år",
                                  skickad_y_var = "Antal",
                                  manual_color = valda_farger,
