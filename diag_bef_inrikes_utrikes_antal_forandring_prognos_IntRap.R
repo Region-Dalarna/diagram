@@ -109,7 +109,8 @@ diagram_utrikes_fodda_tidsserie <-function(region_vekt = c("20"),# Max 1, län
     
     gg_obj <- SkapaStapelDiagram(skickad_df = antal_inrikes_utrikes_df %>%
                                    filter(region == region_namn) %>% 
-                                   mutate(födelseregion = factor(födelseregion, c("utrikes född","född i Sverige"))),
+                                   mutate(födelseregion = paste0(toupper(substring(födelseregion, 1, 1)), substring(födelseregion, 2))) %>% 
+                                   mutate(födelseregion = factor(födelseregion, c("Utrikes född","Född i Sverige"))),
                                  skickad_x_var = "år",
                                  skickad_y_var = "Antal",
                                  skickad_x_grupp = "födelseregion",
