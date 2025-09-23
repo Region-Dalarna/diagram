@@ -154,7 +154,8 @@ diagram_kvalifikationskrav <- function(region_vekt = "20", # Vilken region vill 
         group_by(across(any_of(variabellista))) %>%
       summarize(Antal = sum(`Anställda 16-64 år med arbetsplats i regionen (dagbef)`)) %>%
             mutate(Andel=((Antal/sum(Antal))*100),
-                   Andel = ifelse(Andel<0.001,Andel,Andel-0.001))
+                   Andel = ifelse(Andel<0.001,Andel,Andel-0.001)) %>% 
+              ungroup()
   
     if(!is.na(output_mapp_data) & !is.na(filnamn_data)){
       list_data <- c(list_data,list("Bransch" = px_df_sum))
