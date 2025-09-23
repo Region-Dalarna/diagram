@@ -18,6 +18,7 @@ diagram_kvalifikationskrav <- function(region_vekt = "20", # Vilken region vill 
   # Skapad av Jon 2024-01-17
   # Senast uppdaterad: 2024-10-15
   # Ändrat Anställda 16-64 år (dagbef) till Anställda 16-64 år med arbetsplats i regionen (dagbef)
+  # Ändrat till Antal istället för ovanstående Jon 2025-09-23
   # =================================================================================================================
   
   # Bibliotek som behövs
@@ -93,7 +94,7 @@ diagram_kvalifikationskrav <- function(region_vekt = "20", # Vilken region vill 
     
     px_df_sum <- px_df %>% 
         group_by(across(any_of(variabellista))) %>%
-          summarize(Antal = sum(`Anställda 16-64 år med arbetsplats i regionen (dagbef)`)) %>%
+          summarize(Antal = sum(`Antal`)) %>%
             mutate(Andel = ((Antal/sum(Antal))*100)-0.001) %>% 
               ungroup()
     
