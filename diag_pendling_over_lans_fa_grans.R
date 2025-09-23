@@ -1,5 +1,3 @@
-source("https://raw.githubusercontent.com/Region-Dalarna/funktioner/main/func_API.R", encoding = "utf-8", echo = FALSE)
-
 diag_pendling_over_lans_fa_grans <- function(region_vekt = hamtaAllaLan(F),            # 
                                            valt_kon = "totalt",                # 
                                            valt_ar = "9999",                   # 
@@ -23,6 +21,7 @@ diag_pendling_over_lans_fa_grans <- function(region_vekt = hamtaAllaLan(F),     
   # samt även de som bor och arbetar i samma län eller FA
   # Skapad av: Peter
   # 
+  # Ändrat i hämtning av data så att det automatiskt blir i long-format (det funkade inte annars) Jon 2025-09-23
   # ===========================================================================================================
   
 
@@ -33,6 +32,7 @@ diag_pendling_over_lans_fa_grans <- function(region_vekt = hamtaAllaLan(F),     
          dplyr,
          openxlsx)
   
+  source("https://raw.githubusercontent.com/Region-Dalarna/funktioner/main/func_API.R", encoding = "utf-8", echo = FALSE)
   source("https://raw.githubusercontent.com/Region-Dalarna/hamta_data/main/hamta_pendling_lan_fa_region_utbildngrupp_kon_tid_RegionInd19U2N1_RegionInd19U2_scb.R")  
   source("https://raw.githubusercontent.com/Region-Dalarna/funktioner/main/func_SkapaDiagram.R", encoding = "utf-8", echo = FALSE)
   source("https://raw.githubusercontent.com/Region-Dalarna/funktioner/main/func_text.R", encoding = "utf-8", echo = FALSE)
@@ -76,8 +76,9 @@ diag_pendling_over_lans_fa_grans <- function(region_vekt = hamtaAllaLan(F),     
   px_df <-  hamta_pendling_lan_fa_region_utbildngrupp_kon_tid_scb(region_vekt = region_vekt,
                                                                   utbildngrupp_klartext = "samtliga utbildningsgrupper",
                                                                   kon_klartext = valt_kon,
+                                                                  wide_om_en_contvar = FALSE,
                                                                   tid_koder = valt_ar)
-  
+
   # ============================== diagram med absoluta tal ==================================
   if (diag_absoluta_tal) {
     
