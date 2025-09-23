@@ -1,5 +1,3 @@
-
-#test = diag_pendling_over_kommungrans(enbart_in_ut = TRUE)
 diag_pendling_over_kommungrans <- function(vald_kommun = "20", # Länsnamn ger samtliga kommuner i länet
                                            hela_lanet = TRUE,           # Ändra inte
                                            valt_kon = "män och kvinnor", # Enda valet
@@ -25,6 +23,8 @@ diag_pendling_over_kommungrans <- function(vald_kommun = "20", # Länsnamn ger s
   # samt även de som bor och arbetar i samma kommun.
   # Skapad av: Peter
   # Senast uppdaterad: Peter, 2024-10-30
+  #
+  # Ändrat i hämtning av data så att det automatiskt blir i long-format (det funkade inte annars) Jon 2025-09-23
   # ===========================================================================================================
   
 # om parametern demo är satt till TRUE så öppnas en flik i webbläsaren med ett exempel på hur diagrammet ser ut och därefter avslutas funktionen
@@ -160,7 +160,8 @@ c("https://region-dalarna.github.io/utskrivna_diagram/in_utpendling_Dalarna2021.
   
   px_df <-  hamta_pendling_over_grans_region_kon_tid_scb(region_vekt = vald_kommun_kod,
                                                          kon_klartext = valt_kon,
-                                                         tid_koder = valt_ar)
+                                                         tid_koder = valt_ar,
+                                                         wide_om_en_contvar = FALSE)
   
   # ============================== diagram med absoluta tal ==================================
   if (diag_absoluta_tal) {
