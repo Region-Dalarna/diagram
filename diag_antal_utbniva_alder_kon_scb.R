@@ -21,7 +21,7 @@ diag_antal_utbniva_alder_kon <- function(
   #
   # Diagram som visar utbildningsnivå bland inrikes och utrikes födda samt även kön. Tre utbildningsnivåer.
   # Skapat 17 okt 2024 av Peter.
-  #
+  # Senaste ändring: SCB hade bytt variabelnamn från Befolkning till Antal. Rättat på rad 69 Jon 2025-09-24
   # ======================================================================================================
   
   
@@ -66,7 +66,7 @@ diag_antal_utbniva_alder_kon <- function(
   			returnera_data = TRUE			# TRUE om man vill ha en dataframe i retur från funktionen
   ) %>% 
     rename(utbildningsnivå_alla = utbildningsnivå,
-           varde = Befolkning) %>%
+           varde = Antal) %>%
     mutate(utbildningsnivå = case_when(
       str_detect(utbildningsnivå_alla, "eftergymnasial|forskar") ~ "eftergymnasial utbildning",
       str_detect(utbildningsnivå_alla, "förgymnasial utbildning") ~ "förgymnasial utbildning",
