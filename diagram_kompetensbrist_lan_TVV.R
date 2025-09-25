@@ -11,6 +11,7 @@ diag_kompetensbrist <- function(diagram_capt =  diagram_capt <- "Källa: Tillvä
   #
   # Data uppdaterades senast Sommaren 2023. Ingen ny data verkar ha kommit (JF 2024-02-12)
   # Skript uppdaterad 20240212
+  # Ingen ny data verkar ha kommit (JF 2025-09-25)
   # Förbättringspotential: Gör så att diagram 2 kan skapas som en facet med uppdelning inrikes/utrikes
   # ========================================== Inställningar ============================================
   
