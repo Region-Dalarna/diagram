@@ -28,7 +28,7 @@ karta_arbetspendling <- function(
   # - output_mapp                                                      # hit skrivs html-filen/filerna som är resultatet av skriptet (dvs. en interaktiv leaflet-karta)
   #
   # Skapat av Peter Möller och Henrik Aldén i november 2023.
-  # Senast ändrad: 30 okt 2024 av Peter Möller
+  # Senast uppdaterad: 30 okt 2024 av Peter Möller
   #
   # ===========================================================================================================
   
@@ -47,7 +47,7 @@ karta_arbetspendling <- function(
   source("https://raw.githubusercontent.com/Region-Dalarna/hamta_data/main/hamta_pendling_rams_bas_scb.R")
   
   if (all(is.na(output_mapp))) {
-    if (exists("utskriftsmapp", mode = "function")) {
+    if (dir.exists(utskriftsmapp())) {
       output_mapp <- utskriftsmapp()
     } else {
       stop("Ingen output-mapp angiven, kör funktionen igen och ge parametern output-mapp ett värde.")
