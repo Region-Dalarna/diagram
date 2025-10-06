@@ -10,11 +10,15 @@ diag_ekonomiska_prognoser_olika_progn_institut_ki <- function(vald_variabel = "B
                                                               skriv_diagramfil = TRUE
                                                               ) { 
   
+  # GG-list skapades inte. Lagt till nedan Jon 2025-10-06
+  
   if (!require("pacman")) install.packages("pacman")
   p_load(tidyverse)
   
   source("https://raw.githubusercontent.com/Region-Dalarna/funktioner/main/func_SkapaDiagram.R", encoding = "utf-8", echo = FALSE)
   source("https://raw.githubusercontent.com/Region-Dalarna/hamta_data/main/hamta_ek_prognoser_fran_prognosinstitut_ki.R")
+  
+  gg_list <- list()
   
   
   if (all(is.na(valda_prognos_ar))) valda_prognos_ar <- "*"
