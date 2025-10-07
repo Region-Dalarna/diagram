@@ -38,7 +38,11 @@ diag_ekonomiska_prognoser_olika_progn_institut_ki <- function(vald_variabel = "B
   diagram_titel <- paste0(vald_variabel, " - prognoser över utveckling")
   diagramfil <- paste0(vald_variabel %>% str_remove_all(","), "_prognos_ar_", prognoser_variabel_ar %>% paste0(collapse = "_"), ".png")
   
-  gg_obj <- SkapaStapelDiagram(skickad_df = prognoser_variabel, 
+  gg_obj <- SkapaStapelDiagram(skickad_df = prognoser_variabel %>% 
+                                 mutate(antal_tecken = nchar(Prognosinstitut),
+                                   Prognosinstitut = fct_reorder(Prognosinstitut, antal_tecken, .desc = FALSE)
+                                 ) %>%
+                                 arrange(antal_tecken),
                                skickad_x_var = "Prognosinstitut", 
                                skickad_y_var = "varde",
                                diagram_titel = diagram_titel,
