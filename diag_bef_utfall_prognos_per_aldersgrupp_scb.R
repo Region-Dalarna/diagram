@@ -33,10 +33,10 @@ diag_bef_utfall_prognos_per_aldersgrupp <- function(
   # Om url_befprognos_tabell är NA och förinställd mapp inte finns på datorn används SCB:s tabell för det senaste året som finns
   if (is.na(url_befprognos_tabell)) {
     url_befprognos_tabell <- if (!dir.exists("G:/Samhällsanalys/Statistik/Befolkningsprognoser/Profet/datafiler/")) {
-      "https://api.scb.se/OV0104/v1/doris/sv/ssd/BE/BE0401/BE0401A/BefProgOsiktRegN"
-    } else {
-      "G:/Samhällsanalys/Statistik/Befolkningsprognoser/Profet/datafiler/"
-    }
+          "https://api.scb.se/OV0104/v1/doris/sv/ssd/BE/BE0401/BE0401A/BefProgOsiktRegN"
+        } else {
+          "G:/Samhällsanalys/Statistik/Befolkningsprognoser/Profet/datafiler/"
+        }
   }
   
   # om ingen färgvektor är medskickad, kolla om funktionen diagramfärger finns, annars använd r:s defaultfärger
