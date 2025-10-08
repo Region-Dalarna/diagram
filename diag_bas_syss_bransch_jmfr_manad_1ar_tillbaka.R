@@ -12,6 +12,7 @@ diag_bas_syss_per_bransch_manad_jmfr_1ar_tillbaka <- function(
     manader_diagramtitel_kortnamn = TRUE,
     jamfor_antal_manader_bakat = 12,
     dagbefolkning = TRUE,                 # om FALSE så visas nattbefolkning, TRUE = dagbefolkning
+    stodlinjer_avrunda_fem = TRUE,
     skriv_till_diagramfil = TRUE,
     ta_bort_diagramtitel = FALSE,                    # FALSE så skrivs ingen diagramtitel ut
     visa_dataetiketter = FALSE,
@@ -156,7 +157,7 @@ diag_bas_syss_per_bransch_manad_jmfr_1ar_tillbaka <- function(
                                diagram_titel = diagramtitel,
                                diagram_capt = diagram_capt,
                                diagram_liggande = TRUE,
-                               stodlinjer_avrunda_fem = TRUE,
+                               stodlinjer_avrunda_fem = stodlinjer_avrunda_fem,
                                filnamn_diagram = diagramfil,
                                dataetiketter = visa_dataetiketter,
                                utan_diagramtitel = ta_bort_diagramtitel,
