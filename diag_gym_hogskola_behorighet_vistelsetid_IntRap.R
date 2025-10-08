@@ -1,4 +1,4 @@
-diag_gymnasiebehorighet_mm <- function(region = "20", # Enbart ett i taget.
+diag_gymnasiebehorighet_mm <- function(region_vekt = "20", # Enbart ett i taget.
                                        diag_kon_gym= TRUE,
                                        diag_kon_hogskola = TRUE,
                                        diag_vistelsetid_gym = TRUE, # Ej könsuppdelat
@@ -42,7 +42,7 @@ diag_gymnasiebehorighet_mm <- function(region = "20", # Enbart ett i taget.
   source("https://raw.githubusercontent.com/Region-Dalarna/hamta_data/refs/heads/main/hamta_integration_gymn_hogsk_behorighet_region_kon_bakgrund_tid_IntGr8RikKON2_IntGr8LanKON2_scb.R")
   
   # Hämtar data
-  behorighet_gym_df <- hamta_integration_gymn_hogsk_behorighet_region_kon_bakgrund_tid_scb  (region_vekt = c(region),
+  behorighet_gym_df <- hamta_integration_gymn_hogsk_behorighet_region_kon_bakgrund_tid_scb  (region_vekt = region_vekt,
                                                                                              kon_klartext = "*",
                                                                                              bakgrund_klartext  = c("födelseregion: Sverige","samtliga utrikes födda","vistelsetid 0-1 år", "vistelsetid 2-3 år", "vistelsetid 4-9 år", "vistelsetid 10- år"),
                                                                                              cont_klartext = "Andel behöriga till gymnasium, procent",
@@ -183,7 +183,7 @@ diag_gymnasiebehorighet_mm <- function(region = "20", # Enbart ett i taget.
   
   if(diag_kon_hogskola){
     
-    behorighet_hogskola_df <- hamta_integration_gymn_hogsk_behorighet_region_kon_bakgrund_tid_scb  (region_vekt = c(region),
+    behorighet_hogskola_df <- hamta_integration_gymn_hogsk_behorighet_region_kon_bakgrund_tid_scb  (region_vekt = region_vekt,
                                                                                                     kon_klartext = c("män","kvinnor"),
                                                                                                     bakgrund_klartext  = c("födelseregion: Sverige","samtliga utrikes födda"),
                                                                                                     cont_klartext = "Andel behöriga till högskola, procent",
