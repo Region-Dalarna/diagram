@@ -10,6 +10,7 @@ diag_ekonomiska_prognoser_olika_progn_institut_ki <- function(vald_variabel = "B
   
   # GG-list skapades inte. Lagt till nedan Jon 2025-10-06
   # Har dessutom lagt till så att man kan ändra diverse parametrar i figuren
+  # Gjort så att prognosinstitut sorteras efter kortaste namn (hamnar utanför figuren annars)
   
   if (!require("pacman")) install.packages("pacman")
   p_load(tidyverse)
