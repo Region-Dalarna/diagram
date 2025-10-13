@@ -96,13 +96,34 @@ SkapaBefPrognosDiagram <- function(region_vekt = "20",
   
   # ========== Hämta befolkningsprognos för tabell(er) i vektor url_tabeller  ====================
   
-  befprogn_df <- hamta_befprognos_data(region_vekt = region_vekt,
-                                       url_prognos_vektor = tabeller_url,
-                                       kon_klartext = c("kvinnor", "män"),
-                                       tid_vekt = prognos_jmfr_ar,                        # ny metod, funkar? gammal: paste0("+", jmfrtid), 
-                                       cont_klartext = "Folkmängd",
-                                       prognos_ar = prognos_ar           # prognos_ar funkar bara för profet-uttag (för uttag från SCB:s API styr url:en vilket år som hämtas men i Profet kan flera år hämtas med samma url om det finns data för flera år i mappen)
-  ) 
+  if (length(region_vekt[region_vekt != "00"]) > 0) {
+    befprogn_reg_df <- hamta_befprognos_data(region_vekt = region_vekt[region_vekt != "00"],
+                                             url_prognos_vektor = tabeller_url,
+                                             kon_klartext = c("kvinnor", "män"),
+                                             tid_vekt = prognos_jmfr_ar,                        # ny metod, funkar? gammal: paste0("+", jmfrtid), 
+                                             cont_klartext = "Folkmängd",
+                                             prognos_ar = prognos_ar           # prognos_ar funkar bara för profet-uttag (för uttag från SCB:s API styr url:en vilket år som hämtas men i Profet kan flera år hämtas med samma url om det finns data för flera år i mappen)
+    ) 
+  } else befprogn_reg_df <- NULL
+  
+  if ("00" %in% region_vekt) {
+    source("https://raw.githubusercontent.com/Region-Dalarna/hamta_data/main/hamta_befprogn_riket_inrikesutrikes_alder_kon_tid_BefolkprognRevNb_scb.R")
+    hamta_prognos_ar <- hamta_giltiga_varden_fran_tabell("https://api.scb.se/OV0104/v1/doris/sv/ssd/START/BE/BE0401/BE0401A/BefolkprognRevNb", "tid") %>%
+      min()
+    
+    befprogn_riket_df <- hamta_befprogn_riket_inrikesutrikes_alder_kon_tid_scb(
+      tid_koder = (senaste_ar_bef+jmfrtid)) %>%
+      mutate(regionkod = "00",
+             region = "Sverige",
+             prognos_ar = hamta_prognos_ar) %>%
+      rename(Folkmängd = Antal)
+    
+    tabeller_url <- if (region_vekt == "00") "api.scb.se" else c(tabeller_url, "api.scb.se")
+  } else befprogn_riket_df <- NULL
+  
+  befprogn_df <- list(befprogn_reg_df, befprogn_riket_df) |> 
+    compact() |>              # tar bort NULL-element
+    bind_rows()
   
   # hantera diagram_capt
   if (diagram_capt == "auto") {
