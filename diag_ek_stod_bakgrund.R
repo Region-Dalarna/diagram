@@ -3,11 +3,11 @@ diagram_ek_stod_bakgrund_SCB <- function(region_vekt = "20",
                                             logga_sokvag = NA,  
                                             diag_bakgrund = TRUE,
                                             diag_totalt = TRUE,
+                                            diag_kon = TRUE,
                                             output_mapp = "G:/Samhällsanalys/Statistik/Näringsliv/basfakta/",
                                             alder_klartext = "15-74 år",			 #  Finns: "15-19 år", "20-24 år", "25-54 år", "55-64 år", "65-74 år", "15-74 år", "16-64 år", "16-65 år", "20-64 år", "20-65 år" 
                                             ta_bort_nast_sista_varde = TRUE, # Ta bort näst sista värdet på x-axeln
                                             skriv_diagrambildfil = FALSE, # Skall diagrammet sparas
-                                            spara_figur = TRUE, # Skall diagrammet sparas
                                             returnera_data_rmarkdown = FALSE # Skall data returneras till global enviroment
 ){
   
@@ -22,16 +22,17 @@ diagram_ek_stod_bakgrund_SCB <- function(region_vekt = "20",
   source("https://raw.githubusercontent.com/Region-Dalarna/funktioner/main/func_SkapaDiagram.R", encoding = "utf-8")
   source("https://raw.githubusercontent.com/Region-Dalarna/hamta_data/refs/heads/main/hamta_bas_huvink_region_huvudfot1m_kon_alder_fodelseregion_tid_ArbStatFoT1_scb.R")
   
-  ekonomiskt_bistand_df<- hamta_bas_huvink_region_huvudfot1m_kon_alder_fodelseregion_tid_scb(region = "20",
+  ekonomiskt_bistand_grund<- hamta_bas_huvink_region_huvudfot1m_kon_alder_fodelseregion_tid_scb(region = "20",
                                                                                              huvudfot1m_klartext = "ekonomiskt stöd",
                                                                                              fodelseregion_klartext = "*",
                                                                                              cont_klartext = "antal totalt",
                                                                                              alder_klartext = alder_klartext,
-                                                                                             kon_klartext = "totalt")%>% 
+                                                                                             kon_klartext = "*") %>% 
     mutate(region = skapa_kortnamn_lan(region))
   
   # Fixar lite med data
-  ekonomiskt_bistand_df <- ekonomiskt_bistand_df %>% 
+  ekonomiskt_bistand_df <- ekonomiskt_bistand_grund %>% 
+    filter(kön == "totalt") %>% 
     rename(antal = `antal totalt`) %>% 
     manader_bearbeta_scbtabeller()
   
@@ -84,6 +85,47 @@ diagram_ek_stod_bakgrund_SCB <- function(region_vekt = "20",
                                 berakna_index = FALSE,
                                 diagram_titel = diagram_titel,
                                 manual_color = rev(diagramfarger("rus_sex")[1:2]),
+                                x_axis_var_xe_etikett_ta_bort_nast_sista_vardet = ta_bort_nast_sista_varde,
+                                diagram_capt =  diagram_capt,
+                                stodlinjer_avrunda_fem = TRUE,
+                                manual_y_axis_title = "",
+                                x_axis_visa_var_xe_etikett = 6,
+                                output_mapp = output_mapp,
+                                filnamn_diagram = diagramfilnamn,
+                                lagg_pa_logga = visa_logga_i_diagram,
+                                skriv_till_diagramfil = skriv_diagrambildfil)
+    
+    gg_list <- c(gg_list, list(gg_obj))
+    
+    names(gg_list)[[length(gg_list)]] <- diagramfilnamn %>% str_remove(".png")
+    
+  }
+  
+  if(diag_kon == TRUE){
+    # Fixar lite med data
+    ekonomiskt_bistand_df_kon <- ekonomiskt_bistand_grund %>% 
+      filter(kön != "totalt",
+             födelseregion != "totalt") %>%
+        mutate(födelseregion = paste0(födelseregion,"a")) %>% 
+        rename(antal = `antal totalt`) %>% 
+          manader_bearbeta_scbtabeller() %>% 
+            mutate(kon_bakgrund = paste0(födelseregion, " ", kön))
+    
+    if(returnera_data_rmarkdown == TRUE){
+      assign("ekonomiskt_stod_kon_df", ekonomiskt_bistand_df_kon, envir = .GlobalEnv)
+    }
+    
+    diagram_titel <- paste0("Antal individer ",unique(ekonomiskt_bistand_df_kon$ålder), " med ekonomiskt stöd i ",unique(ekonomiskt_bistand_df_kon$region))
+    diagramfilnamn <- paste0("ekonomiskt_bistand_fodelseland_kon_",unique(ekonomiskt_bistand_df_kon$region),".png")
+    
+    gg_obj <- SkapaLinjeDiagram(skickad_df = ekonomiskt_bistand_df_kon %>% 
+                                  filter(födelseregion != "totalt"),
+                                skickad_x_var = "månad_år", 
+                                skickad_y_var = "antal",
+                                skickad_x_grupp = "kon_bakgrund",
+                                berakna_index = FALSE,
+                                diagram_titel = diagram_titel,
+                                manual_color = diagramfarger("rus_sex"),
                                 x_axis_var_xe_etikett_ta_bort_nast_sista_vardet = ta_bort_nast_sista_varde,
                                 diagram_capt =  diagram_capt,
                                 stodlinjer_avrunda_fem = TRUE,
