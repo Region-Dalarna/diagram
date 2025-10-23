@@ -207,7 +207,7 @@ diag_bef_utfall_prognos_per_aldersgrupp <- function(
     slutar_prognos <- diagram_df %>% filter(typ == "prognos") %>% dplyr::pull(år) %>% max()
   
     diagramtitel <- glue("Befolkning i {region_txt} år {startar_utfall}-{slutar_utfall} samt befolkningsprognos {startar_prognos}-{slutar_prognos}")
-    diagramfil <- glue("befolkning_utfall_progn_{region_filnamn}_ar{startar_utfall}-{slutar_prognos}.png")
+    diagramfil <- glue("befolkning_utfall_progn_{region_filnamn %>% str_replace_all(',', '_')}_ar{startar_utfall}-{slutar_prognos}.png")
   
   
     gg_obj <- SkapaStapelDiagram(skickad_df = diagram_df,
