@@ -69,7 +69,7 @@ SkapaBefPrognosDiagram <- function(region_vekt = "20",
   
   # om mappen för datafiler från Profet eller Hallands befolkningsprognosskript inte finns så 
   # används SCB:s API istället
-  if (tabeller_url == "G:/Samhällsanalys/Statistik/Befolkningsprognoser/Profet/datafiler/" &
+  if (any(tabeller_url == "G:/Samhällsanalys/Statistik/Befolkningsprognoser/Profet/datafiler/") &
     !dir.exists("G:/Samhällsanalys/Statistik/Befolkningsprognoser/Profet/datafiler/")) {
     tabeller_url <- "https://api.scb.se/OV0104/v1/doris/sv/ssd/BE/BE0401/BE0401A/BefProgOsiktRegN"
   } 
@@ -128,13 +128,13 @@ SkapaBefPrognosDiagram <- function(region_vekt = "20",
   # hantera diagram_capt
   if (diagram_capt == "auto") {
     diagram_capt <- case_when(
-      str_detect(tabeller_url, "api.scb.se") & str_detect(tabeller_url, "Profet/datafiler") ~ 
+      any(str_detect(tabeller_url, "api.scb.se")) & any(str_detect(tabeller_url, "Profet/datafiler")) ~ 
         "Källa: SCB:s befolkningsprognos och Region Dalarnas egna befolkningsprognos, bearbetning av Samhällsanalys, Region Dalarna\nI Region Dalarnas befolkningsprognos baseras prognosen för Ludvika kommun på ett scenario som i allt väsentligt liknar det som Ludvika kommun\nsjälva tagit fram i deras scenario med medelstark tillväxt.",
-      str_detect(tabeller_url, "api.scb.se") ~ 
+      any(str_detect(tabeller_url, "api.scb.se")) ~ 
         "Källa: SCB:s befolkningsprognos\nBearbetning: Samhällsanalys, Region Dalarna",
-      str_detect(tabeller_url, "Profet/datafiler") & region_vekt %in% c("20", "2085") ~ 
+      any(str_detect(tabeller_url, "Profet/datafiler")) & region_vekt %in% c("20", "2085") ~ 
         "Källa: Region Dalarnas egna befolkningsprognos, bearbetning av Samhällsanalys, Region Dalarna\nPrognosen för Ludvika kommun baseras på ett scenario som i allt väsentligt liknar den som Ludvika kommun\nsjälva tagit fram i deras scenario med medelstark tillväxt.",
-      str_detect(tabeller_url, "Profet/datafiler") ~ 
+      any(str_detect(tabeller_url, "Profet/datafiler")) ~ 
         "Källa: Region Dalarnas egna befolkningsprognos\nBearbetning: Samhällsanalys, Region Dalarna"
     )
   }
@@ -161,7 +161,7 @@ SkapaBefPrognosDiagram <- function(region_vekt = "20",
                                                      alder_koder = "*",
                                                      cont_klartext = "Folkmängd", 
                                                      tid_koder = startar) %>% 
-    mutate(prognos_ar = år %>% as.numeric %>% "+"(1) %>% as.character())
+    mutate(prognos_ar = år %>% as.numeric %>% "+"(1) %>% as.character()) 
 
   # ================= lägg ihop och bearbeta prognos- och befolkningsdata ==================
   
