@@ -76,7 +76,7 @@ diag_foraldrapenning_vab <- function(region_vekt = "20", # Enbart ett län åt g
     
     # Andel nettodagar
     diagram_capt <- "Källa: Försäkringskassan.\nBearbetning: Samhällsanalys, Region Dalarna."
-    diagramtitel <- paste0("Andel nettodagar per kön i " ,skapa_kortnamn_lan(unique(foraldrapenning_df$Län)))
+    diagramtitel <- paste0("Föräldrapenning, andel nettodagar per kön i " ,skapa_kortnamn_lan(unique(foraldrapenning_df$Län)))
     diagramfilnamn <- paste0("Foraldrapenning_andel_",skapa_kortnamn_lan(unique(foraldrapenning_df$Län)),".png")
     
     gg_obj <- SkapaStapelDiagram(skickad_df = foraldrapenning_df%>%
@@ -104,7 +104,7 @@ diag_foraldrapenning_vab <- function(region_vekt = "20", # Enbart ett län åt g
     
     # Andel per kommun
     diagram_capt <- "Källa: Försäkringskassan.\nBearbetning: Samhällsanalys, Region Dalarna."
-    diagramtitel <- paste0("Andel nettodagar per kön i " ,skapa_kortnamn_lan(unique(foraldrapenning_df$Län)), " år ",max(foraldrapenning_df$År))
+    diagramtitel <- paste0("Föräldrapenning, andel nettodagar per kön i " ,skapa_kortnamn_lan(unique(foraldrapenning_df$Län)), " år ",max(foraldrapenning_df$År))
     diagramfilnamn <- paste0("Foraldrapenning_andel_kommun_",skapa_kortnamn_lan(unique(foraldrapenning_df$Län)),".png")
     
     gg_obj <- SkapaStapelDiagram(skickad_df = foraldrapenning_df%>%
