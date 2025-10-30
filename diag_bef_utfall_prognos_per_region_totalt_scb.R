@@ -13,6 +13,7 @@ diag_bef_utfall_prognos_per_region_totalt <- function(
     returnera_dataframe_global_environment = FALSE,          
     ta_bort_diagramtitel = FALSE,                            # FALSE så skrivs ingen diagramtitel ut
     visa_dataetiketter = FALSE,
+    antal_istallet_for_andel = FALSE,                        # default är andel då regioner jämförs (mest rimligt) men man kan få antal om man sätter denna parameter till TRUE
     url_befprognos_tabell = NA,                              # om NA så väljs standardtabell, annars kan man skicka med vilken tabell man vill använda (SCB eller sökväg till egna datafiler), SCB:s senaste: "https://api.scb.se/OV0104/v1/doris/sv/ssd/BE/BE0401/BE0401A/BefProgOsiktRegN"
     skriv_till_diagramfil = TRUE,
     skriv_till_excelfil = FALSE
@@ -62,7 +63,8 @@ diag_bef_utfall_prognos_per_region_totalt <- function(
   
   # om man har valt åldersgrupper
   if (!any(is.na(aldersgrupper))) {
-    aldrar_hamta <- map(aldersgrupper, ~ seq(.x[1],.x[2])) %>% unlist() %>% unique()
+    aldrar_hamta <- map(aldersgrupper, ~ seq(.x[1],.x[2])) %>% unlist() %>% unique() %>% 
+      as.character() %>% str_replace("100", "100+")
     aldervekt_max <- map(aldersgrupper, ~ .x[2]) %>% unlist() %>% unique() %>% max() +1
     till_aldervekt <- map(aldersgrupper, ~ .x[1]) %>% unlist() %>% unique() %>% c(., aldervekt_max)
     
@@ -70,7 +72,8 @@ diag_bef_utfall_prognos_per_region_totalt <- function(
       hamta_bef_folkmangd_alder_kon_ar_scb(region_vekt = region_vekt, 
                                            alder_koder = aldrar_hamta,
                                            kon_klartext = NA)) %>% 
-      mutate(alder_grp = skapa_aldersgrupper(ålder, till_aldervekt))
+      mutate(alder_grp = skapa_aldersgrupper(ålder, till_aldervekt),
+             alder_grp = if_else(str_detect(alder_grp, "-100 år"), str_replace(alder_grp, "-100 år", "+ år"), alder_grp))
     
   } else {
   
@@ -103,7 +106,8 @@ diag_bef_utfall_prognos_per_region_totalt <- function(
   if (!any(is.na(aldersgrupper))) {
     bef_prognos <- bef_prognos %>% 
       filter(ålder %in% paste0(aldrar_hamta, " år")) %>% 
-      mutate(alder_grp = skapa_aldersgrupper(ålder, till_aldervekt)) 
+      mutate(alder_grp = skapa_aldersgrupper(ålder, till_aldervekt),
+             alder_grp = if_else(str_detect(alder_grp, "-100 år"), str_replace(alder_grp, "-100 år", "+ år"), alder_grp)) 
   } else {
     bef_prognos <- bef_prognos %>% 
       mutate(alder_grp = "alla åldrar")
@@ -211,14 +215,16 @@ diag_bef_utfall_prognos_per_region_totalt <- function(
     slutar_prognos <- diagram_df %>% filter(typ == "prognos") %>% dplyr::pull(år) %>% max()
     alder_grp_filnamn <- if(skickad_alder_grp == "alla åldrar") "" else paste0("_", skickad_alder_grp)
     alder_grp_txt <- if(skickad_alder_grp == "alla åldrar") "" else paste0(" för invånare ", skickad_alder_grp)
+    enhet_txt <- if(antal_istallet_for_andel) "Befolkningsförändring" else "Relativ befolkningsförändring"
+    enhet_filnamn <- if(antal_istallet_for_andel) "" else "rel_"
     
-    diagramtitel <- glue("Relativ befolkningsförändring år {startar_utfall}-{slutar_utfall} samt befolkningsprognos {startar_prognos}-{slutar_prognos}{alder_grp_txt}")
-    diagramfil <- glue("rel_befforandring_utfall_progn_{region_filnamn}_ar{startar_utfall}-{slutar_prognos}{alder_grp_filnamn}.png")
+    diagramtitel <- glue("{enhet_txt} år {startar_utfall}-{slutar_utfall} samt befolkningsprognos {startar_prognos}-{slutar_prognos}{alder_grp_txt}")
+    diagramfil <- glue("{enhet_filnamn}befforandring_utfall_progn_{region_filnamn}_ar{startar_utfall}-{slutar_prognos}{alder_grp_filnamn}.png")
   
   
     gg_obj <- SkapaStapelDiagram(skickad_df = diagram_df,
                                  skickad_x_var = "år",
-                                 skickad_y_var = "bef_okning_rel",
+                                 skickad_y_var = if (antal_istallet_for_andel) "Befolkningsökning" else "bef_okning_rel",
                                  skickad_x_grupp = "typ",
                                  #x_axis_sort_value = TRUE,
                                  diagram_titel = diagramtitel,
@@ -229,7 +235,7 @@ diag_bef_utfall_prognos_per_region_totalt <- function(
                                  #x_axis_lutning = 0,
                                  manual_x_axis_text_vjust = 1,
                                  manual_x_axis_text_hjust = 1,
-                                 manual_y_axis_title = "procent",
+                                 manual_y_axis_title =  if (antal_istallet_for_andel) "förändring antal invånare" else "procent",
                                  manual_color = diagram_fargvekt,
                                  output_mapp = output_mapp,
                                  lagg_pa_logga = ta_med_logga,
