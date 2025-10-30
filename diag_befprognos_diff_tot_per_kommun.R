@@ -8,6 +8,8 @@ diag_befprognos_diff_tot_per_region_scb <- function(
     fokus_regionkod = "region",                    # NA = ingen, "region" på regioner (och inte kommuner). om man vill fokusera på någon speciell kommun eller region
     variabel_klartext = "Folkmängd",         # "Folkmängd", "Födda", "Döda", "Inrikes inflyttning", "Inrikes utflyttning", "Invandring", "Utvandring"
     befprognostabell_url = "G:/Samhällsanalys/Statistik/Befolkningsprognoser/Profet/datafiler/",
+    jmfrtid = 10,
+    stodlinjer_avrunda_fem = TRUE,
     ta_med_logga = TRUE,
     logga_path = NA,
     skapa_fil = TRUE,
@@ -39,6 +41,7 @@ diag_befprognos_diff_tot_per_region_scb <- function(
   prognos_diff_df <- hamta_befprognos_diff_data(
     region_vekt = region_vekt,
     tabeller_url = befprognostabell_url,
+    jmfrtid = jmfrtid
     #cont_klartext = variabel_klartext,       
     #kon_klartext = kon_klartext,     
     #alder_list = alder_koder
@@ -101,7 +104,7 @@ diag_befprognos_diff_tot_per_region_scb <- function(
                      diagram_capt = diagram_capt,
                      diagram_facet = skickad_facetinst,
                      #facet_legend_bottom = if(length(unique(prognos_diff_df$prognos_ar)) > 1) TRUE else skickad_facetinst,
-                     stodlinjer_avrunda_fem = FALSE,
+                     stodlinjer_avrunda_fem = stodlinjer_avrunda_fem,
                      #x_var_fokus = diagram_fokus_var,
                      manual_color = diag_fargvekt[c(1,2)], # if (length(unique(skickad_df$prognos_ar)) > 1) farger_diagram else farger_diagram[1],
                      #logga_scaling = logga_storlek,
