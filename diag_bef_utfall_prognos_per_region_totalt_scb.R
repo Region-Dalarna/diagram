@@ -14,6 +14,8 @@ diag_bef_utfall_prognos_per_region_totalt <- function(
     ta_bort_diagramtitel = FALSE,                            # FALSE så skrivs ingen diagramtitel ut
     visa_dataetiketter = FALSE,
     antal_istallet_for_andel = FALSE,                        # default är andel då regioner jämförs (mest rimligt) men man kan få antal om man sätter denna parameter till TRUE
+    x_axis_visa_var_xe_etikett = 3,                          # var x:e etikett visas enbart
+    x_axis_var_xe_etikett_ta_bort_nast_sista_vardet = FALSE, # man kan ta bort näst sista värdet om det hamnar på varandra
     url_befprognos_tabell = NA,                              # om NA så väljs standardtabell, annars kan man skicka med vilken tabell man vill använda (SCB eller sökväg till egna datafiler), SCB:s senaste: "https://api.scb.se/OV0104/v1/doris/sv/ssd/BE/BE0401/BE0401A/BefProgOsiktRegN"
     skriv_till_diagramfil = TRUE,
     skriv_till_excelfil = FALSE
@@ -247,7 +249,8 @@ diag_bef_utfall_prognos_per_region_totalt <- function(
                                  facet_scale = "free_x",
                                  x_axis_storlek = 7,
                                  facet_x_axis_storlek = 5,
-                                 x_axis_visa_var_xe_etikett = 3,
+                                 x_axis_visa_var_xe_etikett = x_axis_visa_var_xe_etikett,
+                                 x_axis_var_xe_etikett_ta_bort_nast_sista_vardet = x_axis_var_xe_etikett_ta_bort_nast_sista_vardet,
                                  facet_legend_bottom = TRUE
                                  #diagram_spara_annat_format = "eps"
     ) # slut skriv ggplot_objekt
