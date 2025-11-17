@@ -12,6 +12,7 @@ diag_aterstaende_medellivslangd_utbniva_lan_scb <- function(
     x_axel_stlk = 10.5,                              # storlek på x-axelns text
     y_axel_stlk = 12,                                # storlek på y-axelns text
     skriv_diagramfil = TRUE,                           # TRUE om diagram ska skrivas till fil, FALSE om diagram inte ska skrivas till fil
+    ggobjektfilnamn_utan_tid = FALSE,    # om TRUE så tas inte tex året med i filnamnet, vilket passar bättre i vissa sammanhang när man vill använda objektsnamnet utan att ändra vid varje uppdatering
     excel_mapp = NA,                                   # mapp där excelfil ska sparas, NA = sparas ingen fil
     demo = FALSE,             # sätts till TRUE om man bara vill se ett exempel på diagrammet i webbläsaren och inget annat
     utmapp = "G:/Samhällsanalys/API/Fran_R/utskrift/"
