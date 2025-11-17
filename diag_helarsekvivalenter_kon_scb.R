@@ -19,6 +19,7 @@ diag_helarsekvivalenter <- function(
     logga_sokvag = NA,
     output_mapp = NA,
     skriv_diagramfil = TRUE,
+    ggobjektfilnamn_utan_tid = FALSE,    # om TRUE så tas inte tex året med i filnamnet, vilket passar bättre i vissa sammanhang när man vill använda objektsnamnet utan att ändra vid varje uppdatering
     excelfil_mapp = NA,			# anges om man vill exportera en excelfil med uttaget, den mapp man vill spara excelfilen till
     excel_filnamn = "helarsekvivalenter.xlsx",			# filnamn för excelfil som exporteras om excel_filnamn och output_mapp anges
     demo = FALSE             # sätts till TRUE om man bara vill se ett exempel på diagrammet i webbläsaren och inget annat
@@ -171,8 +172,12 @@ diag_helarsekvivalenter <- function(
     
     gg_list <- c(gg_list, list(gg_obj))
     names(gg_list)[[length(gg_list)]] <- diagramfil %>% 
-      str_remove("\\.[^.]+$") %>%
-      str_remove("_ar.*$")
+      str_remove("\\.[^.]+$") 
+    
+    # ta bort tidsbestämning (tex. år) ur objektsnamnet, för användning i tex r-markdownrapporter
+    if (ggobjektfilnamn_utan_tid) {
+      names(gg_list)[[length(gg_list)]] <- names(gg_list)[[length(gg_list)]]  %>% str_remove("_ar.*$")
+    }
     
     return(gg_list)
     
