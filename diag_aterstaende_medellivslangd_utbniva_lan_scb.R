@@ -98,13 +98,18 @@ c("https://region-dalarna.github.io/utskrivna_diagram/medellivslangd_aterstaende
   			 facet_grp = "kön",
   			 facet_scale = "fixed",
   			 facet_legend_bottom = TRUE,
+  			 ggobjektfilnamn_utan_tid = FALSE,    # om TRUE så tas inte tex året med i filnamnet, vilket passar bättre i vissa sammanhang när man vill använda objektsnamnet utan att ändra vid varje uppdatering
   			 skriv_till_diagramfil = skriv_diagramfil
   )
   
   gg_list <- c(gg_list, list(gg_obj))
   names(gg_list)[[length(gg_list)]] <- diagramfil %>% 
-    str_remove("\\.[^.]+$") %>%
-    str_remove("_ar.*$")
+    str_remove("\\.[^.]+$") 
+  
+  # ta bort tidsbestämning (tex. år) ur objektsnamnet, för användning i tex r-markdownrapporter
+  if (ggobjektfilnamn_utan_tid) {
+    names(gg_list)[[length(gg_list)]] <- names(gg_list)[[length(gg_list)]]  %>% str_remove("_ar.*$")
+  }
   
   return(gg_list)
 
