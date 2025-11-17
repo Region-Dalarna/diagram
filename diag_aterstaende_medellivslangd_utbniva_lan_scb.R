@@ -99,7 +99,6 @@ diag_aterstaende_medellivslangd_utbniva_lan_scb <- function(
                               facet_grp = "kön",
                               facet_scale = "fixed",
                               facet_legend_bottom = TRUE,
-                              ggobjektfilnamn_utan_tid = FALSE,    # om TRUE så tas inte tex året med i filnamnet, vilket passar bättre i vissa sammanhang när man vill använda objektsnamnet utan att ändra vid varje uppdatering
                               skriv_till_diagramfil = skriv_diagramfil
   )
   
