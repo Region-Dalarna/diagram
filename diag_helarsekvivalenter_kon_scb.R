@@ -133,10 +133,12 @@ diag_helarsekvivalenter <- function(
       list_komma_och()
     
     facet_txt <- if (length(unique(chart_df$region)) > 1) "" else glue(" i {vald_region}")
+    konsuppdelat <- if (length(unique(chart_df$kön)) > 1) TRUE else FALSE 
+    kon_txt <- if (konsuppdelat) "kon_" else ""
     
     diagramtitel <- glue("Helårsekvivalenter för invånare {aldersgrp}{facet_txt}")
     diagramundertitel <- " - motsvarar individer som på heltid försörjs med sociala ersättningar och bidrag" 
-    diagramfil <- glue("helarsekvivalenter_{vald_region %>% paste0(collapse = '_')}_ar{first(chart_df$tid)}_{last(chart_df$tid)}.png")
+    diagramfil <- glue("helarsekvivalenter_{kon_txt}{vald_region %>% paste0(collapse = '_')}_ar{first(chart_df$tid)}_{last(chart_df$tid)}.png")
     
     
     gg_obj <- SkapaStapelDiagram(
@@ -158,26 +160,29 @@ diag_helarsekvivalenter <- function(
       manual_x_axis_text_hjust = 1,
       manual_color = diagram_farger,
       output_mapp = output_mapp,
-      diagram_facet = length(unique(chart_df$region)) > 1,
+      diagram_facet = length(unique(chart_df$region)) > 1 | konsuppdelat,
       lagg_pa_logga = ta_med_logga,
       logga_path = logga_sokvag,
-      facet_grp = "region",
-      facet_scale = "free",
+      facet_grp = if (konsuppdelat) "kön" else "region",
+      facet_scale = if (konsuppdelat) "free_x" else "free",
       facet_legend_bottom = TRUE,
       skriv_till_diagramfil = skriv_diagramfil
     )
     
     gg_list <- c(gg_list, list(gg_obj))
-    names(gg_list)[[length(gg_list)]] <- diagramfil %>% str_remove("\\.[^.]+$")
+    names(gg_list)[[length(gg_list)]] <- diagramfil %>% 
+      str_remove("\\.[^.]+$") %>%
+      str_remove("_ar.*$")
+    
     return(gg_list)
     
   } # slut skapa_diagram-funktion
   
-  if (skapa_facet_diagram) {
+  if (skapa_facet_diagram & length(unique(helarsekv_alla_df$kön)) == 1) {
     retur_list <- skapa_diagram(region_vekt)
     
   } else {
-    retur_list <- map(unique(region_vekt), ~ skapa_diagram(.x)) %>% flatten()
+    retur_list <- map(unique(region_vekt), ~ skapa_diagram(.x)) %>% purrr::flatten()
     
   }
   
