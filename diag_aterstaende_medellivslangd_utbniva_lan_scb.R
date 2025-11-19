@@ -17,7 +17,7 @@ diag_aterstaende_medellivslangd_utbniva_lan_scb <- function(
     demo = FALSE,             # sätts till TRUE om man bara vill se ett exempel på diagrammet i webbläsaren och inget annat
     utmapp = "G:/Samhällsanalys/API/Fran_R/utskrift/"
     ) {
-
+  
   
   # =======================================================================================================================
   #
