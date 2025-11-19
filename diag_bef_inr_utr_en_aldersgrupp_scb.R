@@ -8,6 +8,7 @@ diag_bef_inr_utr_en_aldersgrupp <- function(
     diagram_fargvekt = NA,
     ta_med_logga = TRUE,
     logga_sokvag = NA,
+    stodlinjer_avrunda_fem = TRUE,
     returnera_dataframe_global_environment = FALSE,          
     ta_bort_diagramtitel = FALSE,                            # FALSE så skrivs ingen diagramtitel ut
     visa_dataetiketter = FALSE,
@@ -90,7 +91,7 @@ diag_bef_inr_utr_en_aldersgrupp <- function(
                                  diagram_titel = diagramtitel,
                                  diagram_capt = diagram_capt,
                                  utan_diagramtitel = ta_bort_diagramtitel,
-                                 stodlinjer_avrunda_fem = TRUE,
+                                 stodlinjer_avrunda_fem = stodlinjer_avrunda_fem,
                                  filnamn_diagram = diagramfil,
                                  #x_axis_lutning = 0,
                                  manual_x_axis_text_vjust = 1,
