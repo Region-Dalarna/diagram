@@ -27,6 +27,7 @@ diag_foraldrapenning_vab <- function(region_vekt = "20", # Enbart ett län åt g
   # Funktioner som behövs
   source("https://raw.githubusercontent.com/Region-Dalarna/funktioner/main/func_SkapaDiagram.R")
   source("https://raw.githubusercontent.com/Region-Dalarna/funktioner/main/func_API.R")
+  source("https://raw.githubusercontent.com/Region-Dalarna/funktioner/main/func_text.R", encoding = "utf-8", echo = FALSE)
   
   # Adresser till data
   path = c("https://www.forsakringskassan.se/api/sprstatistikrapportera/public/v1/fp-antal-mottagare-nettodagar-belopp/FPAntalDagarBeloppLanKommun.xlsx",
@@ -40,7 +41,7 @@ diag_foraldrapenning_vab <- function(region_vekt = "20", # Enbart ett län åt g
   # om något av föräldrapenningsdiagrammen är TRUE så hämtas data för föräldrapenning, annars inte
   if(any(
     diag_foraldrapenning_mottagare, diag_foraldrapenning_andel_nettodagar,
-         diag_foraldrapenning_andel_sen_ar_lanets_kommuner,
+         diag_foraldrapenning_andel_senaste_ar_lanets_kommuner,
          diag_foraldrapenning_antal_nettodagar)){
 
     foraldrapenning_df = hamta_excel_dataset_med_url(path[1],skippa_rader = 2) %>%
