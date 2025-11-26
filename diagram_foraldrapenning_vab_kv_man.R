@@ -17,6 +17,8 @@ diag_foraldrapenning_vab <- function(region_vekt = "20", # Enbart ett län åt g
   # Reviderad av Peter Möller 2025-11-24. 
   # Nu går det att hämta Riket, län och kommuner. Ersatt län/kommun (bara namn, inte kod) med 
   # Regionkod och Region. Lagt till TRUE/FALSE för varje enskild diagram
+  #
+  # diagram_capt saknades i diagrammet foraldrapening_antal_nettodagar, så jag la till den. Jon 2025-11-26
   # =============================================== Uttag ===============================================
   
   # # Läser in nödvändiga bibliotek med pacman
@@ -160,7 +162,7 @@ diag_foraldrapenning_vab <- function(region_vekt = "20", # Enbart ett län åt g
     
     # föräldrapenning antal nettodagar
     if (diag_foraldrapenning_antal_nettodagar) {
-      
+      diagram_capt <- "Källa: Försäkringskassan.\nBearbetning: Samhällsanalys, Region Dalarna."
       diagramtitel <- paste0("Föräldrapenning, antal nettodagar per kön i " , unique(foraldrapenning_df$Region) %>% skapa_kortnamn_lan() %>% list_komma_och())
       diagramfilnamn <- paste0("Foraldrapenning_antal_", unique(foraldrapenning_df$Region) %>% skapa_kortnamn_lan() %>% list_komma_och(),".png")
       
