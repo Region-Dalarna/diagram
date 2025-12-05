@@ -149,7 +149,7 @@ diag_inkomst_scb <- function(regionvekt = "20", # Enbart ett i taget. går även
     
   }
   
-  diag <- map(alder_klartext, ~ skapa_diagram(forvarvsinkomst_df, .x)) %>% flatten()
+  diag <- map(alder_klartext, ~ skapa_diagram(forvarvsinkomst_df, .x)) %>% purrr::flatten()
   
   return(diag)
   
