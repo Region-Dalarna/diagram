@@ -5,6 +5,7 @@ diagram_andel_offentligt <- function(region_vekt = hamtakommuner("20",tamedlan =
                                      output_mapp_data = NA, # Vart hamnar data om den skall sparas. NA medför att data inte sparas
                                      filnamn_data = "andel_offentligt.xlsx", # Filnamn för sparad data
                                      vald_farg = "rus_sex", # Vilken färgvektor vill man ha. Blir alltid "kon" när man väljer det diagrammet
+                                     stodlinjer_avrunda_fem = TRUE,
                                      spara_figur = FALSE, # Sparar figuren till output_mapp_figur
                                      returnera_figur = TRUE, # Om man vill att figuren skall returneras från funktionen
                                      returnera_data = FALSE # True om användaren vill returnera data från funktionen
@@ -16,6 +17,7 @@ diagram_andel_offentligt <- function(region_vekt = hamtakommuner("20",tamedlan =
   # Går även att använda olika åldersspann.
   # Uppdaterat så att data hämtas från BAS istället för RAMS. Jag lämnar kvar det gamla skriptet diagram_andel_offentligt.R ifall det används någonstans
   # Skapat: 2024-11-15 av Jon Frank
+  # Ändrar så att det går att välja bort stodlinjer_avrunda_fem / Jon 2025-12-09
   # ===========================================================================================================
   if(length(kon_klartext)>2){
     stop("Går enbart att välja antingen totalt eller uppdelat på kvinnor och män (kon_klartext)")
@@ -99,7 +101,7 @@ diagram_andel_offentligt <- function(region_vekt = hamtakommuner("20",tamedlan =
                                  manual_x_axis_text_vjust = 1,
                                  manual_x_axis_text_hjust = 1,
                                  manual_color = diagramfarger(vald_farg),
-                                 stodlinjer_avrunda_fem = TRUE,
+                                 stodlinjer_avrunda_fem = stodlinjer_avrunda_fem,
                                  geom_position_stack = ifelse(length(unique(andel_df$kön))>1,FALSE,TRUE),
                                  legend_vand_ordning = ifelse(length(unique(andel_df$kön))>1,FALSE,TRUE),
                                  x_axis_sort_value = TRUE,
