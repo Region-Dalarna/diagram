@@ -6,6 +6,7 @@ diag_demografi <-function(region = hamtakommuner("20",tamedlan = TRUE,tamedriket
                           diag_medelalder = TRUE, # Medelålder
                           konsuppdelat = FALSE, # Om TRUE jämförs kön för senaste år, om FALSE jämförs första och sista år i sample
                           valda_farger = diagramfarger("rus_sex"),
+                          stodlinjer_avrunda_fem = TRUE,
                           tid = 2007:2100, # Tid. Ett högt sistavärde ger senaste år
                           spara_figur = TRUE, # Skall figuren sparas
                           returnera_figur = TRUE, # Skall figur returneras från funktion
@@ -18,6 +19,7 @@ diag_demografi <-function(region = hamtakommuner("20",tamedlan = TRUE,tamedriket
   # Data för län som helhet finns enbart från 2007
   # Skapad av Jon Frank
   # Senast ändrad: 2023-12-08
+  # Ändrat så att man kan välja bort stodlinjer_avrunda_fem /Jon 2025-12-09
   # ===========================================================================================================
   
   
@@ -103,7 +105,7 @@ c("https://region-dalarna.github.io/utskrivna_diagram/demo_fors.png",
                                  x_axis_sort_value = TRUE,
                                  x_axis_sort_grp = 2,
                                  vand_sortering = TRUE,
-                                 stodlinjer_avrunda_fem = TRUE,
+                                 stodlinjer_avrunda_fem = stodlinjer_avrunda_fem,
                                  manual_y_axis_title= "",
                                  diagram_titel = diagram_titel,
                                  diagram_capt = diagram_capt,
@@ -153,7 +155,7 @@ c("https://region-dalarna.github.io/utskrivna_diagram/demo_fors.png",
                                  manual_x_axis_text_vjust=1,
                                  manual_x_axis_text_hjust=1,
                                  manual_color = diag_farger,
-                                 x_axis_sort_value = TRUE,
+                                 x_axis_sort_value = stodlinjer_avrunda_fem,
                                  dataetiketter = FALSE,
                                  stodlinjer_avrunda_fem = TRUE,
                                  dataetiketter_antal_dec = 1,
