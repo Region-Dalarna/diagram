@@ -71,8 +71,11 @@ c("https://region-dalarna.github.io/utskrivna_diagram/fodelsetal_globalt_ar_ar20
   iso_tabell <- tabeller[[1]] %>% 
     .[2:nrow(tabeller[[1]]),]
   
-  names(iso_tabell) <- c("Land", "Officiellt namn", "Självständighet",
-                        "id_A2", "id_A3", "id_num", "subdiv", "tld")
+  # names(iso_tabell) <- c("Land", "Officiellt namn", "Självständighet",
+  #                       "id_A2", "id_A3", "id_num", "subdiv", "tld")
+  
+  names(iso_tabell) <- c("Land", "Självständighet",
+                         "id_A2", "id_A3", "id_num", "subdiv", "tld")
   
   iso_tabell <- iso_tabell %>% 
     mutate(id_A2 = id_A2 %>% str_remove("^.*?\\}"))
