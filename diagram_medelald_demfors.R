@@ -12,7 +12,7 @@ diag_demografi <-function(region = hamtakommuner("20",tamedlan = TRUE,tamedriket
                           returnera_figur = TRUE, # Skall figur returneras från funktion
                           returnera_data = FALSE, # Om TRUE returneras data till R-Studios globala miljö
                           demo = FALSE             # sätts till TRUE om man bara vill se ett exempel på diagrammet i webbläsaren och inget annat
-                          ) {
+) {
   
   # ===========================================================================================================  # 
   # Skript som skriver ut diagram för demografisk försörjningskvot och medelålder. Går att välja med eller utan uppdelning på kön
@@ -20,22 +20,23 @@ diag_demografi <-function(region = hamtakommuner("20",tamedlan = TRUE,tamedriket
   # Skapad av Jon Frank
   # Senast ändrad: 2023-12-08
   # Ändrat så att man kan välja bort stodlinjer_avrunda_fem /Jon 2025-12-09
+  # Har uppdaterat skripet så att data hämtas direkt via Peters funktion, snarare än via ett skript
   # ===========================================================================================================
   
   
   # ========================================== Inställningar ============================================
-
-# om parametern demo är satt till TRUE så öppnas en flik i webbläsaren med ett exempel på hur diagrammet ser ut och därefter avslutas funktionen
-# demofilen måste läggas upp på webben för att kunna öppnas, vi lägger den på Region Dalarnas github-repo som heter utskrivna_diagram
-if (demo){
-  demo_url <- 
-c("https://region-dalarna.github.io/utskrivna_diagram/demo_fors.png",
-"https://region-dalarna.github.io/utskrivna_diagram/medelalder.png")
-  walk(demo_url, ~browseURL(.x))
-  if (length(demo_url) > 1) cat(paste0(length(demo_url), " diagram har öppnats i webbläsaren."))
-  stop_tyst()
-}
-
+  
+  # om parametern demo är satt till TRUE så öppnas en flik i webbläsaren med ett exempel på hur diagrammet ser ut och därefter avslutas funktionen
+  # demofilen måste läggas upp på webben för att kunna öppnas, vi lägger den på Region Dalarnas github-repo som heter utskrivna_diagram
+  if (demo){
+    demo_url <- 
+      c("https://region-dalarna.github.io/utskrivna_diagram/demo_fors.png",
+        "https://region-dalarna.github.io/utskrivna_diagram/medelalder.png")
+    walk(demo_url, ~browseURL(.x))
+    if (length(demo_url) > 1) cat(paste0(length(demo_url), " diagram har öppnats i webbläsaren."))
+    stop_tyst()
+  }
+  
   if (!require("pacman")) install.packages("pacman")
   p_load(pxweb,
          tidyverse,
@@ -48,24 +49,29 @@ c("https://region-dalarna.github.io/utskrivna_diagram/demo_fors.png",
   gg_list <- list() # Skapa en tom lista att lägga flera ggplot-objekt i (om man skapar flera diagram)
   objektnamn <- c() # Används för att namnge
   list_data <- lst() # Skapa tom lista som används för att spara till Excel.
-
+  
   # =============================================== API-uttag ===============================================
   
-  # Hämtar data
-  source("https://raw.githubusercontent.com/Region-Dalarna/hamta_data/main/hamta_data_medelald_demfors_kolada.R")
+  # # Hämtar data
+  # source("https://raw.githubusercontent.com/Region-Dalarna/hamta_data/main/hamta_data_medelald_demfors_kolada.R")
+  # 
+  # df_list = hamta_data_medel_demo(region = region, 
+  #                                 konsuppdelat = konsuppdelat,
+  #                                 cont_cod = c("N00959","N00927"), 
+  #                                 tid = tid,
+  #                                 returnera_data = TRUE)
   
-  df_list = hamta_data_medel_demo(region = region, 
-                                  konsuppdelat = konsuppdelat,
-                                  cont_cod = c("N00959","N00927"), 
-                                  tid = tid,
-                                  returnera_data = TRUE)
-
   
   if(diag_forsorjningskvot == TRUE){
     
-    demo_df <- df_list[["Demografisk_forsorjningskvot"]] %>% 
-      mutate(municipality = skapa_kortnamn_lan(byt_namn_lan_kolada(municipality),TRUE),
-             value = value*100)
+    demo_df <- hamta_kolada_df(kpi_id = "N00927", # Demografisk försörjningskvot
+                               valda_kommuner = region,
+                               konsuppdelat = konsuppdelat,
+                               valda_ar = tid)
+    
+    demo_df <- demo_df %>% 
+      mutate(region = skapa_kortnamn_lan(byt_namn_lan_kolada(region),TRUE),
+             varde = varde * 100)
     
     if(returnera_data == TRUE){
       assign("demografisk_forsorjningskvot", demo_df, envir = .GlobalEnv)
@@ -77,7 +83,7 @@ c("https://region-dalarna.github.io/utskrivna_diagram/demo_fors.png",
     
     if(konsuppdelat == FALSE){
       demo_df <- demo_df %>% 
-        filter(year %in% c(min(year),max(year)))
+        filter(ar %in% c(min(ar),max(ar)))
       diag_farger = valda_farger
       diagram_titel <- "Demografisk försörjningskvot"
       
@@ -96,9 +102,9 @@ c("https://region-dalarna.github.io/utskrivna_diagram/demo_fors.png",
     diagram_capt <- "Källa: SCB (via RKA/Kolada)\nBearbetning: Samhällsanalys, Region Dalarna\nDiagramförklaring: Den demografiska försörjningskvoten beräknas som summan av antal personer 0-19 år och antal personer 65 år och äldre dividerat med antal personer 20-64 år.\nEtt värde över 100 innebär att gruppen äldre och yngre är större än den i arbetsför ålder." 
     
     gg_obj <- SkapaStapelDiagram(skickad_df = demo_df ,
-                                 skickad_x_var = "municipality", 
-                                 skickad_y_var = "value", 
-                                 skickad_x_grupp = ifelse(konsuppdelat == FALSE,"year","gender"),
+                                 skickad_x_var = "region", 
+                                 skickad_y_var = "varde", 
+                                 skickad_x_grupp = ifelse(konsuppdelat == FALSE,"ar","kon"),
                                  manual_x_axis_text_vjust=1,
                                  manual_x_axis_text_hjust=1,
                                  manual_color = diag_farger,
@@ -115,12 +121,17 @@ c("https://region-dalarna.github.io/utskrivna_diagram/demo_fors.png",
     
     gg_list <- c(gg_list, list(gg_obj))
   }
-
+  
   
   if(diag_medelalder == TRUE){
     
-    medelalder_df <- df_list[["Medelalder"]] %>% 
-      mutate(municipality = skapa_kortnamn_lan(byt_namn_lan_kolada(municipality),TRUE))
+    medelalder_df <- hamta_kolada_df(kpi_id = "N00959", # Demografisk försörjningskvot
+                                     valda_kommuner = region,
+                                     konsuppdelat = konsuppdelat,
+                                     valda_ar = tid)
+    
+    medelalder_df <- medelalder_df %>% 
+      mutate(region = skapa_kortnamn_lan(byt_namn_lan_kolada(region),TRUE))
     
     if(returnera_data == TRUE){
       assign("medelalder", medelalder_df, envir = .GlobalEnv)
@@ -132,15 +143,15 @@ c("https://region-dalarna.github.io/utskrivna_diagram/demo_fors.png",
     
     if(konsuppdelat == FALSE){
       medelalder_df <- medelalder_df %>% 
-        filter(year%in%c(min(year),max(year)))
+        filter(ar%in%c(min(ar),max(ar)))
       diag_farger = valda_farger
       diagram_titel <- "Medelålder"
       
       
     } else{
-      medelalder_df <- medelalder_df %>% filter(year == max(year))
+      medelalder_df <- medelalder_df %>% filter(ar == max(ar))
       diag_farger = diagramfarger("kon")
-      diagram_titel <- paste0("Medelålder år ",unique(medelalder_df$year))
+      diagram_titel <- paste0("Medelålder år ",unique(medelalder_df$ar))
     } 
     
     diagram_typ <- "medelalder"
@@ -149,9 +160,9 @@ c("https://region-dalarna.github.io/utskrivna_diagram/demo_fors.png",
     diagram_capt <- "Källa: SCB (via RKA/Kolada)\nBearbetning: Samhällsanalys, Region Dalarna\n" 
     
     gg_obj <- SkapaStapelDiagram(skickad_df = medelalder_df ,
-                                 skickad_x_var = "municipality", 
-                                 skickad_y_var = "value", 
-                                 skickad_x_grupp = ifelse(konsuppdelat == FALSE,"year","gender"),
+                                 skickad_x_var = "region", 
+                                 skickad_y_var = "varde", 
+                                 skickad_x_grupp = ifelse(konsuppdelat == FALSE,"ar","kon"),
                                  manual_x_axis_text_vjust=1,
                                  manual_x_axis_text_hjust=1,
                                  manual_color = diag_farger,
