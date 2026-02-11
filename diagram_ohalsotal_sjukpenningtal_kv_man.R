@@ -30,6 +30,7 @@ diag_ohalsotal_sjukpenningtal <- function(region_vekt = "20", # Enbart ett län 
   # Funktioner som behövs
   source("https://raw.githubusercontent.com/Region-Dalarna/funktioner/main/func_SkapaDiagram.R")
   source("https://raw.githubusercontent.com/Region-Dalarna/funktioner/main/func_API.R")
+  source("https://raw.githubusercontent.com/Region-Dalarna/funktioner/main/func_text.R")
   
   # # Adresser till data
   path = c("https://www.forsakringskassan.se/api/sprstatistikrapportera/public/v1/ohm-ohalsotal/SJPohttal.xlsx","https://www.forsakringskassan.se/api/sprstatistikrapportera/public/v1/ohm-sjptal/SJPsjptal.xlsx")
@@ -37,13 +38,7 @@ diag_ohalsotal_sjukpenningtal <- function(region_vekt = "20", # Enbart ett län 
   # # Med Peters nya skript
   flik_lista = list()
   gg_list = list()
-  
-  # skapa variabler med text som används i diagramtitlar och filnamn
-  alder_txt <- unique(ohalsotal_df$ålder) %>% 
-    str_remove("Samtliga ")
-  
-  ar_txt <- max(ohalsotal_df$år)
-  
+
   vald_region_txt <- hamtaregion_kod_namn(region_vekt)$region %>% 
     skapa_kortnamn_lan() %>% 
     list_komma_och()
@@ -101,6 +96,12 @@ diag_ohalsotal_sjukpenningtal <- function(region_vekt = "20", # Enbart ett län 
     
     # För att kunna skriva ut i caption hur många månader som det senaste året består av
     senaste_manad <- ohalsotal_df %>% mutate(månad_namn = format(as.Date(paste0(år,"-", månad, "-01")), "%B")) %>% .$månad_namn %>% unique() %>% first()
+    
+    # skapa variabler med text som används i diagramtitlar och filnamn
+    alder_txt <- unique(ohalsotal_df$ålder) %>% 
+      str_remove("Samtliga ")
+    
+    ar_txt <- max(ohalsotal_df$år)
     
     # Bearbetar data
     ohalsotal_df <- ohalsotal_df %>% 
