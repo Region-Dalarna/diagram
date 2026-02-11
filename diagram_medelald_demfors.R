@@ -21,6 +21,7 @@ diag_demografi <-function(region = hamtakommuner("20",tamedlan = TRUE,tamedriket
   # Senast ändrad: 2023-12-08
   # Ändrat så att man kan välja bort stodlinjer_avrunda_fem /Jon 2025-12-09
   # Har uppdaterat skripet så att data hämtas direkt via Peters funktion, snarare än via ett skript
+  # Funktionen fungerar för tillfället inte, så jag har återgått till en äldre version av datauttag
   # ===========================================================================================================
   
   
@@ -61,13 +62,37 @@ diag_demografi <-function(region = hamtakommuner("20",tamedlan = TRUE,tamedriket
   #                                 tid = tid,
   #                                 returnera_data = TRUE)
   
+  valda_kommuner <- hamtakommuner("20",tamedlan = TRUE,tamedriket = TRUE) %>%
+    { ifelse(nchar(.) == 2, paste0("00", .), .) }
+  
   
   if(diag_forsorjningskvot == TRUE){
     
-    demo_df <- hamta_kolada_df(kpi_id = "N00927", # Demografisk försörjningskvot
-                               valda_kommuner = region,
-                               konsuppdelat = konsuppdelat,
-                               valda_ar = tid)
+    
+      
+      
+    
+    demo_df <- get_values(
+      kpi = c("N00927"),
+      municipality = valda_kommuner,
+      period = tid
+    ) %>% 
+      rename(region = municipality,
+             ar = year,
+             varde = value,
+             kon = gender) %>% 
+      mutate(kon = case_when(
+        kon == "K" ~ "Kvinnor",
+        kon == "M" ~ "Män",
+        TRUE ~ "Totalt"
+       ))
+    
+    if(konsuppdelat == FALSE) demo_df <- demo_df %>% filter(kon == "Totalt")
+    
+    # demo_df <- hamta_kolada_df(kpi_id = "N00927", # Demografisk försörjningskvot
+    #                            valda_kommuner = region,
+    #                            konsuppdelat = konsuppdelat,
+    #                            valda_ar = tid)
     
     demo_df <- demo_df %>% 
       mutate(region = skapa_kortnamn_lan(byt_namn_lan_kolada(region),TRUE),
@@ -125,10 +150,28 @@ diag_demografi <-function(region = hamtakommuner("20",tamedlan = TRUE,tamedriket
   
   if(diag_medelalder == TRUE){
     
-    medelalder_df <- hamta_kolada_df(kpi_id = "N00959", # Demografisk försörjningskvot
-                                     valda_kommuner = region,
-                                     konsuppdelat = konsuppdelat,
-                                     valda_ar = tid)
+    medelalder_df <- get_values(
+      kpi = c("N00959"),
+      municipality = valda_kommuner,
+      period = tid
+    ) %>% 
+      rename(region = municipality,
+             ar = year,
+             varde = value,
+             kon = gender) %>% 
+      mutate(kon = case_when(
+        kon == "K" ~ "Kvinnor",
+        kon == "M" ~ "Män",
+        TRUE ~ "Totalt"
+      ))
+    
+    if(konsuppdelat == FALSE) medelalder_df <- medelalder_df %>% filter(kon == "Totalt")
+    
+    
+    # medelalder_df <- hamta_kolada_df(kpi_id = "N00959", # Demografisk försörjningskvot
+    #                                  valda_kommuner = region,
+    #                                  konsuppdelat = konsuppdelat,
+    #                                  valda_ar = tid)
     
     medelalder_df <- medelalder_df %>% 
       mutate(region = skapa_kortnamn_lan(byt_namn_lan_kolada(region),TRUE))
