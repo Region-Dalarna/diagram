@@ -176,6 +176,24 @@ diag_demografi <-function(region = hamtakommuner("20",tamedlan = TRUE,tamedriket
     medelalder_df <- medelalder_df %>% 
       mutate(region = skapa_kortnamn_lan(byt_namn_lan_kolada(region),TRUE))
     
+    # Då data inte finns för alla år i alla län/riket, så måste jag hitta det senaste år där alla regioner har data, och sedan bara visa från det året och framåt.
+    regions_2024 <- medelalder_df %>%
+      filter(ar == max(ar)) %>%
+      distinct(region) %>%
+      dplyr::pull(region)
+    
+    common_start <- medelalder_df %>%
+      filter(region %in% regions_2024) %>%
+      group_by(ar) %>%
+      summarise(n_present = n_distinct(region), .groups = "drop") %>%
+      filter(n_present == length(regions_2024)) %>%
+      summarise(common_start = min(ar)) %>%
+      dplyr::pull(common_start)
+    
+    medelalder_df <- medelalder_df %>%
+      filter(region %in% regions_2024,
+             ar >= common_start)
+    
     if(returnera_data == TRUE){
       assign("medelalder", medelalder_df, envir = .GlobalEnv)
     }
