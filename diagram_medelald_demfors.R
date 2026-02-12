@@ -124,7 +124,7 @@ diag_demografi <-function(region = hamtakommuner("20",tamedlan = TRUE,tamedriket
     diagramfil <- "demo_fors.png"
     objektnamn <- c(objektnamn,diagram_typ)
     
-    diagram_capt <- "Källa: SCB (via RKA/Kolada)\nBearbetning: Samhällsanalys, Region Dalarna\nDiagramförklaring: Den demografiska försörjningskvoten beräknas som summan av antal personer 0-19 år och\nantal personer 65 år och äldre\ndividerat med antal personer 20-64 år. Ett värde över 100 innebär att gruppen äldre och yngre är större än den i arbetsför ålder." 
+    diagram_capt <- "Källa: SCB (via RKA/Kolada)\nBearbetning: Samhällsanalys, Region Dalarna\nDiagramförklaring: Den demografiska försörjningskvoten beräknas som summan av antal personer 0-19 år och\nantal personer 65 år och äldre dividerat med antal personer 20-64 år. Ett värde över 100 innebär\natt gruppen äldre och yngre är större än den i arbetsför ålder." 
     
     gg_obj <- SkapaStapelDiagram(skickad_df = demo_df ,
                                  skickad_x_var = "region", 
