@@ -1,4 +1,3 @@
-test <- diag_demografi(spara_figur = FALSE)
 diag_demografi <-function(region = hamtakommuner("20",tamedlan = TRUE,tamedriket = TRUE), # Val av region. 
                           outputmapp_figur = "G:/Samhällsanalys/Statistik/Näringsliv/basfakta/",
                           output_mapp_data = NA, # Ändra om data skall sparas
