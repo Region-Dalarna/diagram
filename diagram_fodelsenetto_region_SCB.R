@@ -3,6 +3,7 @@ diagram_fodelsenetto <- function(region_vekt = "20", # Val av kommuner
                                vald_farg = NA, # Vilken färgvektor vill man ha. Blir alltid "kon" när man väljer det diagrammet
                                spara_diagrambild = TRUE, # Sparar figuren till output_mapp
                                diag_facet = FALSE, # Skall ett facetdiagram skapas
+                               stodlinjer_avrunda_fem = FALSE, # Funkar för tillfället inte som TRUE. Blir något konstigt med svarta streck för netto.
                                visa_totalvarden = TRUE, # Visa totalvärden i diagrammet. Funkar om diag_facet = FALSE
                                etiketter_xaxel = 4, # Intervall för etiketter på x-axeln
                                tid = "*", # Välj tid, finns från 1968 till senaste år (som skrivs "9999")
@@ -19,6 +20,7 @@ diagram_fodelsenetto <- function(region_vekt = "20", # Val av kommuner
   # Förbättringsmöjligheter: Svart linje för födelsenetto funkar inte med facet.
   # Ändrat 9 jan 2025, SCB verkar ha ändrat namn på variabeln döda till antal. Jag lägger till en mutate som döper tillbaka variabeln /Jon
   # Ändrat 24 feb 2026 - Lagt till ny data för CKM och ändrat ovan från mutate till en rename
+  # Av oklar anledning funkar inte heller stodlinjer avrunda fem tillsammans med de svarta strecken som visar netto. Har därför lagt till en parameter för den som är false som default
   # ===========================================================================================================
   
 # om parametern demo är satt till TRUE så öppnas en flik i webbläsaren med ett exempel på hur diagrammet ser ut och därefter avslutas funktionen
@@ -90,7 +92,7 @@ if (demo){
     select(-'ålder') %>% 
     rename(Döda = Antal)
   
-  fodda_df <- bind_rows(doda_df,doda_df_CKM)
+  doda_df <- bind_rows(doda_df,doda_df_CKM)
   
   df <- fodda_df %>% 
     left_join(doda_df, by = c("regionkod","region", "år")) %>% 
@@ -156,7 +158,8 @@ if (demo){
                                  diagram_capt = diagram_capt,
                                  #x_axis_storlek = 8,
                                  x_axis_visa_var_xe_etikett = ifelse(length(unique(df$region)) > 1,12,etiketter_xaxel),
-                                 stodlinjer_avrunda_fem = TRUE,
+                                 stodlinjer_avrunda_fem = stodlinjer_avrunda_fem,
+                                 x_axis_var_xe_etikett_ta_bort_nast_sista_vardet = TRUE,
                                  manual_x_axis_text_vjust = 1,
                                  manual_x_axis_text_hjust = 1,
                                  manual_y_axis_title = "",
