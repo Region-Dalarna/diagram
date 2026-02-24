@@ -19,6 +19,7 @@ diagram_befolkningsforandring_ar <- function(region_vekt = "20", # Val av kommun
   # Skapad: 2024-04-23
   # Förbättringsmöjligheter: Går för tillfället inte att summera  flera regioner
   # Uppdaterat så att ggplot-objekten inte innehåller år i sina namn (för att undvika problem i rapporter). /Jon
+  # Uppdaterat med ny data från SCB där hänsyn tas till CKM
   # ===========================================================================================================
   
   
