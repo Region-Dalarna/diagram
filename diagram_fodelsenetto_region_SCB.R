@@ -18,6 +18,7 @@ diagram_fodelsenetto <- function(region_vekt = "20", # Val av kommuner
   # Ändrat: 25 nov 2024, ändrat höjd och bredd till samma mått som i vårt skapa-diagramskript 
   # Förbättringsmöjligheter: Svart linje för födelsenetto funkar inte med facet.
   # Ändrat 9 jan 2025, SCB verkar ha ändrat namn på variabeln döda till antal. Jag lägger till en mutate som döper tillbaka variabeln /Jon
+  # Ändrat 24 feb 2026 - Lagt till ny data för CKM och ändrat ovan från mutate till en rename
   # ===========================================================================================================
   
 # om parametern demo är satt till TRUE så öppnas en flik i webbläsaren med ett exempel på hur diagrammet ser ut och därefter avslutas funktionen
