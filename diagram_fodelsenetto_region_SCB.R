@@ -3,7 +3,8 @@ diagram_fodelsenetto <- function(region_vekt = "20", # Val av kommuner
                                vald_farg = NA, # Vilken färgvektor vill man ha. Blir alltid "kon" när man väljer det diagrammet
                                spara_diagrambild = TRUE, # Sparar figuren till output_mapp
                                diag_facet = FALSE, # Skall ett facetdiagram skapas
-                               stodlinjer_avrunda_fem = FALSE, # Funkar för tillfället inte som TRUE. Blir något konstigt med svarta streck för netto.
+                               stodlinjer_avrunda_fem = TRUE, # Funkar för tillfället inte som TRUE. Blir något konstigt med svarta streck för netto.
+                               svarta_streck_tjocklek = 0.002, # Tjocklek på svarta streck som visar födelsenetto. Är en andel av skillnaden mellan högsta och lägsta värdet i datasetet, så att det anpassar sig efter olika skalor. Sätts till 0.002 som default
                                visa_totalvarden = TRUE, # Visa totalvärden i diagrammet. Funkar om diag_facet = FALSE
                                etiketter_xaxel = 4, # Intervall för etiketter på x-axeln
                                tid = "*", # Välj tid, finns från 1968 till senaste år (som skrivs "9999")
@@ -19,8 +20,9 @@ diagram_fodelsenetto <- function(region_vekt = "20", # Val av kommuner
   # Ändrat: 25 nov 2024, ändrat höjd och bredd till samma mått som i vårt skapa-diagramskript 
   # Förbättringsmöjligheter: Svart linje för födelsenetto funkar inte med facet.
   # Ändrat 9 jan 2025, SCB verkar ha ändrat namn på variabeln döda till antal. Jag lägger till en mutate som döper tillbaka variabeln /Jon
-  # Ändrat 24 feb 2026 - Lagt till ny data för CKM och ändrat ovan från mutate till en rename
-  # Av oklar anledning funkar inte heller stodlinjer avrunda fem tillsammans med de svarta strecken som visar netto. Har därför lagt till en parameter för den som är false som default
+  # Ändrat 24 feb 2026 - Lagt till ny data för CKM och ändrat ovan från mutate till en rename /Jon 2026-02-24
+  # Ser lite märkligt ut med stodlinjer avrunda fem så jag har skapat en parameter som kan ändras /Jon 2026-02-24
+  # Har även ändrat nettot tjocklek (svart streck) så att denna kan väljas. Tidigare var det 0.002 som gällde så den tjockleken sätts som standard /Jon 2026-02-24
   # ===========================================================================================================
   
 # om parametern demo är satt till TRUE så öppnas en flik i webbläsaren med ett exempel på hur diagrammet ser ut och därefter avslutas funktionen
@@ -113,7 +115,7 @@ if (demo){
     if (visa_totalvarden == TRUE && diag_facet == FALSE){
       
       diff <- max(df$varde) - min(df$varde) # ta reda på skillnaden mellan det högsta och lägsta värdet i datasetet
-      totalvarden_linjebredd <- 0.002*diff      # gör en linjetjocklek på totallinjerna som är 0,2 % av diff (på raden ovan)
+      totalvarden_linjebredd <- svarta_streck_tjocklek*diff      # gör en linjetjocklek på totallinjerna som är 0,2 % av diff (på raden ovan)
       total_list <- list()
       unika_ar <- unique(df$år)
       vald_regionkod = vald_region
