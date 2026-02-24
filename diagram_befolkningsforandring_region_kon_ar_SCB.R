@@ -29,6 +29,7 @@ diagram_befolkningsforandring_ar <- function(region_vekt = "20", # Val av kommun
   source("https://raw.githubusercontent.com/Region-Dalarna/funktioner/main/func_API.R")
   
   source("https://raw.githubusercontent.com/Region-Dalarna/hamta_data/main/hamta_bef_folkmangd_alder_kon_ar_scb.R")
+  source("https://raw.githubusercontent.com/Region-Dalarna/hamta_data/refs/heads/main/hamta_bef_folkmangd_alder_kon_ar_civilstand_scb_CKM_2025.R")
   diagram_capt <- "Källa: SCB:s öppna statistikdatabas, bearbetning av Samhällsanalys, Region Dalarna."
   
   gg_list <- list()
@@ -39,6 +40,17 @@ diagram_befolkningsforandring_ar <- function(region_vekt = "20", # Val av kommun
                                                         tid_koder = tid,
                                                         kon_klartext = kon_klartext,
                                                         cont_klartext = c("folkmängd", "folkökning"))) 
+  
+  befolkning_df_CKM <- suppress_specific_warning(
+    hamta_folkmangd_civilstand_alder_kon_ar_CKM(region_vekt = region_vekt,
+                                                     tid_koder = tid,
+                                                     alder_koder = "TotSA",
+                                                     civilstand_klartext = "totalt, samtliga civilstånd",
+                                                     kon_klartext = kon_klartext,
+                                                     cont_klartext = c("folkmängd", "folkökning"))) %>% 
+    select(-c(ålder, civilstånd))
+  
+  befolkning_df <- bind_rows(befolkning_df,befolkning_df_CKM)
   
   if(returnera_data == TRUE){
     assign("befolkning_df", befolkning_df, envir = .GlobalEnv)
