@@ -19,7 +19,6 @@ diagram_befolkningsforandring_ar <- function(region_vekt = "20", # Val av kommun
   # Skapad: 2024-04-23
   # Förbättringsmöjligheter: Går för tillfället inte att summera  flera regioner
   # Uppdaterat så att ggplot-objekten inte innehåller år i sina namn (för att undvika problem i rapporter). /Jon
-  # Uppdaterat med ny data från SCB där hänsyn tas till CKM
   # ===========================================================================================================
   
   
@@ -42,16 +41,16 @@ diagram_befolkningsforandring_ar <- function(region_vekt = "20", # Val av kommun
                                                         kon_klartext = kon_klartext,
                                                         cont_klartext = c("folkmängd", "folkökning"))) 
   
-  befolkning_df_CKM <- suppress_specific_warning(
-    hamta_folkmangd_civilstand_alder_kon_ar_CKM(region_vekt = region_vekt,
-                                                     tid_koder = tid,
-                                                     alder_koder = "TotSA",
-                                                     civilstand_klartext = "totalt, samtliga civilstånd",
-                                                     kon_klartext = kon_klartext,
-                                                     cont_klartext = c("folkmängd", "folkökning"))) %>% 
-    select(-c(ålder, civilstånd))
-  
-  befolkning_df <- bind_rows(befolkning_df,befolkning_df_CKM)
+  # befolkning_df_CKM <- suppress_specific_warning(
+  #   hamta_folkmangd_civilstand_alder_kon_ar_CKM(region_vekt = region_vekt,
+  #                                                    tid_koder = tid,
+  #                                                    alder_koder = "TotSA",
+  #                                                    civilstand_klartext = "totalt, samtliga civilstånd",
+  #                                                    kon_klartext = kon_klartext,
+  #                                                    cont_klartext = c("folkmängd", "folkökning"))) %>% 
+  #   select(-c(ålder, civilstånd))
+  # 
+  # befolkning_df <- bind_rows(befolkning_df,befolkning_df_CKM)
   
   if(returnera_data == TRUE){
     assign("befolkning_df", befolkning_df, envir = .GlobalEnv)
