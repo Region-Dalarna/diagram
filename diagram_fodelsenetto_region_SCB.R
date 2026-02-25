@@ -20,7 +20,6 @@ diagram_fodelsenetto <- function(region_vekt = "20", # Val av kommuner
   # Ändrat: 25 nov 2024, ändrat höjd och bredd till samma mått som i vårt skapa-diagramskript 
   # Förbättringsmöjligheter: Svart linje för födelsenetto funkar inte med facet.
   # Ändrat 9 jan 2025, SCB verkar ha ändrat namn på variabeln döda till antal. Jag lägger till en mutate som döper tillbaka variabeln /Jon
-  # Ändrat 24 feb 2026 - Lagt till ny data för CKM och ändrat ovan från mutate till en rename /Jon 2026-02-24
   # Ser lite märkligt ut med stodlinjer avrunda fem så jag har skapat en parameter som kan ändras /Jon 2026-02-24
   # Har även ändrat nettot tjocklek (svart streck) så att denna kan väljas. Tidigare var det 0.002 som gällde så den tjockleken sätts som standard /Jon 2026-02-24
   # ===========================================================================================================
@@ -41,7 +40,7 @@ if (demo){
   source("https://raw.githubusercontent.com/Region-Dalarna/funktioner/main/func_API.R")
   
   source("https://raw.githubusercontent.com/Region-Dalarna/hamta_data/main/hamta_fodda_moderns_alder_region_scb.R")
-  source("https://raw.githubusercontent.com/Region-Dalarna/hamta_data/refs/heads/main/hamta_fodda_moderns_alder_region_scb_CKM.R")
+  #source("https://raw.githubusercontent.com/Region-Dalarna/hamta_data/refs/heads/main/hamta_fodda_moderns_alder_region_scb_CKM.R")
   source("https://raw.githubusercontent.com/Region-Dalarna/hamta_data/main/hamta_doda_alder_kon_region_scb.R")
   source("https://raw.githubusercontent.com/Region-Dalarna/hamta_data/refs/heads/main/hamta_doda_alder_kon_region_scb_CKM.R")
   
@@ -68,18 +67,19 @@ if (demo){
   objektnamn <- c()
   
   fodda_df <- hamta_fodda_moderns_alder_region_scb(region_vekt = region_vekt,
-                                                   alder_moder = "tot",
+                                                   alder_moder = "*",
                                                    tid_koder = tid) %>% 
+    filter(`moderns ålder` %in% c("totalt ålder","totalt, samtliga åldrar")) %>% 
     select(-'moderns ålder')
   
-  fodda_df_CKM <- hamta_fodda_moderns_alder_region_scb_CKM(region_vekt = region_vekt,
-                                                           aldermoder_klartext = "totalt, samtliga åldrar",
-                                                           kon_klartext = "totalt, samtliga män och kvinnor",
-                                                           tid_koder = tid) %>% 
-    select(-c('moderns ålder','kön')) %>% 
-      rename(födda = Antal)
+  # fodda_df_CKM <- hamta_fodda_moderns_alder_region_scb_CKM(region_vekt = region_vekt,
+  #                                                          aldermoder_klartext = "totalt, samtliga åldrar",
+  #                                                          kon_klartext = "totalt, samtliga män och kvinnor",
+  #                                                          tid_koder = tid) %>% 
+  #   select(-c('moderns ålder','kön')) %>% 
+  #     rename(födda = Antal)
   
-  fodda_df <- bind_rows(fodda_df,fodda_df_CKM)
+  #fodda_df <- bind_rows(fodda_df,fodda_df_CKM)
   
   doda_df <- hamta_doda_alder_kon_region_scb(region_vekt = region_vekt,
                                              alder = "*",
@@ -88,13 +88,13 @@ if (demo){
     select(-'ålder') %>% 
     rename(Döda = Antal)
   
-  doda_df_CKM <- hamta_doda_alder_kon_region_scb_CKM(region_vekt = region_vekt,
-                                                     alder_koder = "TotSA",
-                                                     kon_klartext = NA) %>% 
-    select(-'ålder') %>% 
-    rename(Döda = Antal)
-  
-  doda_df <- bind_rows(doda_df,doda_df_CKM)
+  # doda_df_CKM <- hamta_doda_alder_kon_region_scb_CKM(region_vekt = region_vekt,
+  #                                                    alder_koder = "TotSA",
+  #                                                    kon_klartext = NA) %>% 
+  #   select(-'ålder') %>% 
+  #   rename(Döda = Antal)
+  # 
+  # doda_df <- bind_rows(doda_df,doda_df_CKM)
   
   df <- fodda_df %>% 
     left_join(doda_df, by = c("regionkod","region", "år")) %>% 
