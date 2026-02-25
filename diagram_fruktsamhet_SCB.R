@@ -5,6 +5,7 @@ diagram_fruktsamhet <- function(region_vekt = hamtakommuner("20"), # Vilka kommu
                                 diag_capt = "Källa: SCB:s öppna statistikdatabas, bearbetning av Samhällsanalys, Region Dalarna\nSummerad fruktsamhet per kvinna är ett mått på hur många barn som en kvinna i genomsnitt skulle föda under\n sin fruktsamma period utifrån, den vid tidpunkten för beräkningen, gällande fruktsamheten.",
                                 vald_period = c(2000:9999), # Vilka år skall väljas. 9999 ger sista år och "*" ger alla år
                                 visa_var_xte = 4, # Hur många år som skall visas på x-axeln. Automatiskt var 8:e vid facet-diagram.
+                                ta_bort_nast_sista = FALSE, # Ta bort näst sista värdet på x-axeln (för att det inte skall krocka med sista årtalet)
                                 spara_figur = FALSE, # Sparar figuren till output_mapp_figur
                                 diag_fokus_tid = TRUE, # Skapa diagram för alla valda år i valda regioner
                                 diag_facet = FALSE, # diag_fokus_tid som facet-diagram istället för ett per region
@@ -22,6 +23,7 @@ diagram_fruktsamhet <- function(region_vekt = hamtakommuner("20"), # Vilka kommu
   # senaste år för alla valda regioner och förändring mellan första och sista året för samtliga valda regioner.
   # Skapad av Jon 2023-04-05 genom att ha kombinerat två av Peters skript (analys_befutv_berakna_summerad_fruktsamhet.R och diagram_summerad_fruktsamhet.R)
   # Revidering : har lagt till en map-funktion för att skapa diagram för alla valda regioner över tid./Jon
+  # Lagt till så att man kan ta bort näst sista årtalet i facet-diagrammet som jämför regioner /Jon 2026-02-25
   # ===========================================================================================================
   
   
@@ -179,6 +181,7 @@ c("https://region-dalarna.github.io/utskrivna_diagram/forandring_summerad_frukts
                                    diagram_capt = diag_capt,
                                    stodlinjer_avrunda_fem = TRUE,
                                    x_axis_visa_var_xe_etikett = ifelse(length(vald_region) > 1,8,visa_var_xte),
+                                   x_axis_var_xe_etikett_ta_bort_nast_sista_vardet = ta_bort_nast_sista,
                                    manual_x_axis_text_vjust = 1,
                                    manual_x_axis_text_hjust = 1,
                                    manual_y_axis_title = "",
