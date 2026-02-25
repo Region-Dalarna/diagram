@@ -42,7 +42,7 @@ if (demo){
   source("https://raw.githubusercontent.com/Region-Dalarna/hamta_data/main/hamta_fodda_moderns_alder_region_scb.R")
   #source("https://raw.githubusercontent.com/Region-Dalarna/hamta_data/refs/heads/main/hamta_fodda_moderns_alder_region_scb_CKM.R")
   source("https://raw.githubusercontent.com/Region-Dalarna/hamta_data/main/hamta_doda_alder_kon_region_scb.R")
-  source("https://raw.githubusercontent.com/Region-Dalarna/hamta_data/refs/heads/main/hamta_doda_alder_kon_region_scb_CKM.R")
+  #source("https://raw.githubusercontent.com/Region-Dalarna/hamta_data/refs/heads/main/hamta_doda_alder_kon_region_scb_CKM.R")
   
   
   # om ingen färgvektor är medskickad, kolla om funktionen diagramfärger finns, annars använd r:s defaultfärger
@@ -67,10 +67,8 @@ if (demo){
   objektnamn <- c()
   
   fodda_df <- hamta_fodda_moderns_alder_region_scb(region_vekt = region_vekt,
-                                                   alder_moder = "*",
-                                                   tid_koder = tid) %>% 
-    filter(`moderns ålder` %in% c("totalt ålder","totalt, samtliga åldrar")) %>% 
-    select(-'moderns ålder')
+                                                   alder_moder = NA,
+                                                   tid_koder = tid) 
   
   # fodda_df_CKM <- hamta_fodda_moderns_alder_region_scb_CKM(region_vekt = region_vekt,
   #                                                          aldermoder_klartext = "totalt, samtliga åldrar",
@@ -82,10 +80,8 @@ if (demo){
   #fodda_df <- bind_rows(fodda_df,fodda_df_CKM)
   
   doda_df <- hamta_doda_alder_kon_region_scb(region_vekt = region_vekt,
-                                             alder = "*",
+                                             alder = NA,
                                              tid_koder = tid) %>% 
-    filter(ålder == "totalt ålder") %>% 
-    select(-'ålder') %>% 
     rename(Döda = Antal)
   
   # doda_df_CKM <- hamta_doda_alder_kon_region_scb_CKM(region_vekt = region_vekt,
