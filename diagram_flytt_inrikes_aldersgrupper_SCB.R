@@ -21,6 +21,7 @@ diagram_inrikes_flytt_alder <- function(region_vekt = "20", # Val av kommuner
   # Finns både med och utan facet. Det är även möjligt att skapa grupper av regioner. Gruppen namnges med gruppera_namn
   # Skapad: 2024-04-24
   # Uppdatering: Ändrat så att det går att gruppera på namn. 
+  # Ändrat så att det blir NA på kön snarare än uppdelat och sedan summering. Detta var inget problem tidigare, men CKM gör att summan av delarna inte alltid överensstämmer med totalen Jon 2026-02-26
   # ===========================================================================================================
   
   # om parametern demo är satt till TRUE så öppnas en flik i webbläsaren med ett exempel på hur diagrammet ser ut och därefter avslutas funktionen
@@ -52,7 +53,7 @@ diagram_inrikes_flytt_alder <- function(region_vekt = "20", # Val av kommuner
   
   flytt_df <- hamta_bef_flyttningar_region_alder_kon_scb(region_vekt = region_vekt,
                                                          cont_klartext = c("Inrikes flyttningsöverskott", "Invandringsöverskott"),
-                                                         kon_klartext = c("Kvinnor", "Män"),
+                                                         kon_klartext = NA,
                                                          tid_koder = tid ,
                                                          alder_koder = "*") %>%
     filter(ålder != "totalt ålder") %>% 
