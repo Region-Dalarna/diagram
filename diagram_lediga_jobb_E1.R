@@ -14,7 +14,7 @@ diagram_lediga_jobb_tid_sektor_E1 <- function(region_vekt = "20",			# Val av reg
   p_load(here,
          tidyverse,
          glue)
-  
+    
   #source(here("Skript","hamta_lediga_jobb_region_sektor_tid_RegionIndE1K_RegionIndE1KN_scb.R"), encoding="UTF-8")
   source("https://raw.githubusercontent.com/Region-Dalarna/hamta_data/main/hamta_lediga_jobb_region_sektor_tid_RegionIndE1K_RegionIndE1KN_scb.R")
   source("https://raw.githubusercontent.com/Region-Dalarna/funktioner/main/func_SkapaDiagram.R", encoding = "utf-8")
