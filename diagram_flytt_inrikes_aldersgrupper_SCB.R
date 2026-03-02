@@ -7,6 +7,7 @@ diagram_inrikes_flytt_alder <- function(region_vekt = "20", # Val av kommuner
                                         diag_flyttnetto_alder = TRUE, # Skapa diagram för flyttnetto
                                         diag_alder_fokus = TRUE, # Skapa diagram för flyttnetto uppdelat
                                         diag_facet = FALSE, # Skall diagrammet göras med facet eller ej
+                                        visa_etiketter = TRUE, # Visa dataetiketter i diagrammet (funkar bara om facet är false)
                                         alder_grupp = c(20, 30, 40, 50, 60), # Vilka åldersgrupper skall användas. Välj enligt principen upp till första, sedan intervall mellan och sedan från sista
                                         alder_grupp_fokus = "20-29 år", # Vilken åldersgrupp skall fokuseras i diag_alder_fokus. Måste finnas bland grupperna ovan
                                         demo = FALSE, # sätts till TRUE om man bara vill se ett exempel på diagrammet i webbläsaren och inget annat
@@ -22,6 +23,7 @@ diagram_inrikes_flytt_alder <- function(region_vekt = "20", # Val av kommuner
   # Skapad: 2024-04-24
   # Uppdatering: Ändrat så att det går att gruppera på namn. 
   # Ändrat så att det blir NA på kön snarare än uppdelat och sedan summering. Detta var inget problem tidigare, men CKM gör att summan av delarna inte alltid överensstämmer med totalen Jon 2026-02-26
+  # Lagt till möjligheten att ta bort dataetiketterna över staplarna /Jon 2026-03-02
   # ===========================================================================================================
   
   # om parametern demo är satt till TRUE så öppnas en flik i webbläsaren med ett exempel på hur diagrammet ser ut och därefter avslutas funktionen
@@ -117,7 +119,7 @@ diagram_inrikes_flytt_alder <- function(region_vekt = "20", # Val av kommuner
                                    facet_legend_bottom = TRUE,
                                    facet_x_axis_storlek = 6,
                                    legend_vand = FALSE,
-                                   dataetiketter = ifelse(diag_facet==TRUE,FALSE,TRUE),
+                                   dataetiketter = ifelse(diag_facet==TRUE,FALSE,visa_etiketter),
                                    manual_color = vald_farg,
                                    output_mapp = output_mapp_figur,
                                    skriv_till_diagramfil = spara_figur,
