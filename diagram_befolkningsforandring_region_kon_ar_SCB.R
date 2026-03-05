@@ -29,7 +29,7 @@ diagram_befolkningsforandring_ar <- function(region_vekt = "20", # Val av kommun
   source("https://raw.githubusercontent.com/Region-Dalarna/funktioner/main/func_API.R")
   
   source("https://raw.githubusercontent.com/Region-Dalarna/hamta_data/main/hamta_bef_folkmangd_alder_kon_ar_scb.R")
-  source("https://raw.githubusercontent.com/Region-Dalarna/hamta_data/refs/heads/main/hamta_bef_folkmangd_alder_kon_ar_civilstand_scb_CKM_2025.R")
+  #source("https://raw.githubusercontent.com/Region-Dalarna/hamta_data/refs/heads/main/hamta_bef_folkmangd_alder_kon_ar_civilstand_scb_CKM_2025.R")
   diagram_capt <- "Källa: SCB:s öppna statistikdatabas, bearbetning av Samhällsanalys, Region Dalarna."
   
   gg_list <- list()
