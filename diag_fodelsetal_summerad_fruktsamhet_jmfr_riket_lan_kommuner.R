@@ -1,10 +1,10 @@
-
-
 diag_fodelsetal_summerad_fruktsamhet_jmfr_riket_lan_kommuner <- function(
     region_vekt = "20",
     output_fold = NA,
     diag_fargvekt = NA,
     visa_dataetiketter = FALSE,
+    visa_var_xte_etikett = NA,
+    ta_bort_nast_sista_etikett = FALSE,
     skriv_diagramfil = TRUE
   ){
   if (!require("pacman")) install.packages("pacman")
@@ -76,6 +76,8 @@ diag_fodelsetal_summerad_fruktsamhet_jmfr_riket_lan_kommuner <- function(
                                stodlinjer_avrunda_fem = TRUE,
                                filnamn_diagram = diagramfil,
                                dataetiketter = visa_dataetiketter,
+                               x_axis_visa_var_xe_etikett = visa_var_xte_etikett,
+                               x_axis_var_xe_etikett_ta_bort_nast_sista_vardet = ta_bort_nast_sista_etikett,
                                manual_y_axis_title = "Summerad fruktsamhet (antal födda barn per kvinna)",
                                manual_x_axis_text_vjust = 1,
                                manual_x_axis_text_hjust = 1,
