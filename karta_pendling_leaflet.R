@@ -271,10 +271,9 @@ karta_arbetspendling <- function(
     zoom_niva <- calculate_zoom_level(avstand_zoom)
     
     # =================================== skapa själva leaflet-kartan =======================================
+    kom_point_utanfor <- kom_point %>% filter(!lanskod_tx %in% (str_sub(karta_kommunkod, 1, 2)))
     
-    #Nu kan du använda 'calculated_weights' i din Leaflet-karta
     leaflet_map <- leaflet::leaflet() %>%
-      #addProviderTiles("CartoDB.DarkMatter") %>%
       addProviderTiles("CartoDB.PositronNoLabels") %>%
       leaflet::addPolygons(data = lanets_kommuner_gis,
                            color = "white", weight = 0.5,
@@ -287,15 +286,27 @@ karta_arbetspendling <- function(
       leaflet::addPolygons(data = kommuner_gis %>% filter(!lanskod_tx %in% (str_sub(karta_kommunkod, 1, 2))),                                               # samtliga 290 kommuner
                            color = "darkgrey", fillOpacity = 0,
                            fillColor = "darkgrey", weight = 0.3,
-                           opacity = 0.2) %>%
-      leaflet::addLabelOnlyMarkers(data = kom_point %>% filter(!lanskod_tx %in% (str_sub(karta_kommunkod, 1, 2))),
-                                   label = ~knnamn,
-                                   labelOptions = leaflet::labelOptions(noHide = TRUE, direction = 'top',
-                                                                        textOnly = TRUE,
-                                                                        style = list("color" = "darkgrey",
-                                                                                     "opacity" = "0.2"))) %>%
+                           opacity = 0.2)
+      
+    if (nrow(kom_point_utanfor) > 0) {
+      leaflet_map <- leaflet_map %>%
+        leaflet::addLabelOnlyMarkers(
+          data = kom_point_utanfor,
+          label = ~as.character(knnamn),
+          labelOptions = leaflet::labelOptions(noHide = TRUE, direction = 'top',
+                                               textOnly = TRUE,
+                                               style = list("color" = "darkgrey",
+                                                            "opacity" = "0.2")))
+    }
+      # leaflet::addLabelOnlyMarkers(data = kom_point %>% filter(!lanskod_tx %in% (str_sub(karta_kommunkod, 1, 2))),
+      #                              label = ~ as.character(knnamn),
+      #                              labelOptions = leaflet::labelOptions(noHide = TRUE, direction = 'top',
+      #                                                                   textOnly = TRUE,
+      #                                                                   style = list("color" = "darkgrey",
+      #                                                                                "opacity" = "0.2"))) %>%
+    leaflet_map <- leaflet_map %>%
       leaflet::addLabelOnlyMarkers(data = lanets_kommuner_centroid,
-                                   label = ~knnamn,
+                                   label = ~ as.character(knnamn),
                                    labelOptions = leaflet::labelOptions(noHide = TRUE, direction = 'top',
                                                                         textOnly = TRUE,
                                                                         style = list("color" = "#777777",
@@ -308,6 +319,7 @@ karta_arbetspendling <- function(
       addControl(html = as.character(legend_html), position = "bottomright", className = "fieldset {border: 0;}")  %>%
       addControl(html = as.character(attribution_html), position = "bottomleft", className = "fieldset {border: 0;}")
     
+
     # har inte fått detta att fungera - tanken är att denna kod tillsammans med refererade css-fil nedan ska flytta ner legenden mot nederkant
     leaflet_map <- htmltools::attachDependencies(leaflet_map, htmltools::htmlDependency(
       name = "custom-leaflet-style",
@@ -321,7 +333,7 @@ karta_arbetspendling <- function(
       mapshot(leaflet_map, paste0(output_mapp, tolower(skickad_pendlingstyp), "_leaflet_", kommunnamn, "_ar_", unique(giskarta_vald_kommun$år), ".html"))
   } # slut funktion för att skapa karta
   
-  kombinationer <- expand.grid(vald_kommun_kod, vald_pendlingstyp)
+  kombinationer <- expand.grid(vald_kommun_kod, vald_pendlingstyp, stringsAsFactors = FALSE)
   pwalk(kombinationer, ~ skapa_karta(..1, ..2))
   
 } # slut funktion
