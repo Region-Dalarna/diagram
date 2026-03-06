@@ -15,8 +15,9 @@ diagram_inr_utr_flytt <- function(region_vekt = "20", # Val av kommuner
   # Diagram för inrikes och utrikes flyttar. Vid flera regioner går det att välja mellan enskilda diagram eller facet
   # Skapad: 2024-04-24
   # Förbättringsmöjligheter: Går för tillfället inte att summera  flera regioner
-  # 
-  # Pga CKM så blir det lite felaktigt i det andra skriptet (för flyttnetto summeras inrikes och utrikes flyttar, snarare än man väljer variabeln Flyttningsöverskott)
+  # Pga ändring nedan sparas ett extra ggplot (två för flyttnetto med lite olika namn). Jag ville inte ändra namnet på flyttnetto då detta skript kanske används av andra 
+  # Förbättringsmöjlighet: Ändra så att tre objekt skapas, Flyttnetto respektive inrikes och utrikes flyttningar (med dessa namn)
+  # Pga CKM så blir det lite felaktigt när man summerar inrikes och utrikes flyttningar, snarare än man väljer variabeln Flyttningsöverskott. Detta har justerats i skriptet Jon 6/3-2026
   # ===========================================================================================================
   
   if (!require("pacman")) install.packages("pacman")
