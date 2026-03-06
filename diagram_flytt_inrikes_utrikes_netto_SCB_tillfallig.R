@@ -15,8 +15,11 @@ diagram_inr_utr_flytt <- function(region_vekt = "20", # Val av kommuner
   # Diagram för inrikes och utrikes flyttar. Vid flera regioner går det att välja mellan enskilda diagram eller facet
   # Skapad: 2024-04-24
   # Förbättringsmöjligheter: Går för tillfället inte att summera  flera regioner
-  # Tillfällig version av skriptet diagram_flytt_inrikes_utrikes_netto_SCB. Detta dä jag inte hade tid att fixa en bättre version just nu. Jon/2026-03-02
-  # Pga CKM så blir det lite felaktigt i det andra skriptet (för flyttnetto summeras inrikes och utrikes flyttar, snarare än man väljer variabeln Flyttningsöverskott)
+  # För tillfället sparas en önödig figur flyttningsöverskott. Denna är samma som flyttnetto. Kom av att jag tidigare summerade
+  # inrikes och utrikes till en total, men har gått ifrån detta nedan. Sparade flyttnetto eftersom jag inte ville ändra namnet (då den eventuellt används i andra skript) 
+  #
+  # Pga CKM så blir det lite felaktigt när flyttnetto summeras som inrikes och utrikes flyttar, snarare än man väljer variabeln Flyttningsöverskott). Detta har justerats i skriptet.
+  # 
   # ===========================================================================================================
   
   if (!require("pacman")) install.packages("pacman")
