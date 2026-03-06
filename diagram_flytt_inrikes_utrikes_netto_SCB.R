@@ -15,17 +15,24 @@ diagram_inr_utr_flytt <- function(region_vekt = "20", # Val av kommuner
   # Diagram för inrikes och utrikes flyttar. Vid flera regioner går det att välja mellan enskilda diagram eller facet
   # Skapad: 2024-04-24
   # Förbättringsmöjligheter: Går för tillfället inte att summera  flera regioner
+  # 
+  # Pga CKM så blir det lite felaktigt i det andra skriptet (för flyttnetto summeras inrikes och utrikes flyttar, snarare än man väljer variabeln Flyttningsöverskott)
   # ===========================================================================================================
   
+  if (!require("pacman")) install.packages("pacman")
+  p_load(tidyverse,scales)
+  
+  source("https://raw.githubusercontent.com/Region-Dalarna/funktioner/main/func_SkapaDiagram.R")
+  source("https://raw.githubusercontent.com/Region-Dalarna/funktioner/main/func_API.R")
   # om parametern demo är satt till TRUE så öppnas en flik i webbläsaren med ett exempel på hur diagrammet ser ut och därefter avslutas funktionen
   # demofilen måste läggas upp på 
   if (demo){
     # om diagramskriptet skriver ut flera diagram läggs länkarna som vektor i demo_url nedan
     demo_url <- 
-        c("https://region-dalarna.github.io/utskrivna_diagram/Flyttnetto_Dalarna.png",
-          "https://region-dalarna.github.io/utskrivna_diagram/Inrikes%20flyttningsöverskott_Dalarna.png",
-          "https://region-dalarna.github.io/utskrivna_diagram/invandringsöverskott_Dalarna.png")
-          
+      c("https://region-dalarna.github.io/utskrivna_diagram/Flyttnetto_Dalarna.png",
+        "https://region-dalarna.github.io/utskrivna_diagram/Inrikes%20flyttningsöverskott_Dalarna.png",
+        "https://region-dalarna.github.io/utskrivna_diagram/invandringsöverskott_Dalarna.png")
+    
     walk(demo_url, ~browseURL(.x))
     if (length(demo_url) > 1) cat(paste0(length(demo_url), " diagram har öppnats i webbläsaren."))
     stop_tyst()
@@ -39,6 +46,7 @@ diagram_inr_utr_flytt <- function(region_vekt = "20", # Val av kommuner
       stop("Ingen output-mapp angiven, kör funktionen igen och ge parametern output-mapp ett värde.")
     }
   }
+  
   
   # om ingen färgvektor är medskickad, kolla om funktionen diagramfärger finns, annars använd r:s defaultfärger
   if (all(is.na(vald_farg))) {
@@ -54,11 +62,6 @@ diagram_inr_utr_flytt <- function(region_vekt = "20", # Val av kommuner
     stop("Region 00 (Riket) saknar inrikes flyttnetto och kan inte användas.\nÄndra region_vekt eller sätt diag_uppdelat = FALSE")
   }
   
-  if (!require("pacman")) install.packages("pacman")
-  p_load(tidyverse)
-  
-  source("https://raw.githubusercontent.com/Region-Dalarna/funktioner/main/func_SkapaDiagram.R")
-  source("https://raw.githubusercontent.com/Region-Dalarna/funktioner/main/func_API.R")
   
   source("https://raw.githubusercontent.com/Region-Dalarna/hamta_data/main/hamta_bef_flyttningar_region_alder_kon_scb.R")
   diagram_capt <- "Källa: SCB:s öppna statistikdatabas, bearbetning av Samhällsanalys, Region Dalarna."
@@ -69,7 +72,7 @@ diagram_inr_utr_flytt <- function(region_vekt = "20", # Val av kommuner
   objektnamn <- c()
   
   flytt_df <- hamta_bef_flyttningar_region_alder_kon_scb(region_vekt = region_vekt,
-                                                         cont_klartext = c("Inrikes flyttningsöverskott", "Invandringsöverskott"),
+                                                         cont_klartext = c("Inrikes flyttningsöverskott", "Invandringsöverskott","Flyttningsöverskott"),
                                                          kon_klartext = c("Kvinnor", "Män"),
                                                          tid_koder = tid)
   
@@ -83,18 +86,20 @@ diagram_inr_utr_flytt <- function(region_vekt = "20", # Val av kommuner
     
     if(diag_flyttnetto == TRUE){
       
+      df_tot_flytt <- df %>% filter(variabel == "Flyttningsöverskott")
+      
       if(diag_facet == FALSE){
-        diff <- max(df$varde) - min(df$varde) # ta reda på skillnaden mellan det högsta och lägsta värdet i datasetet
+        diff <- max(df_tot_flytt$varde) - min(df_tot_flytt$varde) # ta reda på skillnaden mellan det högsta och lägsta värdet i datasetet
         totalvarden_linjebredd <- 0.002*diff      # gör en linjetjocklek på totallinjerna som är 0,2 % av diff (på raden ovan)
         total_list <- list()
-        unika_ar <- unique(df$år)
+        unika_ar <- unique(df_tot_flytt$år)
         vald_regionkod = vald_region
         unika_reg <- unique(vald_regionkod)
         unika_reg_txt <- hamtaregion_kod_namn(unika_reg)$region %>% skapa_kortnamn_lan()
         
         for (reg in 1:length(unika_reg)) { 
           for (ar in 1:length(unika_ar)){
-            arsvarde <- df %>% 
+            arsvarde <- df_tot_flytt %>% 
               filter(år == unika_ar[ar],
                      regionkod == unika_reg[reg]) %>% 
               group_by(år,regionkod) %>% 
@@ -121,7 +126,7 @@ diagram_inr_utr_flytt <- function(region_vekt = "20", # Val av kommuner
       diagramfil <- paste0("Flyttnetto_", reg_txt, ".png")
       #objektnamn <- c(objektnamn,diagramfil %>% str_remove(".png"))
       
-      gg_obj <- SkapaStapelDiagram(skickad_df = df, 
+      gg_obj <- SkapaStapelDiagram(skickad_df = df_tot_flytt , 
                                    skickad_x_var = "år", 
                                    skickad_y_var = "varde",
                                    skickad_x_grupp = "kön",
@@ -208,7 +213,7 @@ diagram_inr_utr_flytt <- function(region_vekt = "20", # Val av kommuner
         return(gg_list_uppdelat)
         
       }
-
+      
       diag_uppdelning <- map(unique(df$variabel), ~ skapa_diagram_uppdelat(df , .x)) %>% purrr::flatten()
       gg_list <- c(gg_list, diag_uppdelning)
     }
