@@ -17,6 +17,7 @@ diagram_inflyttlan_utflyttlan <- function(output_mapp_figur= "G:/skript/jon/Figu
   # Stapeldiagram för inflyttningslan respektive utflyttningslan (i antal).Går att få för senaste år (1 diagram) eller över tid (flera diagram eller facet).
   # Skapad: 2024-06-25 av Jon
   # SCB har ändrat namn på variabel inrikes omflyttning mellan län till antal. Jag ändrar tillbaka med en mutate/Jon
+  # Har justerat skriptet så att det tar hänsyn till CKM (tagit bort två variabler total in/utflytt vid datahämtning) Jon 2026-04-08
   # ===========================================================================================================
   
   # om parametern demo är satt till TRUE så öppnas en flik i webbläsaren med ett exempel på hur diagrammet ser ut och därefter avslutas funktionen
@@ -56,7 +57,9 @@ diagram_inflyttlan_utflyttlan <- function(output_mapp_figur= "G:/skript/jon/Figu
                                                                          cont_klartext = "*",
                                                                          tid_koder = tid,
                                                                          returnera_df = TRUE) %>% 
-    mutate(`Inrikes omflyttning mellan län `= Antal)
+    mutate(`Inrikes omflyttning mellan län `= Antal) %>% 
+    filter(Inflyttningslän != "Totalt, samtliga inflyttningslän",
+           Utflyttningslän != "Samtliga utflyttningslän")
   
   # Byter dåliga namn på regioner till bättre
   inflytt_utflytt_df <- inflytt_utflytt_df %>%
