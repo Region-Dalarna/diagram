@@ -19,6 +19,7 @@ diag_utbniva_inr_utr_fodda_kon_lan <- function(
   # Diagram som visar utbildningsnivå bland inrikes och utrikes födda samt även kön. Tre utbildningsnivåer.
   # Skapat 17 okt 2024 av Peter.
   #
+  # Ändrat variabel till bakgrundsvariabel på rad 66. / Jon 2026-04-14
   # ======================================================================================================
   
   
@@ -62,7 +63,7 @@ diag_utbniva_inr_utr_fodda_kon_lan <- function(
   			excel_filnamn = "integration.xlsx",			# filnamn för excelfil som exporteras om excel_filnamn och output_mapp anges
   			returnera_df = TRUE			# TRUE om man vill ha en dataframe i retur från funktionen
   ) %>% 
-    rename(utbildning = variabel) %>% 
+    rename(utbildning = bakgrundsvariabel) %>% 
     mutate(utbildning = utbildning %>% str_remove("andel med ") %>% str_remove(", procent"),
            utbildning = factor(utbildning, levels = c("förgymnasial utbildning", "gymnasial utbildning", "eftergymnasial utbildning")))
   
