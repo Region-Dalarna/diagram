@@ -11,6 +11,7 @@ diag_ekonomiska_prognoser_olika_progn_institut_ki <- function(vald_variabel = "B
   # GG-list skapades inte. Lagt till nedan Jon 2025-10-06
   # Har dessutom lagt till så att man kan ändra diverse parametrar i figuren
   # Gjort så att prognosinstitut sorteras efter kortaste namn (hamnar utanför figuren annars)
+  # Ändrat felaktighet som gjorde att ett namn blev NA. Jon 2026-05-18
   
   if (!require("pacman")) install.packages("pacman")
   p_load(tidyverse)
@@ -29,6 +30,9 @@ diag_ekonomiska_prognoser_olika_progn_institut_ki <- function(vald_variabel = "B
   prognoser_df <- hamta_ek_prognoser_fran_prognosinstitut_ki(prognos_ar = valda_prognos_ar %>% as.character(),
                                                              bara_senaste_prognos = endast_mest_aktuell_prognos)
   
+  # För vissa insitut (ESV) saknas utskrivet namn. Ändrar här så att namnet då sätts till förkortningen (annars blir det NA) Jon 2026-05-18
+  prognoser_df <- prognoser_df %>% 
+    mutate(Prognosinstitut = ifelse(is.na(Prognosinstitut), inst_kod, Prognosinstitut))
   # Skapa diagram över prognoser
   
   prognoser_variabel <- prognoser_df %>% filter(variabel == vald_variabel)
