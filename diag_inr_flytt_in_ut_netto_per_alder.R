@@ -8,6 +8,8 @@ diag_inr_flytt_in_ut_netto_per_alder <- function(region_vekt = "20",
                                      output_mapp = NA,
                                      kon_klartext = NA,
                                      visa_flyttnetto_linje = TRUE,
+                                     inrikes_utflytt_till_vanster = TRUE,         # FALSE så blir utflytt till höger istället och inflytt till vänster
+                                     stodlinjer_avrunda_fem = TRUE,
                                      skriv_diagramfil = TRUE,
                                      demo = FALSE,                    # sätts till TRUE om man bara vill se ett exempel på diagrammet i webbläsaren och inget annat
                                      alder_koder = "*",
@@ -70,8 +72,13 @@ diag_inr_flytt_in_ut_netto_per_alder <- function(region_vekt = "20",
 
   chart_df <- flytt_df %>% 
     filter(ålder != "totalt ålder") %>% 
-    mutate(varde = ifelse(variabel == "Inrikes utflyttningar", varde*-1, varde),
-           alder_num = ålder %>% parse_number()) %>% 
+    mutate(
+      varde = case_when(
+        inrikes_utflytt_till_vanster & variabel == "Inrikes utflyttningar" ~ varde * -1,
+        !inrikes_utflytt_till_vanster & variabel == "Inrikes inflyttningar" ~ varde * -1,
+        TRUE ~ varde
+      ),
+      alder_num = ålder %>% parse_number()) %>% 
     arrange(alder_num) %>% 
     mutate(ålder = factor(ålder, levels = unique(ålder)))
            
@@ -79,12 +86,22 @@ diag_inr_flytt_in_ut_netto_per_alder <- function(region_vekt = "20",
     group_by(across(any_of(netto_grp_var))) %>% 
     summarise(varde = sum(varde[variabel == "Inrikes inflyttningar"]) + sum(varde[variabel == "Inrikes utflyttningar"])) %>% 
     ungroup() %>% 
-    mutate(variabel = "Netto")
+    mutate(variabel = "Netto",
+           varde = ifelse(!inrikes_utflytt_till_vanster, varde * -1, varde))
   
   total_df <- bind_rows(chart_df, netto_df) %>% 
     pivot_wider(names_from = variabel, values_from = varde) %>% 
-    mutate(`Inrikes inflyttningar` = ifelse(Netto > 0, `Inrikes inflyttningar` - Netto, `Inrikes inflyttningar`),
-           `Inrikes utflyttningar` = ifelse(Netto < 0, `Inrikes utflyttningar` - Netto, `Inrikes utflyttningar`)) %>% 
+    mutate(
+      `Inrikes inflyttningar` = case_when(
+        inrikes_utflytt_till_vanster & Netto > 0 ~ `Inrikes inflyttningar` - Netto,
+        !inrikes_utflytt_till_vanster & Netto < 0 ~ `Inrikes inflyttningar` - Netto,
+        TRUE ~ `Inrikes inflyttningar`
+      ),
+      `Inrikes utflyttningar` = case_when(
+        inrikes_utflytt_till_vanster & Netto < 0 ~ `Inrikes utflyttningar` - Netto,
+        !inrikes_utflytt_till_vanster & Netto > 0 ~ `Inrikes utflyttningar` - Netto,
+        TRUE ~ `Inrikes utflyttningar`
+      )) %>% 
     pivot_longer(cols = c(`Inrikes inflyttningar`, `Inrikes utflyttningar`, Netto), names_to = "variabel", values_to = "varde")
   
   diagram_capt <- "Källa: Befolkningsstatistik, SCB:s öppna statistikdatabas\nBearbetning av Samhällsanalys, Region Dalarna"
@@ -101,6 +118,7 @@ diag_inr_flytt_in_ut_netto_per_alder <- function(region_vekt = "20",
                                x_axis_visa_var_xe_etikett = 2,
                                diagram_liggande = TRUE,
                                geom_position_stack = TRUE,
+                               stodlinjer_avrunda_fem = stodlinjer_avrunda_fem,
                                manual_color = diagramfarger("rus_sex"),
                                manual_y_axis_title = "Antal in- och utflyttade",
                                diagram_titel = diagram_titel,

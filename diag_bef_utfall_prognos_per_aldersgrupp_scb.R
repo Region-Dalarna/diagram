@@ -11,6 +11,8 @@ diag_bef_utfall_prognos_per_aldersgrupp <- function(
     ta_med_logga = TRUE,
     logga_sokvag = NA,
     jmfr_tid = 10,                                           # hur många år framåt från befolkningsprognosen vi ska ta med
+    x_axis_visa_var_xe_etikett = 3,
+    x_axis_var_xe_etikett_ta_bort_nast_sista_vardet = TRUE,  # ta bort var x:te etikett för det näst sista värdet på x-axeln, för att undvika överlappning med sista etiketten
     returnera_dataframe_global_environment = FALSE,          
     ta_bort_diagramtitel = FALSE,                            # FALSE så skrivs ingen diagramtitel ut
     visa_dataetiketter = FALSE,
@@ -235,7 +237,8 @@ diag_bef_utfall_prognos_per_aldersgrupp <- function(
                                  facet_scale = "free",
                                  x_axis_storlek = 7,
                                  facet_x_axis_storlek = 6,
-                                 x_axis_visa_var_xe_etikett = 3,
+                                 x_axis_visa_var_xe_etikett = x_axis_visa_var_xe_etikett,
+                                 x_axis_var_xe_etikett_ta_bort_nast_sista_vardet = x_axis_var_xe_etikett_ta_bort_nast_sista_vardet, 
                                  facet_legend_bottom = TRUE
                                  #diagram_spara_annat_format = "eps"
     ) # slut skriv ggplot_objekt
