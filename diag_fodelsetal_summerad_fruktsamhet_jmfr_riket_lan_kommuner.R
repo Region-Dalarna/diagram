@@ -33,9 +33,18 @@ diag_fodelsetal_summerad_fruktsamhet_jmfr_riket_lan_kommuner <- function(
   
   # ============================ Dalarna, riket och länets kommuner ============================
   
-  if (region_vekt == "00" | is.na(region_vekt)) hamta_regioner <- hamtaAllaLan() else {
-    hamta_regioner <- hamtakommuner(str_sub(region_vekt, 1, 2) %>% unique(), T, T)
+  if (all(region_vekt == "00" | is.na(region_vekt))) {
+    hamta_regioner <- hamtaAllaLan()
+  } else {
+    lan_koder <- region_vekt[nchar(region_vekt) == 2]
+    kommun_koder <- region_vekt[nchar(region_vekt) == 4]
+    
+    hamta_regioner <- c(
+      hamtakommuner(unique(str_sub(lan_koder, 1, 2)), T, T),
+      kommun_koder
+    ) %>% unique()
   }
+  
   fodelsetal_df <- hamta_summerad_fruktsamhet_fodelsetal_scb(region_vekt = hamta_regioner) 
   
   if (all(nchar(hamta_regioner) == 2)) {
@@ -51,12 +60,12 @@ diag_fodelsetal_summerad_fruktsamhet_jmfr_riket_lan_kommuner <- function(
     fodelsetal_df <- fodelsetal_df %>%
       mutate(region = region %>% skapa_kortnamn_lan(T),
              fokus = case_when(
-               nchar(regionkod) == 4 ~ "Kommuner",
-               regionkod != "00" ~ "Län",
                regionkod == "00" ~ "Riket",
+               nchar(regionkod) == 2 | regionkod == "0980" ~ "Län",
+               nchar(regionkod) == 4 ~ "Kommuner",
                TRUE ~ "Övriga"))
-    
   }
+  
   diagram_capt <- "Källa: SCB:s öppna statistikdatabas\nBearbetning: Samhällsanalys, Region Dalarna"
   
   
