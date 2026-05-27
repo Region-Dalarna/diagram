@@ -16,7 +16,8 @@ diag_befprognos_diff_tot_per_region_scb <- function(
     dataetiketter = FALSE,
     diag_fargvekt = NA,
     output_fold = NA,
-    diagram_capt = "Källa: SCB:s befolkningsframskrivning\nBearbetning: Samhällsanalys, Region Dalarna",
+    #diagram_capt = "Källa: SCB:s befolkningsframskrivning\nBearbetning: Samhällsanalys, Region Dalarna",
+    diagram_capt = "auto", # Lagt till så att man kan välja en diagram_capt själv /Jon
     skickad_facetinst = FALSE,
     andel_istallet_for_antal = FALSE
 ) {
@@ -48,10 +49,12 @@ diag_befprognos_diff_tot_per_region_scb <- function(
     ) %>% 
     mutate(region = region %>% skapa_kortnamn_lan())
   
-  if (str_detect(befprognostabell_url, "api.scb.se")) {
-    diagram_capt <- paste0("Källa: SCB:s befolkningsframskrivning från juni år ", unique(prognos_diff_df$prognos_ar), "\nBearbetning: Samhällsanalys, Region Dalarna")
-  } else if (befprognostabell_url == "G:/Samhällsanalys/Statistik/Befolkningsprognoser/Profet/datafiler/") {
-    diagram_capt <- "Källa: Region Dalarnas egna befolkningsprognos, bearbetning av Samhällsanalys, Region Dalarna\nPrognosen för Ludvika kommun baseras på ett scenario som i allt väsentligt liknar den som Ludvika kommun\nsjälva tagit fram i deras scenario med medelstark tillväxt."
+  if (diagram_capt == "auto") {
+    if (str_detect(befprognostabell_url, "api.scb.se")) {
+      diagram_capt <- paste0("Källa: SCB:s befolkningsframskrivning från juni år ", unique(prognos_diff_df$prognos_ar), "\nBearbetning: Samhällsanalys, Region Dalarna")
+    } else if (befprognostabell_url == "G:/Samhällsanalys/Statistik/Befolkningsprognoser/Profet/datafiler/") {
+      diagram_capt <- "Källa: Region Dalarnas egna befolkningsprognos, bearbetning av Samhällsanalys, Region Dalarna\nPrognosen för Ludvika kommun baseras på ett scenario som i allt väsentligt liknar den som Ludvika kommun\nsjälva tagit fram i deras scenario med medelstark tillväxt."
+    }
   }
   
   y_lbl_axel <- "förändring antal invånare"
