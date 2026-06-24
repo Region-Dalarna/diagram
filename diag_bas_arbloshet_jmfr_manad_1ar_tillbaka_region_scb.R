@@ -4,12 +4,14 @@ diag_bas_arbloshet_manad_jmfr_1ar_tillbaka_scb <- function(
     output_mapp = "G:/Samhällsanalys/API/Fran_R/Utskrift/",
     tid_koder = "9999",
     dela_upp_utrikes = TRUE, # Sätts till FALSE om man vill ha förändring i arbetslöshet totalt, dvs. inte uppdelat på inrikes/utrikes-födda
+    returnera_data = FALSE, # Sätts till TRUE om man vill returnera data till R-studios global environment
     jamfor_antal_manader_bakat = 12,
     visa_dataetiketter = FALSE,
     demo = FALSE             # sätts till TRUE om man bara vill se ett exempel på diagrammet i webbläsaren och inget annat
     ) {
   
 # Ändrat så att man även kan jämföra förändring i arbetslöshet totalt, dvs. inte uppdelat på utrikes/inrikes födda Jon 2026-06-24
+# Det går dessutom att returnera data till global environment
     
 # om parametern demo är satt till TRUE så öppnas en flik i webbläsaren med ett exempel på hur diagrammet ser ut och därefter avslutas funktionen
 # demofilen måste läggas upp på webben för att kunna öppnas, vi lägger den på Region Dalarnas github-repo som heter utskrivna_diagram
@@ -63,6 +65,11 @@ c("https://region-dalarna.github.io/utskrivna_diagram/bas_arbloshet_jmfr_Sverige
     select(-c(år, månad, månad_år, år_månad)) %>% 
     pivot_wider(names_from = tid, values_from = arbetslöshet) %>% 
     mutate(diff = .[[manad_nu]] - .[[manad_da]]) 
+  
+  # Returnerar data till R global environment
+  if(returnera_data == TRUE){
+    assign("forandring_arbetsloshet_df", chart_df, envir = .GlobalEnv)
+  }
   
   # om regioner är alla kommuner i ett län eller alla län i Sverige görs revidering, annars inte
   region_start <- unique(bas_syss_df$region) %>% skapa_kortnamn_lan() %>% list_komma_och()
