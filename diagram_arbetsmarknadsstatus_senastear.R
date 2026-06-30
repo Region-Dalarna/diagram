@@ -60,7 +60,7 @@ diagram_arbetsmarknadsstatus <-function(region_vekt = hamtakommuner("20"), # Anv
   #   select(-månad)
   
   # Länk till tabell: https://www.statistikdatabasen.scb.se/pxweb/sv/ssd/START__AM__AM0210__AM0210A/ArbStatusM/
-  arbetsmarknadsstatus_df_2 <- pxweb2_hamta_data(
+  arbetsmarknadsstatus_df <- pxweb2_hamta_data(
     tabell = "TAB6260",
     query = list(
       Region = region_vekt,
