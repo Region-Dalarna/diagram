@@ -20,13 +20,17 @@ diagram_arbetsmarknadsstatus_tidsserie <-function(region_vekt = "20", # Max 1 re
   # Går att skapa facet-diagram för inrikes/utrikes födda.
   # Skapad av Jon Frank (2024-04-18) - 
   # Potentiell förbättring: Facet-diagram blir i samma skala av någon oklar anledning (har testat både fixed och free).
+  #
+  #
+  # Uppdaterat och lagt till datahämtning via PXweb 2. Jon 2026-06-30
   # =================================================================================================================
   if (!require("pacman")) install.packages("pacman")
   p_load(openxlsx)
   
   source("https://raw.githubusercontent.com/Region-Dalarna/funktioner/main/func_API.R")
   source("https://raw.githubusercontent.com/Region-Dalarna/funktioner/main/func_SkapaDiagram.R")
-  source("https://raw.githubusercontent.com/Region-Dalarna/hamta_data/main/hamta_bas_arbstatus_region_kon_alder_fodelseregion_prel_manad_ArbStatusM_scb.R")
+  #source("https://raw.githubusercontent.com/Region-Dalarna/hamta_data/main/hamta_bas_arbstatus_region_kon_alder_fodelseregion_prel_manad_ArbStatusM_scb.R")
+  source("https://raw.githubusercontent.com/Region-Dalarna/funktioner/main/func_pxweb2.R")
   
   gg_list <- list()  # skapa en tom lista att lägga flera ggplot-objekt i (om man skapar flera diagram)
   objektnamn <- c()
@@ -37,13 +41,34 @@ diagram_arbetsmarknadsstatus_tidsserie <-function(region_vekt = "20", # Max 1 re
       fodelseregion = fodelseregion_klartext
     }
 
-  arbetsmarknadsstatus_df = hamta_bas_arbstatus_region_kon_alder_fodelseregion_prel_manad_scb(region_vekt = region_vekt,
-                                                                                              alder_klartext = alder_klartext,
-                                                                                              kon_klartext = "totalt",
-                                                                                              fodelseregion_klartext = fodelseregion,
-                                                                                              cont_klartext = "arbetslöshet",
-                                                                                              wide_om_en_contvar = FALSE,
-                                                                                              tid_koder = "*")  %>% 
+  # Äldre version av pxweb
+  # arbetsmarknadsstatus_df = hamta_bas_arbstatus_region_kon_alder_fodelseregion_prel_manad_scb(region_vekt = region_vekt,
+  #                                                                                             alder_klartext = alder_klartext,
+  #                                                                                             kon_klartext = "totalt",
+  #                                                                                             fodelseregion_klartext = fodelseregion,
+  #                                                                                             cont_klartext = "arbetslöshet",
+  #                                                                                             wide_om_en_contvar = FALSE,
+  #                                                                                             tid_koder = "*")  %>% 
+  #   mutate(ar=substr(månad,1,4),
+  #          manad_long=format(as.Date(paste(ar, str_sub(månad, 6,7),"1", sep = "-")), "%B"),
+  #          Period=paste(ar, str_sub(månad, 6,7),sep = "-")) %>% 
+  #   select(-månad) %>% 
+  #     filter(ar>=start_ar) 
+  
+  # Länk till tabell: https://www.statistikdatabasen.scb.se/pxweb/sv/ssd/START__AM__AM0210__AM0210A/ArbStatusM/
+  arbetsmarknadsstatus_df <- pxweb2_hamta_data(
+    tabell = "TAB6260",
+    query = list(
+      Region = region_vekt,
+      Kon = "totalt",
+      Alder = alder_klartext,
+      Fodelseregion = fodelseregion_klartext,
+      ContentsCode = "arbetslöshet",
+      Tid = "*"
+    )) %>% 
+    rename(varde = value,
+           regionkod = region_kod,
+           variabel = tabellinnehåll) %>% 
     mutate(ar=substr(månad,1,4),
            manad_long=format(as.Date(paste(ar, str_sub(månad, 6,7),"1", sep = "-")), "%B"),
            Period=paste(ar, str_sub(månad, 6,7),sep = "-")) %>% 
