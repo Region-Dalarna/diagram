@@ -47,17 +47,17 @@ diagram_arbetsmarknadsstatus <-function(region_vekt = hamtakommuner("20"), # Anv
   if(diag_arbetskraftsdeltagande==TRUE) variabel <- c(variabel,"arbetskraftsdeltagande")
   
   # Tidigare version av PXweb
-  arbetsmarknadsstatus_df = hamta_bas_arbstatus_region_kon_alder_fodelseregion_prel_manad_scb(region_vekt = region_vekt,
-                                                                                              kon_klartext = kon_klartext,
-                                                                                              alder_klartext = alder_klartext,
-                                                                                              fodelseregion_klartext = fodelseregion_klartext_vekt,
-                                                                                              cont_klartext = variabel,
-                                                                                              wide_om_en_contvar = FALSE,
-                                                                                              tid_koder = "9999")  %>%
-    mutate(ar=substr(månad,1,4),
-           manad_long=format(as.Date(paste(ar, str_sub(månad, 6,7),"1", sep = "-")), "%B"),
-           Period=paste(ar, str_sub(månad, 6,7),sep = "-")) %>%
-    select(-månad)
+  # arbetsmarknadsstatus_df = hamta_bas_arbstatus_region_kon_alder_fodelseregion_prel_manad_scb(region_vekt = region_vekt,
+  #                                                                                             kon_klartext = kon_klartext,
+  #                                                                                             alder_klartext = alder_klartext,
+  #                                                                                             fodelseregion_klartext = fodelseregion_klartext_vekt,
+  #                                                                                             cont_klartext = variabel,
+  #                                                                                             wide_om_en_contvar = FALSE,
+  #                                                                                             tid_koder = "9999")  %>%
+  #   mutate(ar=substr(månad,1,4),
+  #          manad_long=format(as.Date(paste(ar, str_sub(månad, 6,7),"1", sep = "-")), "%B"),
+  #          Period=paste(ar, str_sub(månad, 6,7),sep = "-")) %>%
+  #   select(-månad)
   
   # Länk till tabell: https://www.statistikdatabasen.scb.se/pxweb/sv/ssd/START__AM__AM0210__AM0210A/ArbStatusM/
   arbetsmarknadsstatus_df_2 <- pxweb2_hamta_data(
