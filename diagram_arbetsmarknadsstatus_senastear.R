@@ -25,13 +25,16 @@ diagram_arbetsmarknadsstatus <-function(region_vekt = hamtakommuner("20"), # Anv
   # Senast uppdaterad av Jon Frank (2024-04-18) - Ändrat så att hämta data görs från skript på Mona. Lagt till så att data bara hämtas för figur som skall plockas ut
   # Uppdatering 2024-11-04 Lagt till parametrar som gör att man kan köra utan titel och caption 
   #Potentiell förbättring: Ändra så att man kan köra för utrikes/inrikes separat. Funkar nu, men diagramtitel hänger inte med.
+  #
+  # Uppdaterat och lagt till datahämtning via PXweb 2. Jon 2026-06-30
   # =================================================================================================================
   if (!require("pacman")) install.packages("pacman")
   p_load(openxlsx)
   
   source("https://raw.githubusercontent.com/Region-Dalarna/funktioner/main/func_API.R")
   source("https://raw.githubusercontent.com/Region-Dalarna/funktioner/main/func_SkapaDiagram.R")
-  source("https://raw.githubusercontent.com/Region-Dalarna/hamta_data/main/hamta_bas_arbstatus_region_kon_alder_fodelseregion_prel_manad_ArbStatusM_scb.R")
+  #source("https://raw.githubusercontent.com/Region-Dalarna/hamta_data/main/hamta_bas_arbstatus_region_kon_alder_fodelseregion_prel_manad_ArbStatusM_scb.R")
+  source("https://raw.githubusercontent.com/Region-Dalarna/funktioner/main/func_pxweb2.R")
   
   gg_list <- list()  # skapa en tom lista att lägga flera ggplot-objekt i (om man skapar flera diagram)
   objektnamn <- c()
@@ -43,18 +46,36 @@ diagram_arbetsmarknadsstatus <-function(region_vekt = hamtakommuner("20"), # Anv
   if(diag_arbetslosthet==TRUE) variabel <- c(variabel,"arbetslöshet")
   if(diag_arbetskraftsdeltagande==TRUE) variabel <- c(variabel,"arbetskraftsdeltagande")
   
+  # Tidigare version av PXweb
+  # arbetsmarknadsstatus_df = hamta_bas_arbstatus_region_kon_alder_fodelseregion_prel_manad_scb(region_vekt = region_vekt,
+  #                                                                                             kon_klartext = kon_klartext,
+  #                                                                                             alder_klartext = alder_klartext,
+  #                                                                                             fodelseregion_klartext = fodelseregion_klartext_vekt,
+  #                                                                                             cont_klartext = variabel,
+  #                                                                                             wide_om_en_contvar = FALSE,
+  #                                                                                             tid_koder = "9999")  %>% 
+  #   mutate(ar=substr(månad,1,4),
+  #          manad_long=format(as.Date(paste(ar, str_sub(månad, 6,7),"1", sep = "-")), "%B"),
+  #          Period=paste(ar, str_sub(månad, 6,7),sep = "-")) %>% 
+  #   select(-månad) 
   
-  arbetsmarknadsstatus_df = hamta_bas_arbstatus_region_kon_alder_fodelseregion_prel_manad_scb(region_vekt = region_vekt,
-                                                                                              kon_klartext = kon_klartext,
-                                                                                              alder_klartext = alder_klartext,
-                                                                                              fodelseregion_klartext = fodelseregion_klartext_vekt,
-                                                                                              cont_klartext = variabel,
-                                                                                              wide_om_en_contvar = FALSE,
-                                                                                              tid_koder = "9999")  %>% 
-    mutate(ar=substr(månad,1,4),
-           manad_long=format(as.Date(paste(ar, str_sub(månad, 6,7),"1", sep = "-")), "%B"),
-           Period=paste(ar, str_sub(månad, 6,7),sep = "-")) %>% 
-    select(-månad) 
+  # Länk till tabell: https://www.statistikdatabasen.scb.se/pxweb/sv/ssd/START__BO__BO0101__BO0101C/LagenhetNyKv16/
+  arbetsmarknadsstatus_df <- pxweb2_hamta_data(
+    tabell = "TAB6260",
+    query = list(
+      Region = region_vekt,
+      Kon = kon_klartext,
+      Alder = alder_klartext,
+      Fodelseregion = fodelseregion_klartext_vekt,
+      ContentsCode = variabel,
+      Tid = "9999"
+    )) %>% 
+    rename(varde = value,
+           regionkod = region_kod) %>% 
+      mutate(ar=substr(månad,1,4),
+             manad_long=format(as.Date(paste(ar, str_sub(månad, 6,7),"1", sep = "-")), "%B"),
+             Period=paste(ar, str_sub(månad, 6,7),sep = "-")) %>% 
+        select(-månad) 
   
   
   # Län att fokusera på
