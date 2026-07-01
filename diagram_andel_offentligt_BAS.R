@@ -53,7 +53,7 @@ diagram_andel_offentligt <- function(region_vekt = hamtakommuner("20",tamedlan =
     #                                                                             returnera_df = TRUE,
     #                                                                             tid = "9999")
     
-    df_2 <- pxweb2_hamta_data(
+    df <- pxweb2_hamta_data(
       tabell = "TAB2597",
       query = list(
         Region = region_vekt,
