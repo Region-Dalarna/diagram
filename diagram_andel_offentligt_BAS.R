@@ -2,7 +2,7 @@ diagram_andel_offentligt <- function(region_vekt = hamtakommuner("20",tamedlan =
                                      alder_klartext = "15-74 år", # Ålder. Finns: "15-24 år", "25-54 år", "55-74 år", "15-74 år", "16-64 år", "20-64 år", "16-65 år", "20-65 år" Max 1 åt gången
                                      kon_klartext = "totalt", # Finns också c("kvinnor", "män") # Styr vilket typ av diagram som skrivs ut. Enbart antingen eller
                                      output_mapp_figur= "G:/Samhällsanalys/Statistik/Näringsliv/basfakta/", # Vart hamnar figur om den skall sparas
-                                     output_mapp_data = NA, # Vart hamnar data om den skall sparas. NA medför att data inte sparas
+                                     output_mapp_data = NA, # Vart hamnar data om den skall sparas. NA medför att data inte sparas 
                                      filnamn_data = "andel_offentligt.xlsx", # Filnamn för sparad data
                                      vald_farg = "rus_sex", # Vilken färgvektor vill man ha. Blir alltid "kon" när man väljer det diagrammet
                                      stodlinjer_avrunda_fem = TRUE,
@@ -18,6 +18,8 @@ diagram_andel_offentligt <- function(region_vekt = hamtakommuner("20",tamedlan =
   # Uppdaterat så att data hämtas från BAS istället för RAMS. Jag lämnar kvar det gamla skriptet diagram_andel_offentligt.R ifall det används någonstans
   # Skapat: 2024-11-15 av Jon Frank
   # Ändrar så att det går att välja bort stodlinjer_avrunda_fem / Jon 2025-12-09
+  #
+  # Uppdaterat med den nya versionen av PXweb 2026-07-01 /Jon
   # ===========================================================================================================
   if(length(kon_klartext)>2){
     stop("Går enbart att välja antingen totalt eller uppdelat på kvinnor och män (kon_klartext)")
@@ -35,25 +37,41 @@ diagram_andel_offentligt <- function(region_vekt = hamtakommuner("20",tamedlan =
     # Data som sourcas från Region Dalarna
     source("https://raw.githubusercontent.com/Region-Dalarna/funktioner/main/func_SkapaDiagram.R")
     source("https://raw.githubusercontent.com/Region-Dalarna/funktioner/main/func_API.R")
-    source("https://raw.githubusercontent.com/Region-Dalarna/hamta_data/main/hamta_forvarvsarbetande_sektor_SCB.R")
-    source("https://raw.githubusercontent.com/Region-Dalarna/hamta_data/refs/heads/main/hamta_sysselsatta_region_arbetssektor_kon_alder_fodelseregion_tid_SektorSyssM_scb.R")
+    #source("https://raw.githubusercontent.com/Region-Dalarna/hamta_data/main/hamta_forvarvsarbetande_sektor_SCB.R")
+    #source("https://raw.githubusercontent.com/Region-Dalarna/hamta_data/refs/heads/main/hamta_sysselsatta_region_arbetssektor_kon_alder_fodelseregion_tid_SektorSyssM_scb.R")
+    source("https://raw.githubusercontent.com/Region-Dalarna/funktioner/main/func_pxweb2.R")
+    
     options(dplyr.summarise.inform = FALSE)
     
-    df <- hamta_sysselsatta_region_arbetssektor_kon_alder_fodelseregion_tid_scb(region = region_vekt,
-                                                                                alder_klartext = alder_klartext,
-                                                                                output_mapp =  output_mapp_data,
-                                                                                arbetssektor_klartext = c("samtliga sektorer","offentlig förvaltning (staten, kommun, region)"),
-                                                                                fodelseregion_klartext = "totalt",
-                                                                                cont_klartext = "sysselsatta efter arbetsställets belägenhet",			
-                                                                                kon_klartext = kon_klartext,
-                                                                                returnera_df = TRUE,
-                                                                                tid = "9999")
+    # df <- hamta_sysselsatta_region_arbetssektor_kon_alder_fodelseregion_tid_scb(region = region_vekt,
+    #                                                                             alder_klartext = alder_klartext,
+    #                                                                             output_mapp =  output_mapp_data,
+    #                                                                             arbetssektor_klartext = c("samtliga sektorer","offentlig förvaltning (staten, kommun, region)"),
+    #                                                                             fodelseregion_klartext = "totalt",
+    #                                                                             cont_klartext = "sysselsatta efter arbetsställets belägenhet",			
+    #                                                                             kon_klartext = kon_klartext,
+    #                                                                             returnera_df = TRUE,
+    #                                                                             tid = "9999")
     
+    df_2 <- pxweb2_hamta_data(
+      tabell = "TAB2597",
+      query = list(
+        Region = region_vekt,
+        ArbetsSektor = c("samtliga sektorer","offentlig förvaltning (staten, kommun, region)"),
+        Kon = kon_klartext,
+        Alder = alder_klartext,
+        Fodelseregion = "totalt",
+        ContentsCode = "sysselsatta efter arbetsställets belägenhet",
+        Tid = "9999"
+      )) %>% 
+      rename(varde = value,
+             regionkod = region_kod) %>% 
+        select(-tabellinnehåll)
     
     # Pivot wider  and calculate share
     andel_df <- df %>%
-      select(-arbetssektorkod) %>% 
-      rename(varde = `sysselsatta efter arbetsställets belägenhet`) %>% 
+      #select(-arbetssektorkod) %>% 
+      #rename(varde = `sysselsatta efter arbetsställets belägenhet`) %>% 
       pivot_wider(names_from = `arbetsställets sektortillhörighet`, values_from = varde) %>% 
       mutate(`Offentlig sektor` = ((`offentlig förvaltning (staten, kommun, region)`/`samtliga sektorer`)*100),
              Övriga = 100-`Offentlig sektor`) %>%
