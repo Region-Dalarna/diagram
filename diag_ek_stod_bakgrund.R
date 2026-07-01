@@ -14,6 +14,8 @@ diagram_ek_stod_bakgrund_SCB <- function(region_vekt = "20",
   
   # Diagram som skapar två figurer för ekonomiskt stöd, används både i det samhällsekonomiska läget i Dalarna och integrationsrapporten. API från SCB
   # Om man vill veta vad ekonomiskt stöd innefattar: https://www.scb.se/contentassets/592dcafe2a3b4e65b8e5434796bab0af/huvudsaklig-inkomstkalla-och-arbetsrelaterad-inkomstniva_x.pdf
+  #
+  # Uppdaterat skript med ny version av PXweb Jon 2026-07-01
   
   if (!require("pacman")) install.packages("pacman")
   p_load(tidyverse,
@@ -21,15 +23,33 @@ diagram_ek_stod_bakgrund_SCB <- function(region_vekt = "20",
          openxlsx)
   
   source("https://raw.githubusercontent.com/Region-Dalarna/funktioner/main/func_SkapaDiagram.R", encoding = "utf-8")
-  source("https://raw.githubusercontent.com/Region-Dalarna/hamta_data/refs/heads/main/hamta_bas_huvink_region_huvudfot1m_kon_alder_fodelseregion_tid_ArbStatFoT1_scb.R")
+  #source("https://raw.githubusercontent.com/Region-Dalarna/hamta_data/refs/heads/main/hamta_bas_huvink_region_huvudfot1m_kon_alder_fodelseregion_tid_ArbStatFoT1_scb.R")
+  source("https://raw.githubusercontent.com/Region-Dalarna/funktioner/main/func_pxweb2.R")
   
-  ekonomiskt_bistand_grund<- hamta_bas_huvink_region_huvudfot1m_kon_alder_fodelseregion_tid_scb(region = "20",
-                                                                                             huvudfot1m_klartext = "ekonomiskt stöd",
-                                                                                             fodelseregion_klartext = "*",
-                                                                                             cont_klartext = "antal totalt",
-                                                                                             alder_klartext = alder_klartext,
-                                                                                             kon_klartext = "*") %>% 
-    mutate(region = skapa_kortnamn_lan(region))
+  # ekonomiskt_bistand_grund <- hamta_bas_huvink_region_huvudfot1m_kon_alder_fodelseregion_tid_scb(region = "20",
+  #                                                                                            huvudfot1m_klartext = "ekonomiskt stöd",
+  #                                                                                            fodelseregion_klartext = "*",
+  #                                                                                            cont_klartext = "antal totalt",
+  #                                                                                            alder_klartext = alder_klartext,
+  #                                                                                            kon_klartext = "*") %>% 
+  #   mutate(region = skapa_kortnamn_lan(region))
+  
+  # Uttag med ny version av PXweb
+  ekonomiskt_bistand_grund <- pxweb2_hamta_data(
+    tabell = "TAB1784",
+    query = list(
+      Region = "20",
+      HuvudFoT1m = "ekonomiskt stöd",
+      Kon = "*",
+      Alder = alder_klartext,
+      Fodelseregion = "*",
+      ContentsCode = "antal totalt",
+      Tid = "*"
+    )) %>% 
+    rename(`antal totalt` = value,
+           regionkod = region_kod) %>% 
+    mutate(`antal totalt` = as.numeric(`antal totalt`)) %>%
+    select(-tabellinnehåll)
   
   # Fixar lite med data
   ekonomiskt_bistand_df <- ekonomiskt_bistand_grund %>% 
