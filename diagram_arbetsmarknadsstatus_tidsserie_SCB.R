@@ -62,7 +62,7 @@ diagram_arbetsmarknadsstatus_tidsserie <-function(region_vekt = "20", # Max 1 re
       Region = region_vekt,
       Kon = "totalt",
       Alder = alder_klartext,
-      Fodelseregion = fodelseregion_klartext,
+      Fodelseregion = fodelseregion,
       ContentsCode = "arbetslöshet",
       Tid = "*"
     )) %>% 
