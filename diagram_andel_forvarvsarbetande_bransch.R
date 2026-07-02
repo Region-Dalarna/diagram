@@ -16,6 +16,8 @@ diag_sysselsatta_andel <- function(region_vekt = "20", # Region vi är intresser
   # 1: Skapar diagram för andelen förvärvsarbetande inom olika branscher, dels på länsnivå, dels på kommunnivå. Enbart senaste år och ingen uppdelning på kön
   # 1: Antal förvärvsarbetande senaste observation uppdelat på kön
   # Senast uppdaterad: Jon 2024-10-16
+  #
+  # Senast uppdaterad: Jon 2026-07-02 - Ny version av PXweb
   # ========================================== Inställningar ============================================
   # Nödvändiga bibliotek och funktioner
   if (!require("pacman")) install.packages("pacman")
@@ -25,6 +27,7 @@ diag_sysselsatta_andel <- function(region_vekt = "20", # Region vi är intresser
   
   source("https://raw.githubusercontent.com/Region-Dalarna/funktioner/main/func_SkapaDiagram.R")
   source("https://raw.githubusercontent.com/Region-Dalarna/funktioner/main/func_API.R")
+  source("https://raw.githubusercontent.com/Region-Dalarna/funktioner/main/func_pxweb2.R")
   
   # Det som står under diagrammet
   diagram_capt <- caption
@@ -39,10 +42,34 @@ diag_sysselsatta_andel <- function(region_vekt = "20", # Region vi är intresser
 
 # =============================================== API-uttag ===============================================
 
-  # Hämtar data
-  source("G:/skript/hamta_data/hamta_syss_bransch_kon_manad_bas.R")
-  df = hamta_syss_branscher_kon_manad_bas(region_vekt =hamtakommuner(region_vekt,tamedlan = TRUE,tamedriket = TRUE),
-                                            ar_vekt = "9999")
+  # Hämtar data - Tidigare PXweb
+  # source("G:/skript/hamta_data/hamta_syss_bransch_kon_manad_bas.R")
+  # df = hamta_syss_branscher_kon_manad_bas(region_vekt = hamtakommuner(region_vekt,tamedlan = TRUE,tamedriket = TRUE),
+  #                                           ar_vekt = "9999")
+  
+  # Ny version av PXweb
+  branschtabell <- read.csv("G:/skript/nycklar/Bransch_Gxx_farger.csv", sep = ";", encoding = "latin1")
+  
+  df <- pxweb2_hamta_data(
+    tabell = "TAB3784",
+    query = list(
+      Region = hamtakommuner(region_vekt,tamedlan = TRUE,tamedriket = TRUE),
+      Kon = c("kvinnor","män"),
+      SNI2007 = "*",
+      Fodelseregion = NA,
+      ContentsCode = "sysselsatta efter arbetsställets belägenhet",
+      Tid = "9999"
+    )) %>% 
+    mutate(`näringsgren sni 2007_kod` = ifelse(`näringsgren sni 2007_kod` == "US", "00", `näringsgren sni 2007_kod`)) %>%
+      filter(`näringsgren sni 2007_kod` != "A-U+US") %>% 
+        rename(branschkod = `näringsgren sni 2007_kod`,
+               regionkod = region_kod,
+               `sysselsatta efter arbetsställets belägenhet` = value) %>% 
+          left_join(branschtabell %>% select(Br15kod, bransch = Bransch), by = c("branschkod" = "Br15kod")) %>% 
+      select(-`näringsgren SNI 2007`,-tabellinnehåll) %>% 
+        relocate(branschkod, .after = region) %>% 
+          relocate(bransch, .after = branschkod) %>% 
+            manader_bearbeta_scbtabeller()
   
   # Summerar på region och sektor
   df_sum <- df %>%
@@ -51,7 +78,7 @@ diag_sysselsatta_andel <- function(region_vekt = "20", # Region vi är intresser
       mutate(andel = (Antal/sum(Antal))*100,
              region = skapa_kortnamn_lan(region,byt_ut_riket_mot_sverige = TRUE),
              manad_txt = format(as.Date(paste0(str_sub(tid, 6,7), "-01"), format = "%m-%d"), "%B"))
-  
+
   if(diag_lan == TRUE | diag_kommun == TRUE){
     if(returnera_data == TRUE){
       assign("andel_forvarvsarbetande_bransch", df_sum, envir = .GlobalEnv)
@@ -70,13 +97,13 @@ diag_sysselsatta_andel <- function(region_vekt = "20", # Region vi är intresser
     objektnamn <- c(objektnamn,"andel_per_bransch")
     
     gg_obj <- SkapaStapelDiagram(skickad_df = df_sum %>% 
-                                   filter(region%in%c("Sverige",vald_region),bransch != "Okänt") %>% 
+                                   filter(region %in% c("Sverige",vald_region),bransch != "Okänt") %>% 
                                     mutate(bransch = str_wrap(bransch,20)),
                                  skickad_x_var = "bransch", 
                                  skickad_y_var = "andel", 
                                  skickad_x_grupp = "region",
-                                 manual_x_axis_text_vjust=1,
-                                 manual_x_axis_text_hjust=1,
+                                 manual_x_axis_text_vjust = 1,
+                                 manual_x_axis_text_hjust = 1,
                                  manual_color = valda_farger,
                                  x_axis_sort_value = TRUE,
                                  manual_y_axis_title = "procent",
