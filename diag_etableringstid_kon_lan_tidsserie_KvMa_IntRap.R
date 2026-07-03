@@ -20,6 +20,7 @@ diag_etablering_utb_kon_scb <- function(region = "20", # Enbart ett i taget.
   # Finns även ett liknande diagramskript, med tre andra diagram som används i RUS-uppföljningen:
   # diag_etableringstid_kon_lan_tidsserie
   #
+  # Uppdaterat med ny version av PXweb 2026-07-03, Jon
   # =======================================================================================================================
   
   # om parametern demo är satt till TRUE så öppnas en flik i webbläsaren med ett exempel på hur diagrammet ser ut och därefter avslutas funktionen
@@ -38,39 +39,128 @@ diag_etablering_utb_kon_scb <- function(region = "20", # Enbart ett i taget.
   
   source("https://raw.githubusercontent.com/Region-Dalarna/funktioner/main/func_API.R")
   source("https://raw.githubusercontent.com/Region-Dalarna/funktioner/main/func_SkapaDiagram.R")
-  source("https://raw.githubusercontent.com/Region-Dalarna/hamta_data/refs/heads/main/hamta_etableringstid_mm_region_kon_utbniv_bakgrvar_tid_IntGr1LanKonUtb_scb.R")
-  source("https://raw.githubusercontent.com/Region-Dalarna/hamta_data/refs/heads/main/hamta_etableringstid_mm_region_kon_utbniv_bakgrvar_tid_IntGr1KomKonUtb_ny_BAS_scb.R")
+  #source("https://raw.githubusercontent.com/Region-Dalarna/hamta_data/refs/heads/main/hamta_etableringstid_mm_region_kon_utbniv_bakgrvar_tid_IntGr1LanKonUtb_scb.R")
+  #source("https://raw.githubusercontent.com/Region-Dalarna/hamta_data/refs/heads/main/hamta_etableringstid_mm_region_kon_utbniv_bakgrvar_tid_IntGr1KomKonUtb_ny_BAS_scb.R")
+  source("https://raw.githubusercontent.com/Region-Dalarna/funktioner/main/func_pxweb2.R")
   
   if (!require("pacman")) install.packages("pacman")
   pacman::p_load(tidyverse,
                  pxweb,
                  readxl)
   
+  # Före 2022 - Tidigare kod
+  # etablering_2021 <- hamta_etableringstid_mm_region_kon_utbniv_bakgrvar_tid_scb(region_vekt = region,
+  #                                                                               kon_klartext = "*",
+  #                                                                               utbniv_klartext = "*",
+  #                                                                               bakgrvar_klartext = c("vistelsetid 0-1 år", "vistelsetid 2-3 år", "vistelsetid 4-9 år", "vistelsetid 10- år","födelseregion: Sverige"),
+  #                                                                               cont_klartext = "Andel förvärvsarbetande (ny definition från och med 2019)",
+  #                                                                               tid_koder = "*") %>%
+  #   rename(andel = `Andel förvärvsarbetande (ny definition från och med 2019)`) %>%
+  #   mutate(bakgrundsvariabel = ifelse(bakgrundsvariabel == "födelseregion: Sverige","Inrikes född",bakgrundsvariabel)) %>% 
+  #   mutate(bakgrundsvariabel =  sub("^vistelsetid ", "", bakgrundsvariabel))
+  
+  # Nya PXweb 
+  # Split codes by digit length
+  lan_koder    <- region[nchar(region) == 2]
+  kommun_koder <- region[nchar(region) == 4]
+  
+  # Container for results
+  resultat <- list()
+  
   # Före 2022
-  etablering_2021 <- hamta_etableringstid_mm_region_kon_utbniv_bakgrvar_tid_scb(region_vekt = region,
-                                                                                kon_klartext = "*",
-                                                                                utbniv_klartext = "*",
-                                                                                bakgrvar_klartext = c("vistelsetid 0-1 år", "vistelsetid 2-3 år", "vistelsetid 4-9 år", "vistelsetid 10- år","födelseregion: Sverige"),
-                                                                                cont_klartext = "Andel förvärvsarbetande (ny definition från och med 2019)",
-                                                                                tid_koder = "*") %>%
-    rename(andel = `Andel förvärvsarbetande (ny definition från och med 2019)`) %>%
-    mutate(bakgrundsvariabel = ifelse(bakgrundsvariabel == "födelseregion: Sverige","Inrikes född",bakgrundsvariabel)) %>% 
-    mutate(bakgrundsvariabel =  sub("^vistelsetid ", "", bakgrundsvariabel))
+  
+  # Call region API once, only if there are region codes
+  if (length(lan_koder) > 0) {
+    resultat$lan <- pxweb2_hamta_data(
+      tabell = "TAB389",
+      query = list(
+        Region = lan_koder,
+        Kon = "*",
+        UtbNiv = "*",
+        BakgrVar = c("vistelsetid 0-1 år", "vistelsetid 2-3 år", "vistelsetid 4-9 år",
+                     "vistelsetid 10- år", "födelseregion: Sverige"),
+        ContentsCode = "Andel förvärvsarbetande (ny definition från och med 2019)",
+        Tid = "*"
+      )
+    )
+  }
+  
+  # Call municipality API once, only if there are municipality codes
+  if (length(kommun_koder) > 0) {
+    resultat$kommun <- pxweb2_hamta_data(
+      tabell = "TAB4881",
+      query = list(
+        Region = kommun_koder,
+        Kon = "*",
+        UtbNiv = "*",
+        BakgrVar = c("vistelsetid 0-1 år", "vistelsetid 2-3 år", "vistelsetid 4-9 år",
+                     "vistelsetid 10- år", "födelseregion: Sverige"),
+        ContentsCode = "Andel förvärvsarbetande (ny definition från och med 2019)",
+        Tid = "*"
+      )
+    )
+  }
+
+    # 
+  # 2022 och senare - Tidigare kod
+  # etablering_2022_ <- hamta_etableringstid_mm_region_kon_utbniv_bakgrvar_tid_scb_ny(region_vekt = region,
+  #                                                                                   kon_klartext = "*",
+  #                                                                                   utbniv_klartext = "*",
+  #                                                                                   bakgrvar_klartext = c("vistelsetid 0-1 år", "vistelsetid 2-3 år", "vistelsetid 4-9 år", "vistelsetid 10- år","födelseregion: Sverige"),
+  #                                                                                   cont_klartext = "Andel sysselsatta",
+  #                                                                                   tid_koder = "*") %>%
+  #   rename(andel = `Andel sysselsatta`) %>%
+  #   mutate(bakgrundsvariabel = ifelse(bakgrundsvariabel == "födelseregion: Sverige","Inrikes född",bakgrundsvariabel)) %>% 
+  #   mutate(bakgrundsvariabel =  sub("^vistelsetid ", "", bakgrundsvariabel))
+
   
   # 2022 och senare
-  etablering_2022_ <- hamta_etableringstid_mm_region_kon_utbniv_bakgrvar_tid_scb_ny(region_vekt = region,
-                                                                                    kon_klartext = "*",
-                                                                                    utbniv_klartext = "*",
-                                                                                    bakgrvar_klartext = c("vistelsetid 0-1 år", "vistelsetid 2-3 år", "vistelsetid 4-9 år", "vistelsetid 10- år","födelseregion: Sverige"),
-                                                                                    cont_klartext = "Andel sysselsatta",
-                                                                                    tid_koder = "*") %>%
-    rename(andel = `Andel sysselsatta`) %>%
-    mutate(bakgrundsvariabel = ifelse(bakgrundsvariabel == "födelseregion: Sverige","Inrikes född",bakgrundsvariabel)) %>% 
-    mutate(bakgrundsvariabel =  sub("^vistelsetid ", "", bakgrundsvariabel))
   
-  etablering_df <- rbind(etablering_2021,etablering_2022_) %>%
-    mutate(region = skapa_kortnamn_lan(region))
+  # Call region API once, only if there are region codes
+  if (length(lan_koder) > 0) {
+    resultat$lan_22 <- pxweb2_hamta_data(
+      tabell = "TAB6384",
+      query = list(
+        Region = lan_koder,
+        Kon = "*",
+        UtbNiv = "*",
+        BakgrVar = c("vistelsetid 0-1 år", "vistelsetid 2-3 år", "vistelsetid 4-9 år",
+                     "vistelsetid 10- år", "födelseregion: Sverige"),
+        ContentsCode = "Andel sysselsatta",
+        Tid = "*"
+      )
+    )
+  }
   
+  # Call municipality API once, only if there are municipality codes
+  if (length(kommun_koder) > 0) {
+    resultat$kommun_22 <- pxweb2_hamta_data(
+      tabell = "TAB6383",
+      query = list(
+        Region = kommun_koder,
+        Kon = "*",
+        UtbNiv = "*",
+        BakgrVar = c("vistelsetid 0-1 år", "vistelsetid 2-3 år", "vistelsetid 4-9 år",
+                     "vistelsetid 10- år", "födelseregion: Sverige"),
+        ContentsCode = "Andel sysselsatta",
+        Tid = "*"
+      )
+    )
+  }
+  
+  # If you want a single combined data frame afterwards (assuming same column structure):
+  etablering_df <- dplyr::bind_rows(resultat) %>% 
+    rename(andel = value,
+           regionkod = region_kod) %>%
+      mutate(bakgrundsvariabel = ifelse(bakgrundsvariabel == "födelseregion: Sverige","Inrikes född",bakgrundsvariabel)) %>% 
+        mutate(bakgrundsvariabel =  sub("^vistelsetid ", "", bakgrundsvariabel)) %>% 
+          select(-tabellinnehåll) %>%
+            mutate(region = skapa_kortnamn_lan(region))
+    
+  
+  # etablering_df <- rbind(etablering_2021,etablering_2022_) %>%
+  #   mutate(region = skapa_kortnamn_lan(region))
+
   if(returnera_data_rmarkdown == TRUE){
     assign("etablering_df", etablering_df, envir = .GlobalEnv)
   }
