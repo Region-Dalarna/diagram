@@ -16,7 +16,7 @@ diag_inkomst_scb <- function(regionvekt = "20", # Enbart ett i taget. går även
   #
   # Tre diagram per åldersgrupp för inkomst. Finns på såväl län som kommunnivå. Används i första hand rapporten "Kvinnor och män i Dalarna".
   #
-  #
+  # Uppdatering 2026-07-03 - Ny version av PXweb används. /Jon
   # =======================================================================================================================
   
  
@@ -26,17 +26,40 @@ diag_inkomst_scb <- function(regionvekt = "20", # Enbart ett i taget. går även
   
   source("https://raw.githubusercontent.com/Region-Dalarna/funktioner/main/func_API.R")
   source("https://raw.githubusercontent.com/Region-Dalarna/funktioner/main/func_SkapaDiagram.R")
-  source("https://raw.githubusercontent.com/Region-Dalarna/hamta_data/refs/heads/main/hamta_forvarvsinkomst_region_kon_fodelseregion_vistelsetid_HE0110_scb.R")
+  #source("https://raw.githubusercontent.com/Region-Dalarna/hamta_data/refs/heads/main/hamta_forvarvsinkomst_region_kon_fodelseregion_vistelsetid_HE0110_scb.R")
+  source("https://raw.githubusercontent.com/Region-Dalarna/funktioner/main/func_pxweb2.R")
   
   # Före 2022
-  forvarvsinkomst_df <- hamta_forvarvsinkomst_region_kon_fodelseregion_vistelsetid_scb(region_vekt = hamtakommuner(regionvekt,tamedriket = FALSE),
-                                                                                       kon_klartext = "*",
-                                                                                       alder_klartext = alder_klartext,
-                                                                                       fodelseregion_klartext = "samtliga",
-                                                                                       vistelsetiduf_klartext = "samtliga",
-                                                                                       cont_klartext = inkomst_typ,
-                                                                                       tid_koder = "*") %>%
-    mutate(region = skapa_kortnamn_lan(region,byt_ut_riket_mot_sverige = TRUE)) 
+  # forvarvsinkomst_df <- hamta_forvarvsinkomst_region_kon_fodelseregion_vistelsetid_scb(region_vekt = hamtakommuner(regionvekt,tamedriket = FALSE),
+  #                                                                                      kon_klartext = "*",
+  #                                                                                      alder_klartext = alder_klartext,
+  #                                                                                      fodelseregion_klartext = "samtliga",
+  #                                                                                      vistelsetiduf_klartext = "samtliga",
+  #                                                                                      cont_klartext = inkomst_typ,
+  #                                                                                      tid_koder = "*") %>%
+  #   mutate(region = skapa_kortnamn_lan(region,byt_ut_riket_mot_sverige = TRUE)) 
+  
+  
+  forvarvsinkomst_df <- pxweb2_hamta_data(
+    tabell = "TAB5278",
+    query = list(
+      Region = hamtakommuner(regionvekt,tamedriket = FALSE),
+      Kon = "*",
+      Fodelseregion = "samtliga",
+      VistelsetidUF = "samtliga",
+      Alder = alder_klartext,
+      ContentsCode = inkomst_typ,
+      Tid = "*"
+    ))
+  
+  # Koden nedan används för att byta namn på den sista variabeln i df (för att efterlikna tidigare hämtning med gamla PXweb)
+  new_name <- unique(forvarvsinkomst_df$tabellinnehåll)
+  
+  forvarvsinkomst_df <- forvarvsinkomst_df %>% 
+      rename(regionkod = region_kod,
+             !!new_name := value) %>% 
+        select(-tabellinnehåll) %>%
+          mutate(region = skapa_kortnamn_lan(region,byt_ut_riket_mot_sverige = TRUE)) 
   
   
   if(returnera_data_rmarkdown == TRUE){
