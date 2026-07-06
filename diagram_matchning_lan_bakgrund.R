@@ -74,7 +74,8 @@ c("https://region-dalarna.github.io/utskrivna_diagram/matchning_bakgrund.png",
       Tid = "9999"
     )) %>% 
       select(-region_kod,-tabellinnehåll) %>% 
-        rename(matchningsgrad = value)
+        rename(matchningsgrad = value) %>% 
+          mutate(region = skapa_kortnamn_lan(region,byt_ut_riket_mot_sverige = TRUE))
   
   
   df <- df %>% 
@@ -127,7 +128,7 @@ c("https://region-dalarna.github.io/utskrivna_diagram/matchning_bakgrund.png",
     diagramfil <- paste0("matchning_bakgrund.png")
     objektnamn <- c(objektnamn,"matchning_bakgrund")
     
-    gg_obj <- SkapaStapelDiagram(skickad_df =df %>%
+    gg_obj <- SkapaStapelDiagram(skickad_df = df %>%
                                    filter(år == max(år),
                                           region == vald_region,
                                           fodelseland != "totalt"),
