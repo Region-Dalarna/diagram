@@ -17,6 +17,8 @@ diag_matchning_lan <- function(region_vekt = "20", # Region vi är intresserade 
   # Enbart för senaste år
   #  
   # Senast uppdaterad: Jon 2024-11-01
+  #
+  # Senast uppdaterad: Ny version av PXweb Jon 2026-07-06 
   # ========================================== Inställningar ============================================
   # Nödvändiga bibliotek och funktioner
 
@@ -51,17 +53,32 @@ c("https://region-dalarna.github.io/utskrivna_diagram/matchning_bakgrund.png",
   # =============================================== API-uttag ===============================================
   
   # Hämtar data
-  source("https://raw.githubusercontent.com/Region-Dalarna/hamta_data/main/hamta_data_matchningsgrad_lan_FA.R")
-  df = hamta_data_matchning_lan_fa(region = hamtaAllaLan(tamedriket = TRUE),
-                                   tid = "9999",
-                                   kon_klartext = kon_klartext,
-                                   alder_fodelseland = c("Sverige","Norden/EU","Afrika","Asien","Övriga_världen","totalt"),
-                                   returnera_data = TRUE)
+  #source("https://raw.githubusercontent.com/Region-Dalarna/hamta_data/main/hamta_data_matchningsgrad_lan_FA.R")
+  source("https://raw.githubusercontent.com/Region-Dalarna/funktioner/main/func_pxweb2.R")
+  
+  # Tidigare version av PXweb
+  # df = hamta_data_matchning_lan_fa(region = hamtaAllaLan(tamedriket = TRUE),
+  #                                  tid = "9999",
+  #                                  kon_klartext = kon_klartext,
+  #                                  alder_fodelseland = c("Sverige","Norden/EU","Afrika","Asien","Övriga_världen","totalt"),
+  #                                  returnera_data = TRUE)
+  
+  # Matchning – olika grupper (M2). Andel anställda med matchning mellan utbildning och yrke, efter region, kön, ålder respektive födelselandsgrupp (nattbefolkning). År 2019-2024
+  df <- pxweb2_hamta_data(
+    tabell = "TAB6366",
+    query = list(
+      Region = hamtaAllaLan(tamedriket = TRUE),
+      Kon = kon_klartext,
+      AlderFodelselandgr = c("Sverige","Norden/EU","Afrika","Asien","Övriga_världen","totalt"),
+      ContentsCode = "000007I3",
+      Tid = "9999"
+    )) %>% 
+      select(-region_kod,-tabellinnehåll) %>% 
+        rename(matchningsgrad = value)
   
   
   df <- df %>% 
-    rename("fodelseland" = `ålder/födelselandgrupp`,
-           matchningsgrad = `Matchningsgrad, procent `) %>% 
+    rename("fodelseland" = `ålder/födelselandgrupp`) %>% 
     mutate("fodelseland" = ifelse(fodelseland %in% c("födda i Europa utom Norden och EU samt Sydamerika, Nordamerika och Oceanien"),"övriga", fodelseland)) 
   
   if(returnera_data == TRUE){
