@@ -11,9 +11,8 @@ diag_narstaendepenning <- function(region_vekt = "20", # Enbart ett län åt gå
   # "Antal vårdare", "Antal sjuka", "Belopp" och "Nettodagar". Flera kan väljas samtidigt.
   # Används i första hand i rapporten "Kvinnor och män i Dalarna"
   # Skapad av Jon Frank 2025-11-04
-  # Källa: https://www.dataportal.se/datasets/547_13998
+  # Källa: https://www.dataportal.se/datasets/547_21402
   # =============================================== Uttag ===============================================
-  
   # # Läser in nödvändiga bibliotek med pacman
   if (!require("pacman")) install.packages("pacman")
   p_load(openxlsx,
