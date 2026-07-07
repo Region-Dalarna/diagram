@@ -121,6 +121,6 @@ diag_narstaendepenning <- function(region_vekt = "20", # Enbart ett län åt gå
       
   }
     
-  diag <- map(variabel, ~ skapa_diagram(narstaendepenning_df, .x)) %>% purr::flatten()
+  diag <- map(variabel, ~ skapa_diagram(narstaendepenning_df, .x)) %>% purrr::flatten()
   return(diag)
 }
