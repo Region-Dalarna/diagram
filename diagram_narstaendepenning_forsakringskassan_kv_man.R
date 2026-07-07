@@ -15,7 +15,8 @@ diag_narstaendepenning <- function(region_vekt = "20", # Enbart ett län åt gå
   # =============================================== Uttag ===============================================
   # # Läser in nödvändiga bibliotek med pacman
   if (!require("pacman")) install.packages("pacman")
-  p_load(openxlsx,
+  p_load(tidyverse,
+         openxlsx,
          here,
          glue)
   
