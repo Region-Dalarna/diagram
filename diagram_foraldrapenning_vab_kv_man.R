@@ -19,6 +19,7 @@ diag_foraldrapenning_vab <- function(region_vekt = "20", # Enbart ett län åt g
   # Regionkod och Region. Lagt till TRUE/FALSE för varje enskild diagram
   #
   # diagram_capt saknades i diagrammet foraldrapening_antal_nettodagar, så jag la till den. Jon 2025-11-26
+  # Ändrat så att även data på kommunnivå returneras (foraldrapenning_lan_df) då detta behövs i markdown-rapporten Jon 2026-07-07
   # =============================================== Uttag ===============================================
   
   # # Läser in nödvändiga bibliotek med pacman
@@ -128,6 +129,11 @@ diag_foraldrapenning_vab <- function(region_vekt = "20", # Enbart ett län åt g
     
     # Andel per kommun i ett län
     if (diag_foraldrapenning_andel_senaste_ar_lanets_kommuner) {
+      
+      if(spara_dataframe_till_global_environment) {
+        assign("foraldrapenning_lan_df", foraldrapenning_lan_df %>% filter(År == max(År)), envir = .GlobalEnv)
+      }
+      
       diagram_capt <- "Källa: Försäkringskassan.\nBearbetning: Samhällsanalys, Region Dalarna."
       diagramtitel <- paste0("Föräldrapenning, andel nettodagar per kön i " , lan_txt %>% list_komma_och(), " år ", max(foraldrapenning_df$År))
       diagramfilnamn <- paste0("Foraldrapenning_andel_kommun_", lan_txt %>% list_komma_och(),".png")
