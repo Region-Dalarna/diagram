@@ -10,11 +10,14 @@ diag_chefer<-function(region_vekt = "20", # Enbart på län, max 1 åt gången
   # 
   # Källa: https://www.statistikdatabasen.scb.se/pxweb/sv/ssd/START__AA__AA0003__AA0003X/IntGr1LanKonUtb/
   # Används primärt i kvinnor och män i Dalarna
+  #
+  # Uppdatering 2026-07-07. Uppdaterat med ny version av PXweb /Jon
   # =================================================================================================================
   # Läser in nödvändiga bibliotek med pacman
   
   if (!require("pacman")) install.packages("pacman")
-  p_load(pxweb,
+  p_load(tidyverse,
+         pxweb,
          openxlsx)
   
   gg_list <- list()
@@ -22,38 +25,65 @@ diag_chefer<-function(region_vekt = "20", # Enbart på län, max 1 åt gången
   # Funktioner som behövs
   source("https://raw.githubusercontent.com/Region-Dalarna/funktioner/main/func_API.R")
   source("https://raw.githubusercontent.com/Region-Dalarna/funktioner/main/func_SkapaDiagram.R")
+  source("https://raw.githubusercontent.com/Region-Dalarna/funktioner/main/func_pxweb2.R")
   
   # Data som inte uppdateras (fram till 2021 - RAMS)
-  url_tidigare <- "https://api.scb.se/OV0104/v1/doris/sv/ssd/START/AA/AA0003/AA0003X/IntGr1LanKonUtb"
+  # url_tidigare <- "https://api.scb.se/OV0104/v1/doris/sv/ssd/START/AA/AA0003/AA0003X/IntGr1LanKonUtb"
+  # 
+  # # Variabler som skall tas ut
+  # varlista <-  list(Region = c(region_vekt),
+  #                   Kon = c("1","2"),
+  #                   UtbNiv = c("000","F","3","EU","US"),
+  #                   BakgrVar = c("tot20-64"),
+  #                   ContentsCode = c("0000001Y"),
+  #                   Tid =c("*"))
+  # 
+  # # Uttag av data
+  # chefer_RAMS_df <- pxweb_get(url = url_tidigare,query = varlista) %>% 
+  #   as.data.frame(column.name.type = "text", variable.value.type = "text") %>% 
+  #   rename(Andel = `Andel i chefsposition, procent`)
   
-  # Variabler som skall tas ut
-  varlista <-  list(Region=c(region_vekt),
-                    Kon=c("1","2"),
-                    UtbNiv=c("000","F","3","EU","US"),
-                    BakgrVar=c("tot20-64"),
-                    ContentsCode=c("0000001Y"),
-                    Tid=c("*"))
-  
-  # Uttag av data
-  chefer_RAMS_df <- pxweb_get(url = url_tidigare,query = varlista) %>% 
-    as.data.frame(column.name.type = "text", variable.value.type = "text") %>% 
-    rename(Andel = `Andel i chefsposition, procent`)
+  chefer_RAMS_df <- pxweb2_hamta_data(
+    tabell = "TAB389",
+    query = list(
+      Region = region_vekt,
+      Kon = c("1","2"),
+      UtbNiv = c("000","F","3","EU","US"),
+      BakgrVar = c("tot20-64"),
+      ContentsCode = c("0000001Y"),
+      Tid = "*"
+    )) %>% 
+      select(-region_kod,-tabellinnehåll) %>% 
+        rename(Andel = value)
   
   # Data som uppdateras (från 2022 - BAS)
-  url_ny <- "https://api.scb.se/OV0104/v1/doris/sv/ssd/START/AA/AA0003/AA0003B/IntGr1LanUtbBAS"
+  # url_ny <- "https://api.scb.se/OV0104/v1/doris/sv/ssd/START/AA/AA0003/AA0003B/IntGr1LanUtbBAS"
+  # 
+  # # Variabler som skall tas ut
+  # varlista <-  list(Region=c(region_vekt),
+  #                   Kon=c("1","2"),
+  #                   UtbNiv=c("000","F","3","EU","US"),
+  #                   BakgrVar=c("TOT"),
+  #                   ContentsCode=c("000007KF"),
+  #                   Tid=c("*"))
+  # 
+  # # Uttag av data
+  # chefer_bas_df <- pxweb_get(url = url_ny,query = varlista) %>% 
+  #   as.data.frame(column.name.type = "text", variable.value.type = "text") %>% 
+  #   rename(Andel = `Andel i chefsposition`)
   
-  # Variabler som skall tas ut
-  varlista <-  list(Region=c(region_vekt),
-                    Kon=c("1","2"),
-                    UtbNiv=c("000","F","3","EU","US"),
-                    BakgrVar=c("TOT"),
-                    ContentsCode=c("000007KF"),
-                    Tid=c("*"))
-  
-  # Uttag av data
-  chefer_bas_df <- pxweb_get(url = url_ny,query = varlista) %>% 
-    as.data.frame(column.name.type = "text", variable.value.type = "text") %>% 
-    rename(Andel = `Andel i chefsposition`)
+  chefer_bas_df <- pxweb2_hamta_data(
+    tabell = "TAB6384",
+    query = list(
+      Region = region_vekt,
+      Kon = c("1","2"),
+      UtbNiv = c("000","F","3","EU","US"),
+      BakgrVar = "TOT",
+      ContentsCode=c("000007KF"),
+      Tid=c("*"))
+    ) %>% 
+      select(-region_kod,-tabellinnehåll) %>% 
+        rename(Andel = value)
   
   # Binder ihop dataseten, tar bort NA och fixar utbildningsnivå
   chefer_df <- rbind(chefer_RAMS_df,chefer_bas_df) %>% 
@@ -103,7 +133,7 @@ diag_chefer<-function(region_vekt = "20", # Enbart på län, max 1 åt gången
     diagramtitel <- paste0("Förändring i andel chefer i ",skapa_kortnamn_lan(unique(chefer_df$region)))
     diagramfilnamn <- paste0("andel_chefer_linje_",skapa_kortnamn_lan(unique(chefer_df$region)),".png")
     
-    gg_obj <- SkapaLinjeDiagram(skickad_df =chefer_df %>% 
+    gg_obj <- SkapaLinjeDiagram(skickad_df = chefer_df %>% 
                                             filter(år >"2000",
                                                    utbildningsnivå == "samtliga utbildningsnivåer"),
                                           skickad_x_var = "år",
