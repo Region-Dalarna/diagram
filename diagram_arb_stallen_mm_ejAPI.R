@@ -17,7 +17,11 @@ diag_foretagarna <- function(region_vekt = "20", # Vilken region skall vi välja
   # https://www.foretagsklimat.se/downloads
   # Enbart senaste år
   # Data uppdaterades senast 2025-01-13
+  #
+  # Observera att skriptet inte uppdateras längre. Använd istället diagram_arb_stallen_mm_foretagarna.R där data laddas från Excelfil automatiskt.
   # ========================================== Inställningar ============================================
+  
+  print("OBS! SKRIPTET UPPDATERAS INTE LÄNGRE. ANVÄND: diagram_arb_stallen_mm_foretagarna.R istället")
   
   # Nödvändiga bibliotek och funktioner
   if (!require("pacman")) install.packages("pacman")
