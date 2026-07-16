@@ -1,5 +1,5 @@
 diagram_andel_offentligt <- function(region_vekt = hamtakommuner("20",tamedlan = TRUE,tamedriket = TRUE), # Val av kommuner
-                                     alder_klartext = "15-74 år", # Ålder. Finns: "15-24 år", "25-54 år", "55-74 år", "15-74 år", "16-64 år", "20-64 år", "16-65 år", "20-65 år" Max 1 åt gången
+                                     alder_klartext = "15–74 år", # Ålder. Finns:  "15–24 år" "15–74 år" "16–64 år" "16–65 år" "16–66 år" "20–64 år" "20–65 år" "20–66 år" "25–54 år" "55–74 år" Max 1 åt gången
                                      kon_klartext = "totalt", # Finns också c("kvinnor", "män") # Styr vilket typ av diagram som skrivs ut. Enbart antingen eller
                                      output_mapp_figur= "G:/Samhällsanalys/Statistik/Näringsliv/basfakta/", # Vart hamnar figur om den skall sparas
                                      output_mapp_data = NA, # Vart hamnar data om den skall sparas. NA medför att data inte sparas 
@@ -20,6 +20,7 @@ diagram_andel_offentligt <- function(region_vekt = hamtakommuner("20",tamedlan =
   # Ändrar så att det går att välja bort stodlinjer_avrunda_fem / Jon 2025-12-09
   #
   # Uppdaterat med den nya versionen av PXweb 2026-07-01 /Jon
+  # Rättat märklig felaktighet där alder_klartext inte längre fungerar då SCB sannolikt har lagt till ett längre - mellan åren. /Jon 2026-07-16
   # ===========================================================================================================
   if(length(kon_klartext)>2){
     stop("Går enbart att välja antingen totalt eller uppdelat på kvinnor och män (kon_klartext)")
