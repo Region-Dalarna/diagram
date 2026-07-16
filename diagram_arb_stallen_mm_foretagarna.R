@@ -92,7 +92,7 @@ diag_foretagarna <- function(region_vekt = "20", # Vilken region skall vi välja
     
     diagramtitel <- paste0("Antal privata arbetsställen per 1000 invånare i ",skapa_kortnamn_lan(na.omit(unique(arbetsstallen_df$Län)))  ," år " ,max(arbetsstallen_df$year))
     diagramfilnamn <- paste0("antal_arbetsstallen_",skapa_kortnamn_lan(na.omit(unique(arbetsstallen_df$Län))),".png")
-    objektnamn <- c(objektnamn,"arbetsställen_",skapa_kortnamn_lan(na.omit(unique(arbetsstallen_df$Län))))
+    objektnamn <- c(objektnamn,paste0("arbetsställen_",skapa_kortnamn_lan(na.omit(unique(arbetsstallen_df$Län)))))
     
     gg_obj <- SkapaStapelDiagram(skickad_df =arbetsstallen_df %>% 
                                    mutate(fokus = ifelse(Kommun == "Sverige", 2,
@@ -138,7 +138,7 @@ diag_foretagarna <- function(region_vekt = "20", # Vilken region skall vi välja
     
     diagramtitel <- paste0("Antal nyföretagsamma per 1000 invånare i ",skapa_kortnamn_lan(na.omit(unique(nyforetagsamma_df$Län)))  ," år " ,max(nyforetagsamma_df$year))
     diagramfilnamn <- paste0("antal_nyforetagsamma_",skapa_kortnamn_lan(na.omit(unique(nyforetagsamma_df$Län))),".png")
-    objektnamn <- c(objektnamn,"nyföretagssamma_",skapa_kortnamn_lan(na.omit(unique(nyforetagsamma_df$Län))))
+    objektnamn <- c(objektnamn,paste0("nyföretagssamma_",skapa_kortnamn_lan(na.omit(unique(nyforetagsamma_df$Län)))))
 
     gg_obj <- SkapaStapelDiagram(skickad_df =nyforetagsamma_df %>% 
                                    mutate(fokus = ifelse(Kommun == "Sverige", 2,
@@ -186,7 +186,7 @@ diag_foretagarna <- function(region_vekt = "20", # Vilken region skall vi välja
     
     diagramtitel <- paste0("Andel företagsamma i ",skapa_kortnamn_lan(na.omit(unique(foretagsamma_df$Län)))  ," år " ,max(foretagsamma_df$year))
     diagramfilnamn <- paste0("foretagsamma_andel_",skapa_kortnamn_lan(na.omit(unique(foretagsamma_df$Län))),".png")
-    objektnamn <- c(objektnamn,"Andel_företagsamma_",skapa_kortnamn_lan(na.omit(unique(foretagsamma_df$Län))))
+    objektnamn <- c(objektnamn,paste0("Andel_företagsamma_",skapa_kortnamn_lan(na.omit(unique(foretagsamma_df$Län)))))
 
     gg_obj <- SkapaStapelDiagram(skickad_df =foretagsamma_df %>% 
                                    mutate(fokus = ifelse(Kommun == "Sverige", 2,
