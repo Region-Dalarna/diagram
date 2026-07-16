@@ -29,9 +29,9 @@ diag_foretagarna <- function(region_vekt = "20", # Vilken region skall vi välja
   source("https://raw.githubusercontent.com/Region-Dalarna/funktioner/main/func_API.R")
   
   # Text till diagram
-  diagram_capt <- c("Källa: SCB (via WWW.foretagsklimat.se).\nBearbetning: Samhällsanalys, Region Dalarna.\nDiagramförklaring: Gäller arbetsställen med minst 1 anställd",
-                    "Källa: UC AB (via WWW.foretagsklimat.se).\nBearbetning: Samhällsanalys, Region Dalarna.\nDiagramförklaring: Nyföretagsamma personer är sådana som inte klassades som företagsamma förra året,\nmen som gör det under innevarande år.",
-                    "Källa: UC, Kreicbergs Utredning & Opinion AB (via WWW.foretagsklimat.se).\nBearbetning: Samhällsanalys, Region Dalarna.\nDiagramförklaring: De invånare som innehar F-skattesedel, är delägare i ett aktivt handelsbolag\neller är vd eller styrelseordförande i ett aktivt aktiebolag räknas som företagsamma.\n")
+  diagram_capt <- c("Källa: SCB (via foretagsklimat.se).\nBearbetning: Samhällsanalys, Region Dalarna.\nDiagramförklaring: Gäller arbetsställen med minst 1 anställd",
+                    "Källa: UC AB (via foretagsklimat.se).\nBearbetning: Samhällsanalys, Region Dalarna.\nDiagramförklaring: Nyföretagsamma personer är sådana som inte klassades som företagsamma förra året,\nmen som gör det under innevarande år.",
+                    "Källa: UC, Kreicbergs Utredning & Opinion AB (via foretagsklimat.se).\nBearbetning: Samhällsanalys, Region Dalarna.\nDiagramförklaring: De invånare som innehar F-skattesedel, är delägare i ett aktivt handelsbolag\neller är vd eller styrelseordförande i ett aktivt aktiebolag räknas som företagsamma.\n")
   
   # Läser in län som vi är intresserade av
   gg_list <- list()  # skapa en tom lista att lägga flera ggplot-objekt i (om man skapar flera diagram)
