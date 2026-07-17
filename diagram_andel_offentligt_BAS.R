@@ -4,7 +4,7 @@ diagram_andel_offentligt <- function(region_vekt = hamtakommuner("20",tamedlan =
                                      output_mapp_figur= "G:/Samhällsanalys/Statistik/Näringsliv/basfakta/", # Vart hamnar figur om den skall sparas
                                      output_mapp_data = NA, # Vart hamnar data om den skall sparas. NA medför att data inte sparas 
                                      filnamn_data = "andel_offentligt.xlsx", # Filnamn för sparad data
-                                     diagram_capt <- "Källa: SCB:s öppna statistikdatabas.\nBearbetning: Samhällsanalys, Region Dalarna.\nDiagramförklaring: Sysselsatta efter arbetsställets belägenhet. Andel av sysselsatta som arbetar inom offentlig sektor respektive övriga sektorer.",
+                                     diagram_capt = "Källa: SCB:s öppna statistikdatabas.\nBearbetning: Samhällsanalys, Region Dalarna.\nDiagramförklaring: Sysselsatta efter arbetsställets belägenhet. Andel av sysselsatta som arbetar inom offentlig sektor respektive övriga sektorer.",
                                      vald_farg = "rus_sex", # Vilken färgvektor vill man ha. Blir alltid "kon" när man väljer det diagrammet
                                      stodlinjer_avrunda_fem = TRUE,
                                      spara_figur = FALSE, # Sparar figuren till output_mapp_figur
