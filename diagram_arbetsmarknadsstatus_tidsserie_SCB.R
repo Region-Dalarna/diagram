@@ -9,7 +9,7 @@ diagram_arbetsmarknadsstatus_tidsserie <-function(region_vekt = "20", # Max 1 re
                                         diagram_facet = FALSE, # Dela upp diagrammet på födelseregion
                                         legend_rader = NULL, # Hur många rader vill man ha i legenden
                                         marginal_yaxis_facet = c(0,0), # Marginaler för y-axeln i facet-diagram
-                                        alder_klartext = "20-64 år", #Välj enbart 1. Finns: 15-19 år, 16-19 år, 20-24 år, 25-29 år, 30-34 år, 35-39 år, 40-44 år, 45-49 år, 50-54 år, 55-59 år, 60-64 år, 65-69 år, 70-74 år, 15-74 år, 16-64 år, 16-65 år, 20-64 år, 20-65 år
+                                        alder_klartext = "20–64 år", #Välj enbart 1. Finns: "15–19 år" "16–19 år" "20–24 år" "25–29 år" "30–34 år" "35–39 år" "40–44 år" "45–49 år" "50–54 år" "55–59 år" "60–64 år" "65–69 år" "70–74 år" "15–74 år" "16–64 år" "16–65 år" "16–66 år" "20–64 år" "20–65 år" "20–66 år"
                                         valda_farger = diagramfarger("rus_sex"), # Ändra till kon om man vill ha de färgerna
                                         returnera_data = FALSE, # Skall data returneras
                                         start_ar ="2020", # Startår för data. Finns från 2020
@@ -23,6 +23,7 @@ diagram_arbetsmarknadsstatus_tidsserie <-function(region_vekt = "20", # Max 1 re
   #
   #
   # Uppdaterat och lagt till datahämtning via PXweb 2. Jon 2026-06-30
+  # Rättat märkligt fel där SCB verkar ha förlängt strecket mellan åren i åldersgrupper. Jon 2026-07-17
   # =================================================================================================================
   if (!require("pacman")) install.packages("pacman")
   p_load(openxlsx)
