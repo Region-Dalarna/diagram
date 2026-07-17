@@ -111,7 +111,7 @@ diagram_andel_offentligt <- function(region_vekt = hamtakommuner("20",tamedlan =
     
     diagram_titel <- paste0("Andel offentligt anställda (",alder_klartext,") i ",unique(andel_df$månad_namn)," ",unique(andel_df$år))
     diagramfilnamn <- "andel_offentligt.png"
-    diagram_capt = glue("Källa: SCB:s öppna statistikdatabas.\nBearbetning: Samhällsanalys, Region Dalarna.\nDiagramförklaring: Förvärvsarbetande efter arbetsställets belägenhet. Andel av förvärvsarbetande {alder_klartext} som arbetar inom offentlig sektor\nrespektive övriga sektorer.")
+    diagram_capt = glue("Källa: SCB:s öppna statistikdatabas.\nBearbetning: Samhällsanalys, Region Dalarna.\nDiagramförklaring: Förvärvsarbetande efter arbetsställets belägenhet. Andel av förvärvsarbetande {alder_klartext} som arbetar inom\noffentlig sektor respektive övriga sektorer.")
     
     objektnamn = c(objektnamn,"andel_off_totalt")
     
