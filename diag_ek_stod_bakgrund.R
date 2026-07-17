@@ -17,6 +17,7 @@ diagram_ek_stod_bakgrund_SCB <- function(region_vekt = "20",
   # Om man vill veta vad ekonomiskt stöd innefattar: https://www.scb.se/contentassets/592dcafe2a3b4e65b8e5434796bab0af/huvudsaklig-inkomstkalla-och-arbetsrelaterad-inkomstniva_x.pdf
   #
   # Uppdaterat skript med ny version av PXweb Jon 2026-07-01
+  # Rättat märklig felaktighet där SCB har ändrat till längre linje mellan åldrar i åldersgrupper. Jon 2026-07-17
   # ====================================================================================================================================================================================
   
   if (!require("pacman")) install.packages("pacman")
