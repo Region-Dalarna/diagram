@@ -4,7 +4,6 @@ diagram_andel_offentligt <- function(region_vekt = hamtakommuner("20",tamedlan =
                                      output_mapp_figur= "G:/Samhällsanalys/Statistik/Näringsliv/basfakta/", # Vart hamnar figur om den skall sparas
                                      output_mapp_data = NA, # Vart hamnar data om den skall sparas. NA medför att data inte sparas 
                                      filnamn_data = "andel_offentligt.xlsx", # Filnamn för sparad data
-                                     diagram_capt = "Källa: SCB:s öppna statistikdatabas.\nBearbetning: Samhällsanalys, Region Dalarna.\nDiagramförklaring: Sysselsatta efter arbetsställets belägenhet. Andel av sysselsatta som arbetar inom offentlig sektor\nrespektive övriga sektorer.",
                                      vald_farg = "rus_sex", # Vilken färgvektor vill man ha. Blir alltid "kon" när man väljer det diagrammet
                                      stodlinjer_avrunda_fem = TRUE,
                                      spara_figur = FALSE, # Sparar figuren till output_mapp_figur
@@ -112,7 +111,8 @@ diagram_andel_offentligt <- function(region_vekt = hamtakommuner("20",tamedlan =
     
     diagram_titel <- paste0("Andel offentligt anställda (",alder_klartext,") i ",unique(andel_df$månad_namn)," ",unique(andel_df$år))
     diagramfilnamn <- "andel_offentligt.png"
-    diagram_capt <- diagram_capt
+    diagram_capt = glue("Källa: SCB:s öppna statistikdatabas.\nBearbetning: Samhällsanalys, Region Dalarna.\nDiagramförklaring: Förvärvsarbetande efter arbetsställets belägenhet. Andel av förvärvsarbetande {alder_klartext} som arbetar inom offentlig sektor\nrespektive övriga sektorer.")
+    
     objektnamn = c(objektnamn,"andel_off_totalt")
     
     gg_obj <- SkapaStapelDiagram(skickad_df = andel_df %>% 
