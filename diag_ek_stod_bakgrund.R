@@ -6,16 +6,18 @@ diagram_ek_stod_bakgrund_SCB <- function(region_vekt = "20",
                                          diag_kon = TRUE,
                                          stodlinjer_avrunda_fem = TRUE, # Blir för plottrigt ibland. Välj FALSE i så fall
                                          output_mapp = "G:/Samhällsanalys/Statistik/Näringsliv/basfakta/",
-                                         alder_klartext = "15-74 år",			 #  Finns: "15-19 år", "20-24 år", "25-54 år", "55-64 år", "65-74 år", "15-74 år", "16-64 år", "16-65 år", "20-64 år", "20-65 år" 
+                                         alder_klartext = "15–74 år",			 #  Finns: "15–19 år" "20–24 år" "25–54 år" "55–64 år" "65–74 år" "15–74 år" "16–64 år" "16–65 år" "16–66 år" "20–64 år" "20–65 år" "20–66 år"
                                          ta_bort_nast_sista_varde = TRUE, # Ta bort näst sista värdet på x-axeln
                                          skriv_diagrambildfil = FALSE, # Skall diagrammet sparas
                                          returnera_data_rmarkdown = FALSE # Skall data returneras till global enviroment
 ){
   
+  # ========================================== Allmän info =============================================================================================================================
   # Diagram som skapar två figurer för ekonomiskt stöd, används både i det samhällsekonomiska läget i Dalarna och integrationsrapporten. API från SCB
   # Om man vill veta vad ekonomiskt stöd innefattar: https://www.scb.se/contentassets/592dcafe2a3b4e65b8e5434796bab0af/huvudsaklig-inkomstkalla-och-arbetsrelaterad-inkomstniva_x.pdf
   #
   # Uppdaterat skript med ny version av PXweb Jon 2026-07-01
+  # ====================================================================================================================================================================================
   
   if (!require("pacman")) install.packages("pacman")
   p_load(tidyverse,
