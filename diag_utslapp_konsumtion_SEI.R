@@ -119,7 +119,7 @@ diagram_konsumtionsutslapp <- function(region_vekt = hamtaAllaLan(), # Finns lä
     
     if (spara_figur){
       ggsave(filename = paste0(output_mapp, diagramfilnamn),
-             plot = p,
+             plot = gg_obj,
              width = 12,
              height = 7,
              dpi = 300)
