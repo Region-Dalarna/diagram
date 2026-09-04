@@ -41,7 +41,7 @@ diagram_konsumtionsutslapp <- function(region_vekt = hamtaAllaLan(), # Finns lä
     ValdGeografi <- skapa_kortnamn_lan(hamtaregion_kod_namn(fokus_region)$region,byt_ut_riket_mot_sverige = TRUE)
     
     # Jämför län för senaste år
-    diagram_titel <- paste0("Hushållens totalt utsläpp år ",max(konsumtionskompassen_df$year))
+    diagram_titel <- paste0("Hushållens totala utsläpp år ",max(konsumtionskompassen_df$year))
     diagramfilnamn <- glue("kons_utslapp_lan_ar_{max(konsumtionskompassen_df$year)}.png")
     diagram_capt = "Källa: https://www.konsumtionskompassen.se (Stockholm Environment Institute (SEI),2025)\nBearbetning: Samhällsanalys, Region Dalarna\nDiagramförklaring: kg koldioxidekvivalenter per person. För en mer ingående förklaring av hur data har beräknats,\nse https://www.konsumtionskompassen.se"
     
@@ -147,7 +147,7 @@ diagram_konsumtionsutslapp <- function(region_vekt = hamtaAllaLan(), # Finns lä
     ValdGeografi <- skapa_kortnamn_lan(hamtaregion_kod_namn(lan_kommun)$region,byt_ut_riket_mot_sverige = TRUE)
     
     # Jämför kommuner för senaste år
-    diagram_titel <- paste0("Hushållens totalt utsläpp år ",max(konsumtionskompassen_df$year))
+    diagram_titel <- paste0("Hushållens totala utsläpp år ",max(konsumtionskompassen_df$year))
     diagramfilnamn <- glue("kons_utslapp_{ValdGeografi}_ar_{max(konsumtionskompassen_df$year)}.png")
     diagram_capt = "Källa: https://www.konsumtionskompassen.se (Stockholm Environment Institute (SEI),2025)\nBearbetning: Samhällsanalys, Region Dalarna\nDiagramförklaring: kg koldioxidekvivalenter per person. För en mer ingående förklaring av hur data har beräknats,\nse https://www.konsumtionskompassen.se"
     
