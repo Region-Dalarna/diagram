@@ -4,6 +4,7 @@ diagram_storsta_fodelseland <-function(region_vekt = "20",# Max 1, län
                                        tid_koder = "*", # Finns från 2000 och framåt
                                        returnera_figur = TRUE, # Returnerar en figur
                                        jmf_ar = 2010, # Första och sista år i tid_koder jämförs med detta år
+                                       ar_sortering = 3, # Vilket år skall födda sorteras på i diagrammet (högst till lägst). 3 ger sista året om man jämför tre år (annars 4 osv) 
                                        antal_lander = 10, # Antal länder som skall visas i diagrammet
                                        valda_farger = diagramfarger("rus_sex"),
                                        visa_logga_i_diagram = FALSE,                        # TRUE om logga ska visas i diagrammet, FALSE om logga inte ska visas i diagrammet
@@ -14,6 +15,8 @@ diagram_storsta_fodelseland <-function(region_vekt = "20",# Max 1, län
   ## =================================================================================================================
   # Ett diagram för största födelseland bland utrikes födda i regionen. Går att jämföra tre år (första, sista och jämförelseår)
   # eller bara titta på sista år
+  #
+  # Uppdaterat med PXweb2 - Jon 20260908
   # =================================================================================================================
   if (!require("pacman")) install.packages("pacman")
   p_load(openxlsx,
@@ -22,16 +25,31 @@ diagram_storsta_fodelseland <-function(region_vekt = "20",# Max 1, län
   source("https://raw.githubusercontent.com/Region-Dalarna/funktioner/main/func_API.R")
   source("https://raw.githubusercontent.com/Region-Dalarna/funktioner/main/func_SkapaDiagram.R")
   source("https://raw.githubusercontent.com/Region-Dalarna/hamta_data/refs/heads/main/hamta_bef_fodelseland_region_fodelseregion_kon_tid_FolkmRegFlandK_scb.R")
+  source("https://raw.githubusercontent.com/Region-Dalarna/funktioner/main/func_pxweb2.R")
   
   gg_list <- list()  # skapa en tom lista att lägga flera ggplot-objekt i (om man skapar flera diagram)
   objektnamn <- c()
   region_namn <- skapa_kortnamn_lan(hamtaregion_kod_namn(region_vekt)$region)
   
-  # Hämta data
-  antal_fodelseland_df <- hamta_bef_fodelseland_region_fodelseregion_kon_tid_scb(region_vekt = region_vekt,
-                                                                                 kon_klartext = NA,
-                                                                                 tid_koder = tid_koder) %>%
-    mutate(region = skapa_kortnamn_lan(region))
+  # Hämta data - Tidigare
+  # antal_fodelseland_df <- hamta_bef_fodelseland_region_fodelseregion_kon_tid_scb(region_vekt = region_vekt,
+  #                                                                                kon_klartext = NA,
+  #                                                                                tid_koder = tid_koder) %>%
+  #   mutate(region = skapa_kortnamn_lan(region))
+  
+  # Hämta data - nya PXweb
+  antal_fodelseland_df <- pxweb2_hamta_data(
+    tabell = c("TAB6030","TAB6646"),
+    query = list(
+      Region = region_vekt,
+      Fodelseregion = "*",
+      Kon = NA,
+      ContentsCode = "*",
+      Tid = "*"
+    )) %>%
+    mutate(region = skapa_kortnamn_lan(region)) |> 
+      rename(regionkod = region_kod,
+             Antal = value)
   
   # # select 10 largest födelseland in the first year
   # top_10_fodelseland_forstaar <- antal_fodelseland_df %>%
@@ -52,7 +70,10 @@ diagram_storsta_fodelseland <-function(region_vekt = "20",# Max 1, län
     assign("storsta_fodelseland_df", storsta_fodelseland_df, envir = .GlobalEnv)
   }
   
-  diagram_capt = "Källa: SCB:s öppna statistikdatabas\nBearbetning: Samhällsanalys, Region Dalarna"
+  diagram_capt = paste0("Källa: SCB:s öppna statistikdatabas\nBearbetning: Samhällsanalys, Region Dalarna\n",
+                        "Från och med referensåret 2025 och framåt är en liten kontrollerad slumpmässig\n",
+                        "osäkerhet införd i samtliga redovisade uppgifter.Osäkerheten har tillförts för\n", 
+                        "att skydda enskilda personer så att ingen riskerar att röjas i statistiken.")
   
   if(length(unique(storsta_fodelseland_df$år)) == 1){
     diagram_titel = paste0("Vanligaste födelseland bland utrikes födda i ",region_namn, " år ",unique(storsta_fodelseland_df$år))
@@ -74,7 +95,7 @@ diagram_storsta_fodelseland <-function(region_vekt = "20",# Max 1, län
                                manual_x_axis_text_hjust = 1,
                                x_axis_sort_value = TRUE,
                                vand_sortering = TRUE,
-                               x_axis_sort_grp = 3,
+                               x_axis_sort_grp = ar_sortering,
                                legend_tabort = ifelse(length(unique(storsta_fodelseland_df$år)) == 1,TRUE,FALSE),
                                diagram_capt =  diagram_capt,
                                output_mapp = output_mapp_figur,
