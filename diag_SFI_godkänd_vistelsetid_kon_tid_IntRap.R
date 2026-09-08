@@ -14,7 +14,7 @@ diag_SFI_bakgrund <- function(region = "20", # Enbart ett i taget.
   # =======================================================================================================================
   #
   # Två diagram godkända i SFI efter vistelsetid i Sverige
-  #
+  # Uppdaterat med ny version av PXweb - Jon 2026-09-08
   # =======================================================================================================================
   
   # om parametern demo är satt till TRUE så öppnas en flik i webbläsaren med ett exempel på hur diagrammet ser ut och därefter avslutas funktionen
@@ -46,14 +46,30 @@ diag_SFI_bakgrund <- function(region = "20", # Enbart ett i taget.
   
   
   
-  # Hämtar data
+  # Hämtar data - Tidigare
   SFI_df <- hamta_SFI_genomfort_region_kon_bakgrund_tid_scb(region_vekt = region,
                                                             kon_klartext = "*",
                                                             bakgrund_klartext = c("utbildningsnivå: förgymnasial utbildning", "utbildningsnivå: gymnasial utbildning", "utbildningsnivå: eftergymnasial utbildning"),
                                                             cont_klartext = "Vistelsetid för godkända i sfi, median i antal dagar",
                                                             tid_koder = "*") %>%
+    rename(variabel = bakgrundsvariabel) |>
     mutate(variabel = sub("utbildningsnivå: ", "", variabel),
            variabel = str_to_sentence(variabel))
+  
+  # Nya PXweb
+  SFI_df <- pxweb2_hamta_data(
+    tabell = "TAB1808",
+    query = list(
+      Region = region,
+      Kon = "*",
+      Bakgrund = c("utbildningsnivå: förgymnasial utbildning", "utbildningsnivå: gymnasial utbildning", "utbildningsnivå: eftergymnasial utbildning"),
+      ContentsCode = "Vistelsetid för godkända i sfi, median i antal dagar",
+      Tid = "*"
+    )) %>%
+    rename(variabel = bakgrundsvariabel) |> 
+    mutate(variabel = sub("utbildningsnivå: ", "", variabel),
+           variabel = str_to_sentence(variabel)) |> 
+    select(-tabellinnehåll)
   
   
   if(returnera_data_rmarkdown == TRUE){
@@ -66,13 +82,13 @@ diag_SFI_bakgrund <- function(region = "20", # Enbart ett i taget.
   
   #Skapar en faktorvariabel för att få tid sedan etablering i "rätt" ordning i figuren
   SFI_df$variabel <- factor(SFI_df$variabel, levels = unique(SFI_df$variabel))
-  
-  # Namn på variabel som används i diagramtitel
-  variabel_namn <- sub("sfi", "SFI", sub(",.*", "", last(names(SFI_df))))
+  # 
+  # # Namn på variabel som används i diagramtitel
+  # variabel_namn <- sub("sfi", "SFI", sub(",.*", "", last(names(SFI_df))))
   
   if(diag_vistelsetid_senaste_ar){
     
-    diagramtitel <- glue("{variabel_namn} i {valt_lan} år {max(SFI_df$år)}")
+    diagramtitel <- glue("Vistelsetid för godkända i SFI i {valt_lan} år {max(SFI_df$år)}")
     diagramfilnamn <- paste0("sfi_vistelsetid_senastear_",valt_lan,".png")
     
     gg_obj <- SkapaStapelDiagram(skickad_df =SFI_df %>%
@@ -100,7 +116,7 @@ diag_SFI_bakgrund <- function(region = "20", # Enbart ett i taget.
   
   if(diag_vistelsetid_tidsserie){
     
-    diagramtitel <- glue("{variabel_namn} i {valt_lan}")
+    diagramtitel <- glue("Vistelsetid för godkända i SFI i {valt_lan}")
     diagramfilnamn <- paste0("sfi_vistelsetid_tidsserie_",valt_lan,".png")
     
     gg_obj <- SkapaStapelDiagram(skickad_df =SFI_df %>%
