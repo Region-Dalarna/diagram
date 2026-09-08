@@ -36,7 +36,8 @@ diag_SFI_bakgrund <- function(region = "20", # Enbart ett i taget.
   
   source("https://raw.githubusercontent.com/Region-Dalarna/funktioner/main/func_API.R")
   source("https://raw.githubusercontent.com/Region-Dalarna/funktioner/main/func_SkapaDiagram.R")
-  source("https://raw.githubusercontent.com/Region-Dalarna/hamta_data/refs/heads/main/hamta_SFI_godkand_region_kon_bakgrund_tid_IntGr8LanKON3_scb.R")
+  #source("https://raw.githubusercontent.com/Region-Dalarna/hamta_data/refs/heads/main/hamta_SFI_godkand_region_kon_bakgrund_tid_IntGr8LanKON3_scb.R")
+  source("https://raw.githubusercontent.com/Region-Dalarna/funktioner/main/func_pxweb2.R")
   
   valt_lan <- skapa_kortnamn_lan(hamtaregion_kod_namn(region)$region)
   # if (!require("pacman")) install.packages("pacman")
@@ -47,14 +48,14 @@ diag_SFI_bakgrund <- function(region = "20", # Enbart ett i taget.
   
   
   # Hämtar data - Tidigare
-  SFI_df <- hamta_SFI_genomfort_region_kon_bakgrund_tid_scb(region_vekt = region,
-                                                            kon_klartext = "*",
-                                                            bakgrund_klartext = c("utbildningsnivå: förgymnasial utbildning", "utbildningsnivå: gymnasial utbildning", "utbildningsnivå: eftergymnasial utbildning"),
-                                                            cont_klartext = "Vistelsetid för godkända i sfi, median i antal dagar",
-                                                            tid_koder = "*") %>%
-    rename(variabel = bakgrundsvariabel) |>
-    mutate(variabel = sub("utbildningsnivå: ", "", variabel),
-           variabel = str_to_sentence(variabel))
+  # SFI_df <- hamta_SFI_genomfort_region_kon_bakgrund_tid_scb(region_vekt = region,
+  #                                                           kon_klartext = "*",
+  #                                                           bakgrund_klartext = c("utbildningsnivå: förgymnasial utbildning", "utbildningsnivå: gymnasial utbildning", "utbildningsnivå: eftergymnasial utbildning"),
+  #                                                           cont_klartext = "Vistelsetid för godkända i sfi, median i antal dagar",
+  #                                                           tid_koder = "*") %>%
+  #   rename(variabel = bakgrundsvariabel) |>
+  #   mutate(variabel = sub("utbildningsnivå: ", "", variabel),
+  #          variabel = str_to_sentence(variabel))
   
   # Nya PXweb
   SFI_df <- pxweb2_hamta_data(
