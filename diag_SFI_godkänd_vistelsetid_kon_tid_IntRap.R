@@ -37,9 +37,6 @@ diag_SFI_bakgrund <- function(region = "20", # Enbart ett i taget.
   
   source("https://raw.githubusercontent.com/Region-Dalarna/funktioner/main/func_API.R")
   source("https://raw.githubusercontent.com/Region-Dalarna/funktioner/main/func_SkapaDiagram.R")
-  #source("https://raw.githubusercontent.com/Region-Dalarna/hamta_data/refs/heads/main/hamta_SFI_godkand_region_kon_bakgrund_tid_IntGr8LanKON3_scb.R")
-  source("https://raw.githubusercontent.com/Region-Dalarna/funktioner/main/func_pxweb2.R")
-  
   valt_lan <- skapa_kortnamn_lan(hamtaregion_kod_namn(region)$region)
 
   # Nya PXweb
