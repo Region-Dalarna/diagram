@@ -14,7 +14,7 @@ diag_SFI_bakgrund <- function(region = "20", # Enbart ett i taget.
   # =======================================================================================================================
   #
   # Två diagram godkända i SFI efter vistelsetid i Sverige
-  # Uppdaterat med ny version av PXweb - Jon 2026-09-08
+  # Uppdaterat med ny version av PXweb - Jon 2026-09-08. Lagt till så att PXweb2 hämtas via paket 2026-09-09
   # =======================================================================================================================
   
   # om parametern demo är satt till TRUE så öppnas en flik i webbläsaren med ett exempel på hur diagrammet ser ut och därefter avslutas funktionen
@@ -30,6 +30,7 @@ diag_SFI_bakgrund <- function(region = "20", # Enbart ett i taget.
   if (!require("pacman")) install.packages("pacman")
   p_load(tidyverse,
          glue)
+  p_load_gh("FaluPeppe/pxweb2r")
   
   
   gg_list <- list()
@@ -40,26 +41,10 @@ diag_SFI_bakgrund <- function(region = "20", # Enbart ett i taget.
   source("https://raw.githubusercontent.com/Region-Dalarna/funktioner/main/func_pxweb2.R")
   
   valt_lan <- skapa_kortnamn_lan(hamtaregion_kod_namn(region)$region)
-  # if (!require("pacman")) install.packages("pacman")
-  # pacman::p_load(tidyverse,
-  #                pxweb,
-  #                readxl)
-  
-  
-  
-  # Hämtar data - Tidigare
-  # SFI_df <- hamta_SFI_genomfort_region_kon_bakgrund_tid_scb(region_vekt = region,
-  #                                                           kon_klartext = "*",
-  #                                                           bakgrund_klartext = c("utbildningsnivå: förgymnasial utbildning", "utbildningsnivå: gymnasial utbildning", "utbildningsnivå: eftergymnasial utbildning"),
-  #                                                           cont_klartext = "Vistelsetid för godkända i sfi, median i antal dagar",
-  #                                                           tid_koder = "*") %>%
-  #   rename(variabel = bakgrundsvariabel) |>
-  #   mutate(variabel = sub("utbildningsnivå: ", "", variabel),
-  #          variabel = str_to_sentence(variabel))
-  
+
   # Nya PXweb
-  SFI_df <- pxweb2_hamta_data(
-    tabell = "TAB1808",
+  SFI_df <- pxweb2_get_data(
+    table = "TAB1808",
     query = list(
       Region = region,
       Kon = "*",

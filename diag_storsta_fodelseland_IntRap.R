@@ -16,30 +16,23 @@ diagram_storsta_fodelseland <-function(region_vekt = "20",# Max 1, län
   # Ett diagram för största födelseland bland utrikes födda i regionen. Går att jämföra tre år (första, sista och jämförelseår)
   # eller bara titta på sista år
   #
-  # Uppdaterat med PXweb2 - Jon 20260908
+  # Uppdaterat med PXweb2 - Jon 20260908. Lagt till så att PXweb2 hämtas via paket 2026-09-09
   # =================================================================================================================
   if (!require("pacman")) install.packages("pacman")
   p_load(openxlsx,
          pxweb)
+  p_load_gh("FaluPeppe/pxweb2r")
   
   source("https://raw.githubusercontent.com/Region-Dalarna/funktioner/main/func_API.R")
   source("https://raw.githubusercontent.com/Region-Dalarna/funktioner/main/func_SkapaDiagram.R")
-  #source("https://raw.githubusercontent.com/Region-Dalarna/hamta_data/refs/heads/main/hamta_bef_fodelseland_region_fodelseregion_kon_tid_FolkmRegFlandK_scb.R")
-  source("https://raw.githubusercontent.com/Region-Dalarna/funktioner/main/func_pxweb2.R")
   
   gg_list <- list()  # skapa en tom lista att lägga flera ggplot-objekt i (om man skapar flera diagram)
   objektnamn <- c()
   region_namn <- skapa_kortnamn_lan(hamtaregion_kod_namn(region_vekt)$region)
-  
-  # Hämta data - Tidigare
-  # antal_fodelseland_df <- hamta_bef_fodelseland_region_fodelseregion_kon_tid_scb(region_vekt = region_vekt,
-  #                                                                                kon_klartext = NA,
-  #                                                                                tid_koder = tid_koder) %>%
-  #   mutate(region = skapa_kortnamn_lan(region))
-  
+
   # Hämta data - nya PXweb
-  antal_fodelseland_df <- pxweb2_hamta_data(
-    tabell = c("TAB6030","TAB6646"),
+  antal_fodelseland_df <- pxweb2_get_data(
+    table = c("TAB6030","TAB6646"),
     query = list(
       Region = region_vekt,
       Fodelseregion = "*",
