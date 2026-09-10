@@ -4,7 +4,7 @@ diag_inkomst_bakgrund_scb <- function(region = "20", # Enbart ett i taget.
                                       output_mapp = "G:/Samhällsanalys/API/Fran_R/utskrift/",                                  # mapp där diagram ska sparas, NA = sparas ingen fil
                                       inkomst_typ = "Medianinkomst, tkr", # Finns "Medianinkomst, tkr", "Medelinkomst, tkr". Max 1 åt gången
                                       skriv_diagrambildfil = FALSE,                           # TRUE om diagram ska skrivas till fil, FALSE om diagram inte ska skrivas till fil
-                                      alder_klartext = "20-64 år",			 #  Finns: "20+ år", "20-64 år", "20-65 år", "65+ år", "66+ år". Max 1 åt gången
+                                      alder_klartext = "20–64 år",			 #  Finns: "20+ år", "20–64 år", "20–65 år", "65+ år", "66+ år". Max 1 åt gången
                                       returnera_data_rmarkdown = FALSE,
                                       demo = FALSE             # sätts till TRUE om man bara vill se ett exempel på diagrammet i webbläsaren och inget annat
 ) {
@@ -15,7 +15,7 @@ diag_inkomst_bakgrund_scb <- function(region = "20", # Enbart ett i taget.
   # Ett diagram för förvärvsinkomst kopplad till bakgrund (vistelsetid)
   # Från integrationsrapporten (därav IntRap i namnet)
   #
-  #
+  # Ändrat felaktighet med för kort - och uppdaterat till nya PXweb - Jon 2026-09-10
   # =======================================================================================================================
   
   # om parametern demo är satt till TRUE så öppnas en flik i webbläsaren med ett exempel på hur diagrammet ser ut och därefter avslutas funktionen
@@ -31,37 +31,36 @@ diag_inkomst_bakgrund_scb <- function(region = "20", # Enbart ett i taget.
   if (!require("pacman")) install.packages("pacman")
   p_load(tidyverse,
          glue)
+  p_load_gh("FaluPeppe/pxweb2r")
   
   source("https://raw.githubusercontent.com/Region-Dalarna/funktioner/main/func_API.R")
   source("https://raw.githubusercontent.com/Region-Dalarna/funktioner/main/func_SkapaDiagram.R")
-  source("https://raw.githubusercontent.com/Region-Dalarna/hamta_data/refs/heads/main/hamta_forvarvsinkomst_region_kon_fodelseregion_vistelsetid_HE0110_scb.R")
-  
-  if (!require("pacman")) install.packages("pacman")
-  pacman::p_load(tidyverse,
-                 pxweb,
-                 readxl)
-  
-  # Före 2022
-  forvarvsinkomst_df <- hamta_forvarvsinkomst_region_kon_fodelseregion_vistelsetid_scb(region_vekt = region,
-                                                                                       kon_klartext = "*",
-                                                                                       alder_klartext = alder_klartext,
-                                                                                       vistelsetiduf_klartext = "*",
-                                                                                       cont_klartext = inkomst_typ,
-                                                                                       tid_koder = "9999") %>%
-    rename(vistelsetid = `vistelsetid år`) %>%
+
+  forvarvsinkomst_df <- pxweb2_get_data(
+    table = "TAB5278",
+    query_list <- list(
+      Region = region,
+      Kon = "*",
+      Fodelseregion = "*",
+      VistelsetidUF = "*",
+      Alder = alder_klartext,
+      ContentsCode = inkomst_typ,
+      Tid ="9999"
+    )
+  ) |>  rename(!!inkomst_typ := value,
+               regionkod = region_kod,
+               vistelsetid = `vistelsetid år`) %>%
     mutate(vistelsetid = ifelse(födelseregion == "födda i Sverige","Inrikes född",vistelsetid)) %>%
     filter(födelseregion %in% c("födda i Sverige","utrikes födda"),
            vistelsetid != "samtliga") %>%
     mutate(vistelsetid = case_when(
-      vistelsetid == "1-2 år i Sverige" ~ "1-2 år",
-      vistelsetid == "3-4 år i Sverige" ~ "3-4 år",
-      vistelsetid == "5-9 år i Sverige" ~ "5-9 år",
-      vistelsetid == "10-19 år i Sverige" ~ "10-19 år",
-      vistelsetid == "20- år i Sverige" ~ "20- år",
+      vistelsetid == "1–2 år i Sverige" ~ "1-2 år",
+      vistelsetid == "3–4 år i Sverige" ~ "3-4 år",
+      vistelsetid == "5–9 år i Sverige" ~ "5-9 år",
+      vistelsetid == "10–19 år i Sverige" ~ "10-19 år",
+      vistelsetid == "20– år i Sverige" ~ "20- år",
       TRUE ~ vistelsetid
     ))
-  
-  # !(is.na(`Medianinkomst, tkr`)),
   
   
   if(returnera_data_rmarkdown == TRUE){
