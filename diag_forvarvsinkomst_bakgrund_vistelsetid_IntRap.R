@@ -47,20 +47,21 @@ diag_inkomst_bakgrund_scb <- function(region = "20", # Enbart ett i taget.
       ContentsCode = inkomst_typ,
       Tid ="9999"
     )
-  ) |>  rename(!!inkomst_typ := value,
-               regionkod = region_kod,
-               vistelsetid = `vistelsetid år`) %>%
-    mutate(vistelsetid = ifelse(födelseregion == "födda i Sverige","Inrikes född",vistelsetid)) %>%
-    filter(födelseregion %in% c("födda i Sverige","utrikes födda"),
-           vistelsetid != "samtliga") %>%
-    mutate(vistelsetid = case_when(
-      vistelsetid == "1–2 år i Sverige" ~ "1-2 år",
-      vistelsetid == "3–4 år i Sverige" ~ "3-4 år",
-      vistelsetid == "5–9 år i Sverige" ~ "5-9 år",
-      vistelsetid == "10–19 år i Sverige" ~ "10-19 år",
-      vistelsetid == "20– år i Sverige" ~ "20- år",
-      TRUE ~ vistelsetid
-    ))
+  ) |>  filter(!is.na(value)) |> 
+          rename(!!inkomst_typ := value,
+                     regionkod = region_kod,
+                     vistelsetid = `vistelsetid år`) %>%
+          mutate(vistelsetid = ifelse(födelseregion == "födda i Sverige","Inrikes född",vistelsetid)) %>%
+          filter(födelseregion %in% c("födda i Sverige","utrikes födda"),
+                 vistelsetid != "samtliga") %>%
+          mutate(vistelsetid = case_when(
+            vistelsetid == "1–2 år i Sverige" ~ "1-2 år",
+            vistelsetid == "3–4 år i Sverige" ~ "3-4 år",
+            vistelsetid == "5–9 år i Sverige" ~ "5-9 år",
+            vistelsetid == "10–19 år i Sverige" ~ "10-19 år",
+            vistelsetid == "20– år i Sverige" ~ "20- år",
+            TRUE ~ vistelsetid
+          ))
   
   
   if(returnera_data_rmarkdown == TRUE){
