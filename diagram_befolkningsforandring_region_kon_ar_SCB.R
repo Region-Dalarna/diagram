@@ -24,22 +24,26 @@ diagram_befolkningsforandring_ar <- function(region_vekt = "20", # Val av kommun
   
   if (!require("pacman")) install.packages("pacman")
   p_load(tidyverse)
-  
+  if (!requireNamespace("pxweb2r", quietly = TRUE)) remotes::install_github("FaluPeppe/pxweb2r")
+
   source("https://raw.githubusercontent.com/Region-Dalarna/funktioner/main/func_SkapaDiagram.R")
   source("https://raw.githubusercontent.com/Region-Dalarna/funktioner/main/func_API.R")
-  
-  source("https://raw.githubusercontent.com/Region-Dalarna/hamta_data/main/hamta_bef_folkmangd_alder_kon_ar_scb.R")
-  #source("https://raw.githubusercontent.com/Region-Dalarna/hamta_data/refs/heads/main/hamta_bef_folkmangd_alder_kon_ar_civilstand_scb_CKM_2025.R")
+
   diagram_capt <- "Källa: SCB:s öppna statistikdatabas, bearbetning av Samhällsanalys, Region Dalarna."
-  
+
   gg_list <- list()
   objektnamn <- c()
-  
-  befolkning_df <- suppress_specific_warning(
-    hamta_bef_folkmangd_alder_kon_ar_scb(region_vekt = region_vekt,
-                                                        tid_koder = tid,
-                                                        kon_klartext = kon_klartext,
-                                                        cont_klartext = c("folkmängd", "folkökning"))) 
+
+  # Hämtar samma data som tidigare kom via
+  # hamta_data/hamta_bef_folkmangd_alder_kon_ar_scb.R (SCB:s tabell BefolkningNy,
+  # gamla API:et), men direkt mot SCB:s nya PxWeb-API v2 med pxweb2r. TAB638 =
+  # "Folkmängden efter region, civilstånd, ålder och kön" - samma tabell, nytt id.
+  befolkning_df <- pxweb2r::pxweb2_get_data(
+      "TAB638",
+      query = list(Region = region_vekt, Kon = kon_klartext, Civilstand = NA,
+                   Alder = NA, ContentsCode = c("Folkmängd", "Folkökning"), Tid = tid)
+    ) %>%
+    rename(regionkod = region_kod, variabel = tabellinnehåll, varde = value)
   
   # befolkning_df_CKM <- suppress_specific_warning(
   #   hamta_folkmangd_civilstand_alder_kon_ar_CKM(region_vekt = region_vekt,
