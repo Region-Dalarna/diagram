@@ -22,12 +22,23 @@ diagram_befolkningsforandring_ar <- function(region_vekt = "20", # Val av kommun
   # ===========================================================================================================
   
   
-  if (!require("pacman")) install.packages("pacman")
-  p_load(tidyverse)
+  # Hämtar bara det som faktiskt behövs (rddiagram/rdverktyg/pxweb2r + tre små
+  # tidyverse-paket) i stället för source() mot funktioner-repot + p_load(tidyverse).
+  # Undviker hela raden av C/C++-beroenden (magick, sf, systemfonts/ragg/textshaping
+  # via hela tidyverse) som annars krävs bara för att komma åt ett fåtal funktioner.
+  if (!requireNamespace("rddiagram", quietly = TRUE)) {
+    remotes::install_github("Region-Dalarna/rdpaket", subdir = "packages/rddiagram")
+  }
+  if (!requireNamespace("rdverktyg", quietly = TRUE)) {
+    remotes::install_github("Region-Dalarna/rdpaket", subdir = "packages/rdverktyg")
+  }
   if (!requireNamespace("pxweb2r", quietly = TRUE)) remotes::install_github("FaluPeppe/pxweb2r")
 
-  source("https://raw.githubusercontent.com/Region-Dalarna/funktioner/main/func_SkapaDiagram.R")
-  source("https://raw.githubusercontent.com/Region-Dalarna/funktioner/main/func_API.R")
+  library(rddiagram)
+  library(rdverktyg)
+  library(dplyr)
+  library(purrr)
+  library(stringr)
 
   diagram_capt <- "Källa: SCB:s öppna statistikdatabas, bearbetning av Samhällsanalys, Region Dalarna."
 
@@ -98,8 +109,7 @@ diagram_befolkningsforandring_ar <- function(region_vekt = "20", # Val av kommun
                                    manual_x_axis_text_hjust = 1,
                                    manual_y_axis_title = "",
                                    geom_position_stack = TRUE,
-                                   diagram_facet = length(unique(ut_df$region)) > 1,
-                                   facet_grp = "region",
+                                   facet_grp = if (length(unique(ut_df$region)) > 1) "region" else NULL,
                                    facet_scale = "free",
                                    facet_legend_bottom = TRUE,
                                    legend_vand = TRUE,
@@ -151,8 +161,7 @@ diagram_befolkningsforandring_ar <- function(region_vekt = "20", # Val av kommun
                                    manual_x_axis_text_hjust = 1,
                                    manual_y_axis_title = "",
                                    geom_position_stack = TRUE,
-                                   diagram_facet = length(unique(ut_df$region)) > 1,
-                                   facet_grp = "region",
+                                   facet_grp = if (length(unique(ut_df$region)) > 1) "region" else NULL,
                                    facet_scale = "free",
                                    facet_legend_bottom = TRUE,
                                    legend_vand = TRUE,
