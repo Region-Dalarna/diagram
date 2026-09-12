@@ -97,15 +97,15 @@ diag_fodda_manad_scb <- function(
   if (kortnamn_lan) diagram_df <- dplyr::mutate(diagram_df, region = rdverktyg::skapa_kortnamn_lan(region))
 
   # om ingen färgvektor är medskickad: en färg per år (en linje per år i
-  # diagrammet), stigande i mättnad så att senaste året - det mest
-  # intressanta - får den tydligaste färgen och äldre år tonas ned. Bygger
-  # på samma rus_gradient-baserade lösning som redan används för en
-  # liknande år-för-år-tidsserie i diagram_arbetsmarknadsstatus_tidsserie_SCB.R,
-  # i stället för upprepade identiska gråa streck som gjorde de äldre åren
-  # omöjliga att skilja åt.
+  # diagrammet). rus_gradient (sex gröna nyanser) visade sig vara för
+  # svårskiljda i praktiken - rus_sex ger sex tydligt olika färger i
+  # stället, vilket också råkar sluta på en mörk, tydlig färg för det
+  # sista (senaste) året eftersom paletten är ordnad så. Antalet år matchar
+  # normalt exakt de sex färgerna (samma "senaste 6 år"-filter som nedan),
+  # men rep_len() används defensivt ifall fler år någonsin visas.
   if (all(is.na(diagram_fargvekt))) {
     antal_ar <- length(unique(diagram_df$år))
-    diagram_fargvekt <- grDevices::colorRampPalette(rddiagram::diagramfarger("rus_gradient"))(antal_ar)
+    diagram_fargvekt <- rep_len(rddiagram::diagramfarger("rus_sex"), antal_ar)
   }
 
   # Lägg till en CKM-notering i captionen om CKM-tabellen (TAB6473, data
