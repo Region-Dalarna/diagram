@@ -62,7 +62,11 @@ diag_bransch_utb_alder <- function(output_mapp_data = NA, # Om man vill spara da
     #  Drar bort en obefintlig summa för att diagrammet skall gå till 100.
     bransch_utb_df_sum <- bransch_utb_alder_df |>
       dplyr::group_by(dplyr::across(dplyr::any_of(variabellista))) |>
-      dplyr::summarize(antal = sum(antal)) |>
+      # .groups = "drop_last" - samma standardbeteende som förut (grupperingen
+      # på ar/lan/bransch behålls, bara sista gruppen tas bort), bara utan
+      # infomeddelandet. mutate(andel = ...) nedan behöver den kvarvarande
+      # grupperingen för att räkna ut andel per grupp, inte totalt.
+      dplyr::summarize(antal = sum(antal), .groups = "drop_last") |>
       dplyr::mutate(andel = (antal / sum(antal) * 100) - 0.001) |>
       dplyr::ungroup() |>
       dplyr::filter(bransch != "Okänt") |>
@@ -140,7 +144,7 @@ diag_bransch_utb_alder <- function(output_mapp_data = NA, # Om man vill spara da
     #  Drar bort en obefintlig summa för att diagrammet skall gå till 100.
     bransch_alder_df_sum <- bransch_utb_alder_df |>
       dplyr::group_by(dplyr::across(dplyr::any_of(variabellista))) |>
-      dplyr::summarize(antal = sum(antal)) |>
+      dplyr::summarize(antal = sum(antal), .groups = "drop_last") |>
       dplyr::mutate(andel = (antal/sum(antal) * 100) - 0.001) |>
       dplyr::ungroup() |>
       dplyr::filter(bransch != "Okänt") |>

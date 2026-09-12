@@ -70,7 +70,7 @@ diagram_examen_hogskolan_NMS <- function(output_mapp_figur = "G:/Samhällsanalys
   df <- df |>
     dplyr::filter(LAr %in% valda_ar) |>
     dplyr::group_by(LAr, SUN2020Inr_2siffer_namn) |>
-    dplyr::summarize(antal = sum(antal))
+    dplyr::summarize(antal = sum(antal), .groups = "drop")
 
   # Returnerar data till R globala miljö
   if(returnera_data == TRUE){

@@ -130,7 +130,7 @@ diagram_inr_utr_flytt <- function(region_vekt = "20", # Val av kommuner
             arsvarde <- df_tot_flytt |>
               dplyr::filter(år == unika_ar[ar], regionkod == unika_reg[reg]) |>
               dplyr::group_by(år, regionkod) |>
-              dplyr::summarize(varde = sum(varde)) |>
+              dplyr::summarize(varde = sum(varde), .groups = "drop") |>
               dplyr::pull(varde)
             #arsvarde <- sum(arsvarde, na.rm = TRUE)
             total_list <- c(total_list, list(list(geom = "rect", ymin=arsvarde-totalvarden_linjebredd, ymax=arsvarde+totalvarden_linjebredd, xmin=ar-0.45, xmax=ar+0.45, alpha=1, fill="black")))

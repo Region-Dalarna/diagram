@@ -109,7 +109,7 @@ diagram_inrikes_flytt_alder <- function(region_vekt = "20", # Val av kommuner
     # Tar bort regionkod och region i gruppering vilket ger en summering på grupp-nivå
     flytt_df <- flytt_df |>
       dplyr::group_by(år, variabel, alder_grupper) |>
-      dplyr::summarize(varde = sum(varde)) |>
+      dplyr::summarize(varde = sum(varde), .groups = "drop") |>
       dplyr::mutate(region = gruppera_namn)
     # Regionvekt måste sättas till ett värde för att map-funktionen bara skall köra en gång
     # Används inte vid gruppera namn
@@ -118,8 +118,7 @@ diagram_inrikes_flytt_alder <- function(region_vekt = "20", # Val av kommuner
   } else {
     flytt_df <- flytt_df |>
       dplyr::group_by(år, regionkod, region, variabel, alder_grupper) |>
-      dplyr::summarize(varde = sum(varde)) |>
-      dplyr::ungroup()
+      dplyr::summarize(varde = sum(varde), .groups = "drop")
   }
 
   # Returnerar data till R globala miljö

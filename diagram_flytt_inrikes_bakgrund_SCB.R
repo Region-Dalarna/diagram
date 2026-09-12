@@ -102,15 +102,13 @@ diag_inr_flyttnetto_inr_utr_fodda <- function(
   if (!is.na(gruppera_namn)){
     px_df <- px_df |>
       dplyr::group_by(år, födelseregion) |>
-      dplyr::summarise(Inrikes_flyttnetto = sum(varde, na.rm = TRUE)) |>
-      dplyr::ungroup() |>
+      dplyr::summarise(Inrikes_flyttnetto = sum(varde, na.rm = TRUE), .groups = "drop") |>
       dplyr::mutate(region = gruppera_namn)
 
   } else {
     px_df <- px_df |>
       dplyr::group_by(år, regionkod, region, födelseregion) |>
-      dplyr::summarise(Inrikes_flyttnetto = sum(varde, na.rm = TRUE)) |>
-      dplyr::ungroup()
+      dplyr::summarise(Inrikes_flyttnetto = sum(varde, na.rm = TRUE), .groups = "drop")
   }
 
 
