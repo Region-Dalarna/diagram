@@ -40,7 +40,7 @@ diagram_befolkningsforandring_ar <- function(region_vekt = "20", # Val av kommun
   library(purrr)
   library(stringr)
 
-  diagram_capt <- "Källa: SCB:s öppna statistikdatabas, bearbetning av Samhällsanalys, Region Dalarna."
+  diagram_capt_bas <- "Källa: SCB:s öppna statistikdatabas, bearbetning av Samhällsanalys, Region Dalarna."
 
   gg_list <- list()
   objektnamn <- c()
@@ -77,7 +77,11 @@ diagram_befolkningsforandring_ar <- function(region_vekt = "20", # Val av kommun
   if (ncol(befolkning_df) > 0) {
     befolkning_df <- rename(befolkning_df, regionkod = region_kod, variabel = tabellinnehåll, varde = value)
   }
-  
+
+  har_ckm_data <- !is.null(befolkning_ckm) && nrow(befolkning_ckm) > 0
+  diagram_capt <- lagg_till_ckm_notering(diagram_capt_bas, har_ckm_data)
+
+
   # befolkning_df_CKM <- suppress_specific_warning(
   #   hamta_folkmangd_civilstand_alder_kon_ar_CKM(region_vekt = region_vekt,
   #                                                    tid_koder = tid,
