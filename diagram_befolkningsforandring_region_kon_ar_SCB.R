@@ -76,7 +76,8 @@ diagram_befolkningsforandring_ar <- function(region_vekt = "20", # Val av kommun
   }
 
   har_ckm_data <- !is.null(befolkning_ckm) && nrow(befolkning_ckm) > 0
-  diagram_capt <- rddiagram::lagg_till_ckm_notering(diagram_capt_bas, har_ckm_data)
+  ckm_fran_ar <- if (har_ckm_data) min(as.integer(befolkning_ckm$år)) else NULL
+  diagram_capt <- rddiagram::lagg_till_ckm_notering(diagram_capt_bas, har_ckm_data, fran_ar = ckm_fran_ar)
 
   if(returnera_data == TRUE){
     assign("befolkning_df", befolkning_df, envir = .GlobalEnv)
