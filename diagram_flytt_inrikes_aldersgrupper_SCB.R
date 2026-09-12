@@ -12,7 +12,7 @@ diagram_inrikes_flytt_alder <- function(region_vekt = "20", # Val av kommuner
                                         alder_grupp_fokus = "20-29 år", # Vilken åldersgrupp skall fokuseras i diag_alder_fokus. Måste finnas bland grupperna ovan
                                         demo = FALSE, # sätts till TRUE om man bara vill se ett exempel på diagrammet i webbläsaren och inget annat
                                         avrunda_fem = TRUE, # Avrunda till närmaste fem på y-axeln
-                                        valda_ar = c("2021","2022","2023"), # Vilka år skall användas i diag_flyttnetto_alder
+                                        valda_ar = NULL, # Vilka år skall användas i diag_flyttnetto_alder. NULL = de tre senaste åren som faktiskt finns i den hämtade datan
                                         returnera_figur = TRUE, # Om man vill att figuren skall returneras från funktionen
                                         returnera_data = TRUE
 ){
@@ -97,6 +97,13 @@ diagram_inrikes_flytt_alder <- function(region_vekt = "20", # Val av kommuner
   flytt_df <- dplyr::bind_rows(flytt_hist, flytt_ckm) |>
     dplyr::rename(regionkod = region_kod, variabel = tabellinnehåll, varde = value) |>
     dplyr::mutate(alder_grupper = rdverktyg::skapa_aldersgrupper(ålder, alder_grupp))
+
+  # Standard: de tre senaste åren som faktiskt finns i den hämtade datan
+  # (i stället för hårdkodade årtal som blir gamla i takt med att nya år
+  # publiceras).
+  if (is.null(valda_ar)) {
+    valda_ar <- utils::tail(sort(unique(as.integer(flytt_df$år))), 3)
+  }
 
   if(!is.na(gruppera_namn)){
     # Tar bort regionkod och region i gruppering vilket ger en summering på grupp-nivå
