@@ -29,11 +29,6 @@ diag_fodda_manad_scb <- function(
 
   gg_list <- list()
 
-  # om ingen färgvektor är medskickad, använd rddiagram::diagramfarger()
-  if (all(is.na(diagram_fargvekt))) {
-    diagram_fargvekt <- c(rep(rddiagram::diagramfarger("rd_gra")[c(1,1,1,1,4)]), rddiagram::diagramfarger("rus_sex")[c(3)])
-  }
-
   # om ingen output_mapp är angiven så läggs diagrammen i Region Dalarnas standardmapp för utskrifter, om den finns. Annars blir det felmeddelande
   if (skriv_till_diagramfil) {           # bara relevant om vi skriver till fil
     if (all(is.na(output_mapp))) {
@@ -100,6 +95,25 @@ diag_fodda_manad_scb <- function(
     dplyr::filter(ar_num > max(ar_num)-6)
 
   if (kortnamn_lan) diagram_df <- dplyr::mutate(diagram_df, region = rdverktyg::skapa_kortnamn_lan(region))
+
+  # om ingen färgvektor är medskickad: en färg per år (en linje per år i
+  # diagrammet), stigande i mättnad så att senaste året - det mest
+  # intressanta - får den tydligaste färgen och äldre år tonas ned. Bygger
+  # på samma rus_gradient-baserade lösning som redan används för en
+  # liknande år-för-år-tidsserie i diagram_arbetsmarknadsstatus_tidsserie_SCB.R,
+  # i stället för upprepade identiska gråa streck som gjorde de äldre åren
+  # omöjliga att skilja åt.
+  if (all(is.na(diagram_fargvekt))) {
+    antal_ar <- length(unique(diagram_df$år))
+    diagram_fargvekt <- grDevices::colorRampPalette(rddiagram::diagramfarger("rus_gradient"))(antal_ar)
+  }
+
+  # Lägg till en CKM-notering i captionen om CKM-tabellen (TAB6473, data
+  # fr.o.m. 2025) faktiskt bidragit med rader till uttaget.
+  har_ckm_data <- !is.null(diagram_df_ckm) && nrow(diagram_df_ckm) > 0
+  if (har_ckm_data) {
+    diagram_capt <- rddiagram::lagg_till_ckm_notering(diagram_capt, TRUE, fran_ar = 2025)
+  }
 
   # returnera datasetet till global environment, bl.a. bra när man skapar Rmarkdown-rapporter
   if(returnera_dataframe_global_environment == TRUE){
