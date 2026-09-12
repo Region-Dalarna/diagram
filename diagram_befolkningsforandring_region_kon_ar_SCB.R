@@ -46,15 +46,37 @@ diagram_befolkningsforandring_ar <- function(region_vekt = "20", # Val av kommun
   objektnamn <- c()
 
   # Hämtar samma data som tidigare kom via
-  # hamta_data/hamta_bef_folkmangd_alder_kon_ar_scb.R (SCB:s tabell BefolkningNy,
-  # gamla API:et), men direkt mot SCB:s nya PxWeb-API v2 med pxweb2r. TAB638 =
-  # "Folkmängden efter region, civilstånd, ålder och kön" - samma tabell, nytt id.
-  befolkning_df <- pxweb2r::pxweb2_get_data(
-      "TAB638",
-      query = list(Region = region_vekt, Kon = kon_klartext, Civilstand = NA,
-                   Alder = NA, ContentsCode = c("Folkmängd", "Folkökning"), Tid = tid)
-    ) %>%
-    rename(regionkod = region_kod, variabel = tabellinnehåll, varde = value)
+  # hamta_data/hamta_bef_folkmangd_alder_kon_ar_scb.R, men direkt mot SCB:s
+  # PxWeb-API v2 med pxweb2r, från två tabeller (SCB bytte metod - CKM,
+  # röjandekontroll - för nya årgångar, med en ny tabell från och med 2025):
+  # - TAB638  = gamla "BefolkningNy", 1968-2024. Civilstånd/ålder kan utelämnas
+  #   (elimeringsbara), ger då totalen automatiskt.
+  # - TAB5557 = nya CKM-tabellen "BefolkningCKM", från 2025. Civilstånd/ålder
+  #   är INTE elimineringsbara där längre - måste anges explicit som
+  #   totalkoderna "SC"/"TotSA", vilket också ger dem som egna kolumner i
+  #   svaret; select() plockar bort dem så de två tabellernas kolumner
+  #   stämmer överens innan de binds ihop till en sammanhängande tidsserie.
+  # on_all_values_invalid = "null" gör att den tabell som inte har det
+  # begärda året (t.ex. om `tid` bara är ett gammalt årtal) hoppas över i
+  # stället för att hela hämtningen stoppas.
+  befolkning_hist <- pxweb2r::pxweb2_get_data(
+    "TAB638",
+    query = list(Region = region_vekt, Kon = kon_klartext, Civilstand = NA,
+                 Alder = NA, ContentsCode = c("Folkmängd", "Folkökning"), Tid = tid),
+    on_all_values_invalid = "null"
+  )
+  befolkning_ckm <- pxweb2r::pxweb2_get_data(
+    "TAB5557",
+    query = list(Region = region_vekt, Kon = kon_klartext, Civilstand = "SC",
+                 Alder = "TotSA", ContentsCode = c("Folkmängd", "Folkökning"), Tid = tid),
+    on_all_values_invalid = "null"
+  )
+  if (!is.null(befolkning_ckm)) befolkning_ckm <- select(befolkning_ckm, -any_of(c("civilstånd", "ålder")))
+
+  befolkning_df <- bind_rows(befolkning_hist, befolkning_ckm)
+  if (ncol(befolkning_df) > 0) {
+    befolkning_df <- rename(befolkning_df, regionkod = region_kod, variabel = tabellinnehåll, varde = value)
+  }
   
   # befolkning_df_CKM <- suppress_specific_warning(
   #   hamta_folkmangd_civilstand_alder_kon_ar_CKM(region_vekt = region_vekt,
