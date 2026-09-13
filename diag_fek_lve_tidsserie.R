@@ -9,73 +9,113 @@ diag_fek_lve_tidsserie <- function(
     diag_jmfr_riket = TRUE,
     demo = FALSE             # sätts till TRUE om man bara vill se ett exempel på diagrammet i webbläsaren och inget annat
     ) {
-  
+
 # om parametern demo är satt till TRUE så öppnas en flik i webbläsaren med ett exempel på hur diagrammet ser ut och därefter avslutas funktionen
 # demofilen måste läggas upp på webben för att kunna öppnas, vi lägger den på Region Dalarnas github-repo som heter utskrivna_diagram
 if (demo){
-  demo_url <- 
+  demo_url <-
 c("https://region-dalarna.github.io/utskrivna_diagram/fek_Förädlingsvärde_Dalarna_ar2007_2022.png",
 "https://region-dalarna.github.io/utskrivna_diagram/fek_Förädlingsvärde_Dalarna_jmfr_riket_ar2007-2022.png")
-  walk(demo_url, ~browseURL(.x))
+  purrr::walk(demo_url, ~browseURL(.x))
   if (length(demo_url) > 1) cat(paste0(length(demo_url), " diagram har öppnats i webbläsaren."))
-  stop_tyst()
+  rdverktyg::stop_tyst()
 }
 
-  if (!require("pacman")) install.packages("pacman")
-  p_load(tidyverse,
-     			glue)
-  
-  source("g:/skript/peter/temp/hamta_fek_lve_region_sni2007_tid_NSEBasfaktaLVEngs07_RegionalBasf07_scb.R")
-  source("https://raw.githubusercontent.com/Region-Dalarna/funktioner/main/func_SkapaDiagram.R", encoding = "utf-8")
-  source("https://raw.githubusercontent.com/Region-Dalarna/funktioner/main/func_text.R", encoding = "utf-8")
-
+  # Bara paket, ingen source() mot funktioner-/hamta_data-reporna och inget
+  # p_load(tidyverse). Anropas med fullt namespace (dplyr::filter() osv.) i
+  # stället för library().
+  if (!requireNamespace("rddiagram", quietly = TRUE)) {
+    remotes::install_github("Region-Dalarna/rdpaket", subdir = "packages/rddiagram")
+  }
+  if (!requireNamespace("rdverktyg", quietly = TRUE)) {
+    remotes::install_github("Region-Dalarna/rdpaket", subdir = "packages/rdverktyg")
+  }
+  if (!requireNamespace("pxweb2r", quietly = TRUE)) remotes::install_github("FaluPeppe/pxweb2r")
+  if (!requireNamespace("glue", quietly = TRUE)) install.packages("glue")
+  if (!requireNamespace("readxl", quietly = TRUE)) install.packages("readxl")
+  # dplyr/purrr/stringr följer med som beroenden till rddiagram/rdverktyg.
 
   gg_list <- list()
-  
-  fek_lve_df <-
-    suppress_specific_warning(
-    hamta_fek_lve_region_sni2007_tid_scb(
-  			region_vekt = c("00", region_vekt),			# Val av region. Finns: "00", "01", "03", "04", "05", "06", "07", "08", "09", "10", "12", "13", "14", "17", "18", "19", "20", "21", "22", "23", "24", "25", "SE0", "SE00", "SE1", "SE11", "SE110", "SE12", "SE121", "SE122", "SE123", "SE124", "SE125", "SE2", "SE21", "SE211", "SE212", "SE213", "SE214", "SE22", "SE221", "SE224", "SE23", "SE231", "SE232", "SE3", "SE31", "SE311", "SE312", "SE313", "SE32", "SE321", "SE322", "SE33", "SE331", "SE332"
-  			sni2007_klartext = "*",			 #  NA = tas inte med i uttaget,  Finns: "A-SexklK-O samtliga näringsgrenar (exkl. K+O+T+U)", "A-01-03 jordbruk, skogsbruk och fiske", "B-05-09 utvinning av mineral", "C-10-33 tillverkning", "D-35 försörjning av el, gas, värme och kyla", "E-36-39 vattenförsörjning; avloppsrening, avfallshantering och sanering", "F-41-43 byggverksamhet", "G-45-47 handel; reparation av motorfordon och motorcyklar", "H-49-53 transport och magasinering", "I-55-56 hotell- och restaurangverksamhet", "J-58-63 informations- och kommunikationsverksamhet", "L-68 fastighetsverksamhet", "M-69-75 verksamhet inom juridik, ekonomi, vetenskap och teknik", "N-77-82 uthyrning, fastighetsservice, resetjänster och andra stödtjänster", "P-85 utbildning", "Q-86-88 vård och omsorg; sociala tjänster", "R-90-93 kultur, nöje och fritid", "S-94-96 annan serviceverksamhet"
-  			cont_klartext = cont_klartext,			 #  Finns: "Antal arbetsställen (lokala verksamheter)", "Antal anställda", "Nettoomsättning exkl. merchantingkostnader, mnkr", "Produktionsvärde, mnkr", "Förädlingsvärde, mnkr", "Totala intäkter, mnkr", "Totala kostnader, mnkr"
-  			tid_koder = "*",			 # "*" = alla år eller månader, "9999" = senaste, finns: "2022"
-  			long_format = TRUE,			# TRUE = konvertera innehållsvariablerna i datasetet till long-format 
-  			wide_om_en_contvar = FALSE,			# TRUE = om man vill behålla wide-format om det bara finns en innehållsvariabel, FALSE om man vill konvertera till long-format även om det bara finns en innehållsvariabel
-  			output_mapp = NA,			# anges om man vill exportera en excelfil med uttaget, den mapp man vill spara excelfilen till
-  			excel_filnamn = "fek_lve.xlsx",			# filnamn för excelfil som exporteras om excel_filnamn och output_mapp anges
-  			returnera_df = TRUE			# TRUE om man vill ha en dataframe i retur från funktionen
-  ))
-  
-  branschnyckel <- read_xlsx("g:/skript/nycklar/Bransch_FEK.xlsx") %>% 
-    select(Kod, Grupp_kod, Branschgrupp) %>% 
-    distinct()
-  
-  bransch_bokstav <- read_xlsx("g:/skript/nycklar/Bransch_FEK.xlsx") %>% 
-    select(Avdelning, Grupp_kod, Branschgrupp) %>% 
-    distinct()
-  
+
+  # Originalet sourcade en lokal, aldrig publicerad wip-fil
+  # (g:/skript/peter/temp/hamta_fek_lve_region_sni2007_tid_
+  # NSEBasfaktaLVEngs07_RegionalBasf07_scb.R) som - att döma av
+  # filnamnet och den efterföljande dubbla nyckel-joinen nedan (både
+  # "Kod" och "Avdelning") - slog ihop två SCB-produkter: den äldre
+  # "Regional Basfakta" (finare SNI2007-indelning, år 2007-2021) och den
+  # nyare NSEBasfaktaLVEngs07 (grövre bokstavsindelning, år 2022-) som
+  # redan används i diag_fek_foradlingsvarde_bransch_lan_scb.R. Hämtas
+  # här direkt via v2-tabellerna TAB3513 (2007-2021) + TAB6329 (2022-).
+  fek_lve_df <- rdverktyg::suppress_specific_warning({
+    historik <- pxweb2r::pxweb2_get_data(
+      table = "TAB3513",
+      query = list(
+        Region = c("00", region_vekt),
+        SNI2007 = "*",
+        ContentsCode = cont_klartext,
+        Tid = "*"
+      )) |>
+      dplyr::rename(regionkod = region_kod, sni2007kod = `näringsgren sni 2007_kod`, variabel = tabellinnehåll, varde = value)
+
+    ny <- pxweb2r::pxweb2_get_data(
+      table = "TAB6329",
+      query = list(
+        Region = c("00", region_vekt),
+        SNI2007 = "*",
+        ContentsCode = cont_klartext,
+        Tid = "*"
+      )) |>
+      dplyr::rename(regionkod = region_kod, variabel = tabellinnehåll, varde = value)
+
+    dplyr::bind_rows(historik, ny)
+  })
+
+  # !is.na(Kod)/!is.na(Avdelning) filtreras bort explicit innan join:
+  # dplyr::left_join() matchar annars NA mot NA, vilket ger en
+  # many-to-many-relation (och därmed uppblåsta, felaktiga summor) så
+  # fort nyckelfilen har fler än en rad utan Kod (typiskt raderna som
+  # bara har Avdelning ifyllt, och vice versa).
+  branschnyckel <- readxl::read_xlsx("g:/skript/nycklar/Bransch_FEK.xlsx") |>
+    dplyr::select(Kod, Grupp_kod, Branschgrupp) |>
+    dplyr::filter(!is.na(Kod)) |>
+    dplyr::distinct()
+
+  bransch_bokstav <- readxl::read_xlsx("g:/skript/nycklar/Bransch_FEK.xlsx") |>
+    dplyr::select(Avdelning, Grupp_kod, Branschgrupp) |>
+    dplyr::filter(!is.na(Avdelning)) |>
+    dplyr::distinct()
+
   vald_ar <- c(min(fek_lve_df$år), max(fek_lve_df$år))
-  
+
   if (diag_tidsserie) {
-    tidsserie_df <- fek_lve_df %>% 
-      filter(sni2007kod != "Total_A-SexklK-O", 
-             regionkod %in% vald_region,
-             år %in% vald_ar) %>% 
-      mutate(bransch_bokstav = str_sub(`näringsgren SNI 2007`, 1, 1)) %>% 
-      left_join(branschnyckel, by = c("sni2007kod" = "Kod")) %>%
-      left_join(bransch_bokstav %>% select(Avdelning, gk = Grupp_kod, bg = Branschgrupp), by = c("bransch_bokstav" = "Avdelning")) %>%
-      mutate(Grupp_kod = ifelse(is.na(Grupp_kod), gk, Grupp_kod),
-             Branschgrupp = ifelse(is.na(Branschgrupp), bg, Branschgrupp)) %>%
-      group_by(år, regionkod, region, Branschgrupp, variabel) %>% 
-      summarise(varde = sum(varde, na.rm = TRUE), .groups = "drop")
-    
-    region_txt <- unique(tidsserie_df$region) %>% skapa_kortnamn_lan() %>% list_komma_och()
-    cont_txt <- cont_klartext %>% str_extract("^[^,]*")
-    
-    diagramtitel <- glue("{cont_txt} i {region_txt}")
-    diagramfil <- glue("fek_{cont_txt}_{region_txt}_ar{min(fek_lve_df$år)}_{max(fek_lve_df$år)}.png")
-    
-    gg_obj <- SkapaStapelDiagram(skickad_df = tidsserie_df,
+    tidsserie_df <- fek_lve_df |>
+      # OBS: originalet filtrerade bort totalraden med
+      # "sni2007kod != 'Total_A-SexklK-O'" - sni2007kod finns bara för
+      # den äldre tabellen (TAB3513 exponerarråa SNI-koder, TAB6329 gör
+      # det inte), så den jämförelsen blev NA (och filtrerade därmed
+      # bort ALLA rader) för den nyare tabellens data. Filtrerar i
+      # stället bort totalraden via klartexten, som finns för båda
+      # tabellerna (samma lösning som i
+      # diag_fek_foradlingsvarde_bransch_lan_scb.R).
+      dplyr::filter(!stringr::str_detect(`näringsgren SNI 2007`, "samtliga näringsgrenar"),
+             regionkod %in% region_vekt,
+             år %in% vald_ar) |>
+      dplyr::mutate(bransch_bokstav = stringr::str_sub(`näringsgren SNI 2007`, 1, 1)) |>
+      dplyr::left_join(branschnyckel, by = c("sni2007kod" = "Kod")) |>
+      dplyr::left_join(dplyr::rename(bransch_bokstav, gk = Grupp_kod, bg = Branschgrupp), by = c("bransch_bokstav" = "Avdelning")) |>
+      dplyr::mutate(Grupp_kod = ifelse(is.na(Grupp_kod), gk, Grupp_kod),
+             Branschgrupp = ifelse(is.na(Branschgrupp), bg, Branschgrupp)) |>
+      dplyr::group_by(år, regionkod, region, Branschgrupp, variabel) |>
+      dplyr::summarise(varde = sum(varde, na.rm = TRUE), .groups = "drop")
+
+    region_txt <- rdverktyg::list_komma_och(rdverktyg::skapa_kortnamn_lan(unique(tidsserie_df$region)))
+    cont_txt <- stringr::str_extract(cont_klartext, "^[^,]*")
+
+    diagramtitel <- glue::glue("{cont_txt} i {region_txt}")
+    diagramfil <- glue::glue("fek_{cont_txt}_{region_txt}_ar{min(fek_lve_df$år)}_{max(fek_lve_df$år)}.png")
+
+    gg_obj <- rddiagram::SkapaStapelDiagram(
+      skickad_df = tidsserie_df,
     			 skickad_x_var = "Branschgrupp",
     			 skickad_y_var = "varde",
     			 skickad_x_grupp = "år",
@@ -88,29 +128,29 @@ c("https://region-dalarna.github.io/utskrivna_diagram/fek_Förädlingsvärde_Dal
     			 manual_y_axis_title = cont_klartext,
     			 manual_x_axis_text_vjust = 1,
     			 manual_x_axis_text_hjust = 1,
-    			 manual_color = diagramfarger("rus_sex"),
+    			 manual_color = rddiagram::diagramfarger("rus_sex"),
     			 output_mapp = output_mapp
     )
-    
+
     gg_list <- c(gg_list, list(gg_obj))
-    names(gg_list)[[length(gg_list)]] <- diagramfil %>% str_remove(".png")
+    names(gg_list)[[length(gg_list)]] <- stringr::str_remove(diagramfil, "\\.png")
   } # slut if-sats om diag_tidsserie
-  
+
   if (diag_jmfr_riket) {
-    jmfr_riket_df <- fek_lve_df %>% 
-      filter(sni2007kod != "Total_A-SexklK-O") %>% 
-      mutate(region = region %>% skapa_kortnamn_lan()) %>% 
-      group_by(år, regionkod, region, variabel) %>% 
-      summarise(varde = sum(varde, na.rm = TRUE), .groups = "drop")
-    
-    region_txt <- unique(jmfr_riket_df %>% filter(regionkod != "00") %>% dplyr::pull(region)) %>% skapa_kortnamn_lan() %>% list_komma_och()
-    cont_txt <- cont_klartext %>% str_extract("^[^,]*")
-    
-    diagramtitel <- glue("Förändring av {tolower(cont_txt)} i {region_txt} jämfört med riket")
-    diagramfil <- glue("fek_{cont_txt}_{region_txt}_jmfr_riket_ar{min(fek_lve_df$år)}-{max(fek_lve_df$år)}.png")
-    
-    gg_obj <- SkapaLinjeDiagram(skickad_df = jmfr_riket_df %>% 
-                                  rename(!!sym(cont_klartext) := varde),
+    jmfr_riket_df <- fek_lve_df |>
+      dplyr::filter(!stringr::str_detect(`näringsgren SNI 2007`, "samtliga näringsgrenar")) |>
+      dplyr::mutate(region = rdverktyg::skapa_kortnamn_lan(region)) |>
+      dplyr::group_by(år, regionkod, region, variabel) |>
+      dplyr::summarise(varde = sum(varde, na.rm = TRUE), .groups = "drop")
+
+    region_txt <- rdverktyg::list_komma_och(rdverktyg::skapa_kortnamn_lan(unique(dplyr::pull(dplyr::filter(jmfr_riket_df, regionkod != "00"), region))))
+    cont_txt <- stringr::str_extract(cont_klartext, "^[^,]*")
+
+    diagramtitel <- glue::glue("Förändring av {tolower(cont_txt)} i {region_txt} jämfört med riket")
+    diagramfil <- glue::glue("fek_{cont_txt}_{region_txt}_jmfr_riket_ar{min(fek_lve_df$år)}-{max(fek_lve_df$år)}.png")
+
+    gg_obj <- rddiagram::SkapaLinjeDiagram(
+      skickad_df = dplyr::rename(jmfr_riket_df, !!rlang::sym(cont_klartext) := varde),
                                  skickad_x_var = "år",
                                  skickad_y_var = cont_klartext,
                                  skickad_x_grupp = "region",
@@ -120,13 +160,14 @@ c("https://region-dalarna.github.io/utskrivna_diagram/fek_Förädlingsvärde_Dal
                                  filnamn_diagram = diagramfil,
                                  berakna_index = TRUE,
                                  #manual_y_axis_title = cont_klartext,
-                                 manual_color = diagramfarger("rus_sex"),
+                                 manual_color = rddiagram::diagramfarger("rus_sex"),
                                  output_mapp = output_mapp
     )
-    
+
     gg_list <- c(gg_list, list(gg_obj))
-    names(gg_list)[[length(gg_list)]] <- diagramfil %>% str_remove(".png")
-  } # slut if-sats om diag_tidsserie
-  
-  
+    names(gg_list)[[length(gg_list)]] <- stringr::str_remove(diagramfil, "\\.png")
+  } # slut if-sats om diag_jmfr_riket
+
+  return(gg_list)
+
 } # slut diag-funktion
