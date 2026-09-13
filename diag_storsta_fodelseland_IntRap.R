@@ -4,34 +4,41 @@ diagram_storsta_fodelseland <-function(region_vekt = "20",# Max 1, län
                                        tid_koder = "*", # Finns från 2000 och framåt
                                        returnera_figur = TRUE, # Returnerar en figur
                                        jmf_ar = 2010, # Första och sista år i tid_koder jämförs med detta år
-                                       ar_sortering = 3, # Vilket år skall födda sorteras på i diagrammet (högst till lägst). 3 ger sista året om man jämför tre år (annars 4 osv) 
+                                       ar_sortering = 3, # Vilket år skall födda sorteras på i diagrammet (högst till lägst). 3 ger sista året om man jämför tre år (annars 4 osv)
                                        antal_lander = 10, # Antal länder som skall visas i diagrammet
-                                       valda_farger = diagramfarger("rus_sex"),
+                                       valda_farger = NA,
                                        visa_logga_i_diagram = FALSE,                        # TRUE om logga ska visas i diagrammet, FALSE om logga inte ska visas i diagrammet
                                        logga_sokvag = NA,                               # sökväg till logga som ska visas i diagrammet.
                                        returnera_data = FALSE) # Skall data returneras)
 {
-  
+
   ## =================================================================================================================
   # Ett diagram för största födelseland bland utrikes födda i regionen. Går att jämföra tre år (första, sista och jämförelseår)
   # eller bara titta på sista år
   #
   # Uppdaterat med PXweb2 - Jon 20260908. Lagt till så att PXweb2 hämtas via paket 2026-09-09
+  # Färdigmigrerad till pxweb2r/rddiagram/rdverktyg (fullt namespace, ingen source()/p_load()) - Claude 2026-09-13
   # =================================================================================================================
-  if (!require("pacman")) install.packages("pacman")
-  p_load(openxlsx,
-         pxweb)
-  p_load_gh("FaluPeppe/pxweb2r")
-  
-  source("https://raw.githubusercontent.com/Region-Dalarna/funktioner/main/func_API.R")
-  source("https://raw.githubusercontent.com/Region-Dalarna/funktioner/main/func_SkapaDiagram.R")
-  
+  if (!requireNamespace("rddiagram", quietly = TRUE)) {
+    remotes::install_github("Region-Dalarna/rdpaket", subdir = "packages/rddiagram")
+  }
+  if (!requireNamespace("rdverktyg", quietly = TRUE)) {
+    remotes::install_github("Region-Dalarna/rdpaket", subdir = "packages/rdverktyg")
+  }
+  if (!requireNamespace("pxweb2r", quietly = TRUE)) remotes::install_github("FaluPeppe/pxweb2r")
+  if (!requireNamespace("openxlsx", quietly = TRUE)) install.packages("openxlsx")
+  # dplyr/stringr följer med som beroenden till rddiagram/rdverktyg.
+
+  if (all(is.na(valda_farger))) valda_farger <- rddiagram::diagramfarger("rus_sex")
+
   gg_list <- list()  # skapa en tom lista att lägga flera ggplot-objekt i (om man skapar flera diagram)
   objektnamn <- c()
-  region_namn <- skapa_kortnamn_lan(hamtaregion_kod_namn(region_vekt)$region)
+  region_namn <- rdverktyg::skapa_kortnamn_lan(rdverktyg::hamtaregion_kod_namn(region_vekt)$region)
 
-  # Hämta data - nya PXweb
-  antal_fodelseland_df <- pxweb2_get_data(
+  # Hämta data - TAB6030 (historik) + TAB6646 (CKM, senaste året). Kon = NA (inte "*") utelämnar
+  # Kon-variabeln ur frågan, vilket - eftersom Kon har elimination = TRUE i båda tabellerna - gör att
+  # SCB summerar ihop män och kvinnor åt oss (bekräftat mot att Kon = "1+2" ger exakt samma värden).
+  antal_fodelseland_df <- pxweb2r::pxweb2_get_data(
     table = c("TAB6030","TAB6646"),
     query = list(
       Region = region_vekt,
@@ -39,35 +46,36 @@ diagram_storsta_fodelseland <-function(region_vekt = "20",# Max 1, län
       Kon = NA,
       ContentsCode = "*",
       Tid = "*"
-    )) %>%
-    mutate(region = skapa_kortnamn_lan(region)) |> 
-      rename(regionkod = region_kod,
+    )) |>
+    dplyr::mutate(region = rdverktyg::skapa_kortnamn_lan(region)) |>
+      dplyr::rename(regionkod = region_kod,
              Antal = value)
-  
+
   # # select 10 largest födelseland in the first year
   # top_10_fodelseland_forstaar <- antal_fodelseland_df %>%
   #   filter(år == min(år),!(födelseregion %in% c("Samtliga födelseländer","Sverige"))) %>%
   #     arrange(desc(Antal)) %>%
   #       head(10) %>%.$födelseregion
-  
-  top_10_fordelseland_sistaar <- antal_fodelseland_df %>%
-    filter(år == max(år),!(födelseregion %in% c("Samtliga födelseländer","Sverige"))) %>%
-    arrange(desc(Antal)) %>%
-    head(antal_lander) %>%.$födelseregion
-  
-  storsta_fodelseland_df <- antal_fodelseland_df %>%
-    filter(födelseregion %in% top_10_fordelseland_sistaar,
+
+  top_10_fordelseland_sistaar <- antal_fodelseland_df |>
+    dplyr::filter(år == max(år), !(födelseregion %in% c("Samtliga födelseländer","Sverige"))) |>
+    dplyr::arrange(dplyr::desc(Antal)) |>
+    head(antal_lander) |>
+    dplyr::pull(födelseregion)
+
+  storsta_fodelseland_df <- antal_fodelseland_df |>
+    dplyr::filter(födelseregion %in% top_10_fordelseland_sistaar,
            år %in% c(min(år),jmf_ar,max(år)))
-  
+
   if(returnera_data == TRUE){
     assign("storsta_fodelseland_df", storsta_fodelseland_df, envir = .GlobalEnv)
   }
-  
+
   diagram_capt = paste0("Källa: SCB:s öppna statistikdatabas\nBearbetning: Samhällsanalys, Region Dalarna\n",
                         "Från och med referensåret 2025 och framåt är en liten kontrollerad slumpmässig\n",
-                        "osäkerhet införd i samtliga redovisade uppgifter.Osäkerheten har tillförts för\n", 
+                        "osäkerhet införd i samtliga redovisade uppgifter.Osäkerheten har tillförts för\n",
                         "att skydda enskilda personer så att ingen riskerar att röjas i statistiken.")
-  
+
   if(length(unique(storsta_fodelseland_df$år)) == 1){
     diagram_titel = paste0("Vanligaste födelseland bland utrikes födda i ",region_namn, " år ",unique(storsta_fodelseland_df$år))
     diagramfilnamn <- paste0("storsta_fodelseland_",region_namn,"_",unique(storsta_fodelseland_df$år),".png")
@@ -75,10 +83,10 @@ diagram_storsta_fodelseland <-function(region_vekt = "20",# Max 1, län
     diagram_titel = paste0("Vanligaste födelseland bland utrikes födda i ",region_namn)
     diagramfilnamn <- paste0("storsta_fodelseland_",region_namn,".png")
   }
-  
-  
-  
-  gg_obj <- SkapaStapelDiagram(skickad_df = storsta_fodelseland_df,
+
+
+
+  gg_obj <- rddiagram::SkapaStapelDiagram(skickad_df = storsta_fodelseland_df,
                                skickad_x_var = "födelseregion",
                                skickad_y_var = "Antal",
                                skickad_x_grupp = "år",
@@ -98,13 +106,13 @@ diagram_storsta_fodelseland <-function(region_vekt = "20",# Max 1, län
                                manual_y_axis_title = "",
                                filnamn_diagram = diagramfilnamn,
                                skriv_till_diagramfil = spara_figur)
-  
+
   gg_list <- c(gg_list, list(gg_obj))
-  names(gg_list)[[length(gg_list)]] <- diagramfilnamn %>% str_remove(".png")
-  
-  
+  names(gg_list)[[length(gg_list)]] <- stringr::str_remove(diagramfilnamn, ".png")
+
+
   if(returnera_figur == TRUE){
     return(gg_list)
   }
-  
+
 }
