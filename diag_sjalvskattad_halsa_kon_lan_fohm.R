@@ -69,7 +69,8 @@ diag_sjalvskattad_halsa_kon_lan <- function(
     kod_for_klartext <- function(variabel_text, klartext_vekt) {
       var <- hamta_variabel(variabel_text)
       if (identical(klartext_vekt, "*")) return(var$values)
-      var$values[match(klartext_vekt, var$valueTexts)]
+      # case-okänslig matchning, som i den frusna func_API.R::sla_upp_varde_klartext_kod()
+      var$values[match(tolower(klartext_vekt), tolower(var$valueTexts))]
     }
 
     giltiga_ar <- hamta_variabel("År")$values
