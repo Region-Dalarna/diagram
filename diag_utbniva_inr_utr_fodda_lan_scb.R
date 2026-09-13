@@ -20,90 +20,112 @@ diag_utbniva_inr_utr_fodda_kon_lan <- function(
   # Skapat 17 okt 2024 av Peter.
   #
   # Ändrat variabel till bakgrundsvariabel på rad 66. / Jon 2026-04-14
+  #
+  # Migrerad till pxweb2r/rddiagram/rdverktyg. hamta_data-repots hamta_integration_region_bakgrund_tid_kon_scb()
+  # slog ihop två v1-tabeller (AA0003E/IntGr3LanKONS för län, AA0003E/IntGr3RikKONS för riket). Båda finns
+  # kvar i SCB:s v1-API men motsvaras nu av två v2-tabeller: IntGr3LanKONS -> TAB4648, IntGr3RikKONS ->
+  # TAB4655. Används bara av det här skriptet - logiken läggs därför in direkt här i stället för i
+  # rdverktyg.
   # ======================================================================================================
-  
-  
-  if (!require("pacman")) install.packages("pacman")
-  p_load(tidyverse,
-     			glue)
-  
-  source("https://raw.githubusercontent.com/Region-Dalarna/hamta_data/main/hamta_integration_region_kon_bakgrund_tid_IntGr3LanKONS_IntGr3RikKONS_scb.R")  
-  source("https://raw.githubusercontent.com/Region-Dalarna/funktioner/main/func_SkapaDiagram.R", encoding = "utf-8")
-  source("https://raw.githubusercontent.com/Region-Dalarna/funktioner/main/func_text.R", encoding = "utf-8")
-  
+
+  if (!requireNamespace("rddiagram", quietly = TRUE)) {
+    remotes::install_github("Region-Dalarna/rdpaket", subdir = "packages/rddiagram")
+  }
+  if (!requireNamespace("rdverktyg", quietly = TRUE)) {
+    remotes::install_github("Region-Dalarna/rdpaket", subdir = "packages/rdverktyg")
+  }
+  if (!requireNamespace("pxweb2r", quietly = TRUE)) remotes::install_github("FaluPeppe/pxweb2r")
+  if (!requireNamespace("glue", quietly = TRUE)) install.packages("glue")
+  # dplyr/purrr/stringr följer med som beroenden till rddiagram/rdverktyg.
+
   gg_list <- list()
-  
-  # om ingen output_mapp är medskickad och funktionen utskriftsmapp finns, använd den, annars sätt skriv_diagramfil till FALSE
+
+  # om ingen output_mapp är medskickad, använd rdverktyg::utskriftsmapp() om den finns, annars sätt skriv_diagramfil till FALSE
   if (all(is.na(output_mapp))) {
-    if (exists("utskriftsmapp", mode = "function")) {
-      output_mapp <- utskriftsmapp() 
+    if (dir.exists(rdverktyg::utskriftsmapp())) {
+      output_mapp <- rdverktyg::utskriftsmapp()
     } else {
       skriv_diagramfil <- FALSE
     }
   }
-  
-  # om ingen färgvektor är medskickad, kolla om funktionen diagramfärger finns, annars använd r:s defaultfärger
-  if (all(is.na(diag_fargvekt))) {
-    if (exists("diagramfarger", mode = "function")) {
-      diag_fargvekt <- diagramfarger("rus_sex")
-    } else {
-      diag_fargvekt <- hue_pal()(9)
-    }
+
+  # om ingen färgvektor är medskickad, använd rddiagram::diagramfarger("rus_sex")
+  if (all(is.na(diag_fargvekt))) diag_fargvekt <- rddiagram::diagramfarger("rus_sex")
+
+  # =============================================== API-uttag ===============================================
+
+  hamta_en_integrationstabell <- function(tabell_id, region_vekt, kon_klartext, bakgrund_klartext, cont_klartext, tid_koder) {
+
+    giltiga_regioner <- pxweb2r::pxweb2_get_values(tabell_id, "Region")$code
+    region_giltig <- region_vekt[region_vekt %in% giltiga_regioner]
+    if (length(region_giltig) == 0) return(NULL)
+
+    giltiga_ar <- pxweb2r::pxweb2_get_values(tabell_id, "Tid")$code
+    tid_vekt <- if (identical(tid_koder, "9999")) max(giltiga_ar) else if (identical(tid_koder, "*")) giltiga_ar else as.character(tid_koder)[as.character(tid_koder) %in% giltiga_ar]
+    if (length(tid_vekt) == 0) return(NULL)
+
+    px <- pxweb2r::pxweb2_get_data(
+      table = tabell_id,
+      query = list(
+        Region = region_giltig,
+        Bakgrund = bakgrund_klartext,
+        ContentsCode = cont_klartext,
+        Tid = tid_vekt,
+        Kon = kon_klartext
+      ),
+      on_all_values_invalid = "null")
+    if (is.null(px)) return(NULL)
+
+    # "tabellinnehåll" (ContentsCode, dvs. Födda i Sverige/Utrikes födda) döps om till "bakgrund" - samma
+    # kolumnnamn som originalets frusna konvertera_till_long_for_contentscode_variabler()-hjälpfunktion gav.
+    dplyr::rename(px, regionkod = region_kod, bakgrund = tabellinnehåll, varde = value)
   }
 
-  integration_df <- hamta_integration_region_bakgrund_tid_kon_scb(
-  			region_vekt = region_vekt,			   
-  			kon_klartext = valt_kon,			 
-  			bakgrund_klartext = bakgrund_klartext,
-  			cont_klartext = cont_klartext,
-  			tid_koder = tid_koder,
-  			long_format = TRUE,			# TRUE = konvertera innehållsvariablerna i datasetet till long-format 
-  			wide_om_en_contvar = FALSE,			# TRUE = om man vill behålla wide-format om det bara finns en innehållsvariabel, FALSE om man vill konvertera till long-format även om det bara finns en innehållsvariabel
-  			output_mapp = NA,			# anges om man vill exportera en excelfil med uttaget, den mapp man vill spara excelfilen till
-  			excel_filnamn = "integration.xlsx",			# filnamn för excelfil som exporteras om excel_filnamn och output_mapp anges
-  			returnera_df = TRUE			# TRUE om man vill ha en dataframe i retur från funktionen
-  ) %>% 
-    rename(utbildning = bakgrundsvariabel) %>% 
-    mutate(utbildning = utbildning %>% str_remove("andel med ") %>% str_remove(", procent"),
+  integration_df <- purrr::map(
+    c("TAB4648", "TAB4655"),  # län, riket
+    ~ hamta_en_integrationstabell(.x, region_vekt, valt_kon, bakgrund_klartext, cont_klartext, tid_koder)
+  ) |>
+    purrr::list_rbind() |>
+    dplyr::rename(utbildning = bakgrundsvariabel) |>
+    dplyr::mutate(utbildning = utbildning |> stringr::str_remove("andel med ") |> stringr::str_remove(", procent"),
            utbildning = factor(utbildning, levels = c("förgymnasial utbildning", "gymnasial utbildning", "eftergymnasial utbildning")))
-  
+
   # om man vill gruppera ihop flera kommuner eller län till en större geografisk indelning
   # så anges den med namn i gruppera_namn. Lämnas den tom görs ingenting nedan
   if (!is.na(gruppera_namn)) {
-    integration_df <- integration_df %>% 
-      group_by(across(-c(regionkod, region, varde))) %>% 
-      summarise(varde = sum(varde, na.rm = TRUE), .groups = "drop") %>% 
-      mutate(regionkod = "gg",
-             region = gruppera_namn) %>% 
-      relocate(region, .before = 1) %>% 
-      relocate(regionkod, .before = region)
-    
+    integration_df <- integration_df |>
+      dplyr::group_by(dplyr::across(-c(regionkod, region, varde))) |>
+      dplyr::summarise(varde = sum(varde, na.rm = TRUE), .groups = "drop") |>
+      dplyr::mutate(regionkod = "gg",
+             region = gruppera_namn) |>
+      dplyr::relocate(region, .before = 1) |>
+      dplyr::relocate(regionkod, .before = region)
+
     region_vekt <- "gg"
   }
-  
+
   if(returnera_df_rmarkdown == TRUE){
     assign("utbniva_bakgr_kon_df", integration_df, envir = .GlobalEnv)
   }
-  
+
   skapa_diagram <- function(chart_df, skickad_regionkod) {
-    
-    chart_df <- chart_df %>% 
-      filter(regionkod %in% skickad_regionkod)
-    
+
+    chart_df <- dplyr::filter(chart_df, regionkod %in% skickad_regionkod)
+
     # om regioner är alla kommuner i ett län eller alla län i Sverige görs revidering, annars inte
-    region_start <- unique(chart_df$region) %>% skapa_kortnamn_lan() %>% list_komma_och()
-    region_txt <- ar_alla_kommuner_i_ett_lan(unique(chart_df$regionkod), returnera_text = TRUE, returtext = region_start)
-    region_txt <- ar_alla_lan_i_sverige(unique(chart_df$regionkod), returnera_text = TRUE, returtext = region_txt)
+    region_start <- rdverktyg::list_komma_och(rdverktyg::skapa_kortnamn_lan(unique(chart_df$region)))
+    region_txt <- rdverktyg::ar_alla_kommuner_i_ett_lan(unique(chart_df$regionkod), returnera_text = TRUE, returtext = region_start)
+    region_txt <- rdverktyg::ar_alla_lan_i_sverige(unique(chart_df$regionkod), returnera_text = TRUE, returtext = region_txt)
     regionfil_txt <- region_txt
     region_txt <- paste0(" i ", region_txt)
-    regionkod_txt <- if (region_start == region_txt) unique(chart_df$regionkod) %>% paste0(collapse = "_") else region_txt
-    
+    regionkod_txt <- if (region_start == region_txt) paste0(unique(chart_df$regionkod), collapse = "_") else region_txt
+
     ar_txt <- if (min(chart_df$år) == max(chart_df$år)) max(chart_df$år) else paste0(min(chart_df$år), "-", max(chart_df$år))
-    
-    diagramtitel <- glue("Utbildningsnivå invånare 20-64 år{region_txt} år {ar_txt}")
-    diagramfil <- glue("utbniva_inr_utr_kon_{regionfil_txt}_ar{ar_txt}.png")
-    
-    gg_obj <- SkapaStapelDiagram(skickad_df = chart_df,
+
+    diagramtitel <- glue::glue("Utbildningsnivå invånare 20-64 år{region_txt} år {ar_txt}")
+    diagramfil <- glue::glue("utbniva_inr_utr_kon_{regionfil_txt}_ar{ar_txt}.png")
+
+    gg_obj <- rddiagram::SkapaStapelDiagram(skickad_df = chart_df,
     			 skickad_x_var = "bakgrund",
     			 skickad_y_var = "varde",
     			 skickad_x_grupp = "utbildning",
@@ -117,24 +139,23 @@ diag_utbniva_inr_utr_fodda_kon_lan <- function(
     			 manual_color = diag_fargvekt,
     			 output_mapp = output_mapp,
     			 skriv_till_diagramfil = skriv_diagramfil,
-    			 diagram_facet = TRUE,
     			 facet_grp = "kön",
     			 facet_scale = "fixed",
     			 facet_legend_bottom = TRUE
     )
-    
+
     gg_list <- c(gg_list, list(gg_obj))
-    names(gg_list)[[length(gg_list)]] <- diagramfil %>% str_remove(".png")
-    
+    names(gg_list)[[length(gg_list)]] <- stringr::str_remove(diagramfil, ".png")
+
     return(gg_list)
-    
+
   } # slut skapa_diagram
-  
+
   if (length(region_vekt) > 1) {
-    retur_list <- map(unique(region_vekt), ~ skapa_diagram(chart_df = integration_df,
-                                                           skickad_regionkod = .x)) %>% purrr::flatten()
+    retur_list <- purrr::flatten(purrr::map(unique(region_vekt), ~ skapa_diagram(chart_df = integration_df,
+                                                           skickad_regionkod = .x)))
   } else {
-    retur_list <- skapa_diagram(chart_df = integration_df, 
+    retur_list <- skapa_diagram(chart_df = integration_df,
                                 skickad_regionkod = region_vekt)
   }
   return(retur_list)
