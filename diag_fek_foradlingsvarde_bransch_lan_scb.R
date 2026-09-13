@@ -2,7 +2,7 @@ diag_fek_foradlingsvarde_bransch_lan_scb <- function(
   region_vekt = "20",			# Val av region. Finns: "00", "01", "03", "04", "05", "06", "07", "08", "09", "10", "12", "13", "14", "17", "18", "19", "20", "21", "22", "23", "24", "25", "SE0", "SE00", "SE1", "SE11", "SE110", "SE12", "SE121", "SE122", "SE123", "SE124", "SE125", "SE2", "SE21", "SE211", "SE212", "SE213", "SE214", "SE22", "SE221", "SE224", "SE23", "SE231", "SE232", "SE3", "SE31", "SE311", "SE312", "SE313", "SE32", "SE321", "SE322", "SE33", "SE331", "SE332"
   sni2007_klartext = "*",			 #  NA = tas inte med i uttaget,  Finns: "A-SexklK-O samtliga näringsgrenar (exkl. K+O+T+U)", "A-01-03 jordbruk, skogsbruk och fiske", "B-05-09 utvinning av mineral", "C-10-33 tillverkning", "D-35 försörjning av el, gas, värme och kyla", "E-36-39 vattenförsörjning; avloppsrening, avfallshantering och sanering", "F-41-43 byggverksamhet", "G-45-47 handel; reparation av motorfordon och motorcyklar", "H-49-53 transport och magasinering", "I-55-56 hotell- och restaurangverksamhet", "J-58-63 informations- och kommunikationsverksamhet", "L-68 fastighetsverksamhet", "M-69-75 verksamhet inom juridik, ekonomi, vetenskap och teknik", "N-77-82 uthyrning, fastighetsservice, resetjänster och andra stödtjänster", "P-85 utbildning", "Q-86-88 vård och omsorg; sociala tjänster", "R-90-93 kultur, nöje och fritid", "S-94-96 annan serviceverksamhet"
   cont_klartext = "Förädlingsvärde, mnkr",			 #  Finns: "Antal arbetsställen (lokala verksamheter)", "Antal anställda", "Nettoomsättning exkl. merchantingkostnader, mnkr", "Produktionsvärde, mnkr", "Förädlingsvärde, mnkr", "Totala intäkter, mnkr", "Totala kostnader, mnkr"
-  tid_koder = "*",			 # "*" = alla år eller månader, "9999" = senaste, finns: "2022", "2023", "2024"
+  tid_koder = "*",			 # "*" = de tre senaste åren (grupperade per år i diagrammet), "9999" = enbart senaste året, eller ange enskilda år, finns: "2022", "2023", "2024"
   gruppera_namn = NA,              # för att skapa egna geografiska indelningar av samtliga regioner som skickas med i uttaget
   diagram_capt = "Källa: Företagens ekonomi i SCB:s öppna statistikdatabas. Bearbetning: Samhällsanalys, Region Dalarna\nDiagramförklaring: Förädlingsvärde är den faktiska produktionen minus kostnader för köpta varor och tjänster, dock ej löner, sociala avgifter och kostnader för handelsvaror.",
   visa_dataetiketter = FALSE,
@@ -72,7 +72,19 @@ gg_list <- list()
 # egen kommentar listade också bara "2022" som giltigt år när det
 # skrevs). "9999" (senaste år) är en v1-specifik sentinel som pxweb2r
 # inte förstår - hanteras explicit nedan.
-if (any(tid_koder == "9999")) {
+#
+# Standardvärdet "*" gav tidigare alla tillgängliga år, vilket när
+# tabellen bara hade ett år (2022) inte gjorde någon skillnad - men nu
+# när tabellen har tre år (2022-2024) och diagrammet inte grupperade på
+# år summerades alla årens värden osynligt ihop till en enda stapel per
+# branschgrupp. "*" betyder därför nu i stället de tre senaste
+# tillgängliga åren, som visas grupperade per år i diagrammet (se
+# skickad_x_grupp nedan) - vill man ha ett enskilt år anges det
+# (eller "9999" för enbart senaste året).
+if (identical(tid_koder, "*")) {
+  giltiga_ar <- pxweb2r::pxweb2_get_values("TAB6329", "Tid")$code
+  tid_koder <- utils::tail(sort(giltiga_ar), 3)
+} else if (any(tid_koder == "9999")) {
   senaste_ar <- max(pxweb2r::pxweb2_get_values("TAB6329", "Tid")$code)
   tid_koder <- ifelse(tid_koder == "9999", senaste_ar, tid_koder)
 }
@@ -133,6 +145,8 @@ ar_txt <- chart_df |>
   dplyr::pull() |>
   rdverktyg::list_komma_och()
 
+flera_ar <- length(unique(chart_df$år)) > 1
+
 diagramtitel <- glue::glue("Förädlingsvärde i {vald_region_txt} per bransch år {ar_txt}")
 diagramfil <- glue::glue("foradlingsvarde_bransch_{paste0(region_vekt, collapse = '_')}_ar{ar_txt}.png")
 
@@ -141,6 +155,7 @@ gg_obj <- rddiagram::SkapaStapelDiagram(
   skickad_df = chart_df,
   skickad_x_var = "Branschgrupp",
   skickad_y_var = "varde",
+  skickad_x_grupp = if (flera_ar) "år" else NULL,
   diagram_titel = diagramtitel,
   diagram_capt = diagram_capt,
   x_axis_sort_value = TRUE,
@@ -151,7 +166,7 @@ gg_obj <- rddiagram::SkapaStapelDiagram(
   manual_x_axis_text_vjust = 1,
   manual_x_axis_text_hjust = 1,
   x_axis_lutning = 45,
-  manual_color = diag_fargvekt,
+  manual_color = if (flera_ar) diag_fargvekt[seq_len(length(unique(chart_df$år)))] else diag_fargvekt,
   output_mapp = output_mapp,
   lagg_pa_logga = ta_med_logga,
   logga_path = logga_sokvag,
