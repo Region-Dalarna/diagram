@@ -72,8 +72,15 @@ diag_bas_arbloshet_manad_jmfr_1ar_tillbaka_scb <- function(
     rdverktyg::manader_bearbeta_scbtabeller() |>
     dplyr::mutate(region = rdverktyg::skapa_kortnamn_lan(region, byt_ut_riket_mot_sverige = TRUE))
 
-  manad_nu <- as.character(dplyr::last(bas_syss_df$tid))
-  manad_da <- as.character(dplyr::first(bas_syss_df$tid))
+  # Bugfix (confirmed genom test): bas_syss_df:s radordning följer frågeordningen i tid_hamta ovan
+  # (tid_nu, dvs. senaste månaden, hämtas/står först - jämförelsemånaden N månader bakåt sist) och är
+  # INTE kronologiskt sorterad. manad_nu/manad_da (och ar_start/ar_slut nedan) använde first()/last() åt
+  # fel håll och pekade därför på varsin fel månad/år - diff blev då "äldre månad minus senaste månaden"
+  # i stället för tvärtom, och diagramtiteln "i {månad} år {ar_slut} jämfört med {månad} år {ar_start}"
+  # visade åren i fel ordning (t.ex. "juni 2025 jämfört med juni 2026" i stället för "juni 2026 jämfört
+  # med juni 2025"). Rättat genom att byta first()/last().
+  manad_nu <- as.character(dplyr::first(bas_syss_df$tid))
+  manad_da <- as.character(dplyr::last(bas_syss_df$tid))
 
   chart_df <- bas_syss_df |>
     dplyr::select(-c(år, månad, månad_år, år_månad)) |>
@@ -94,9 +101,9 @@ diag_bas_arbloshet_manad_jmfr_1ar_tillbaka_scb <- function(
 
   manad_txt <- as.character(dplyr::pull(dplyr::distinct(bas_syss_df, månad)))
 
-  ar_start <- as.character(dplyr::first(dplyr::pull(dplyr::distinct(bas_syss_df, år))))
+  ar_start <- as.character(dplyr::last(dplyr::pull(dplyr::distinct(bas_syss_df, år))))
 
-  ar_slut <- as.character(dplyr::last(dplyr::pull(dplyr::distinct(bas_syss_df, år))))
+  ar_slut <- as.character(dplyr::first(dplyr::pull(dplyr::distinct(bas_syss_df, år))))
 
   diagramtitel <- glue::glue("Skillnad i arbetslöshet för invånare 20-64 år i {region_txt}\ni {manad_txt} år {ar_slut} jämfört med {manad_txt} år {ar_start}")
 
