@@ -746,238 +746,281 @@ SkapaBefPrognosDiagram_befforandr <- function(region_vekt = "20",
 
 } # slut på funktionen
 
-SkapaBefPrognosDiagram_InrUtrFodda <- function(aktlan = "20", 
+SkapaBefPrognosDiagram_InrUtrFodda <- function(aktlan = "20",
                                                bara_lan = TRUE,                      # TRUE om bara län ska visas, FALSE för att visa länets kommuner
-                                               AktuellRegion = NULL,                 # Till diagramrubriken - NULL om namnet ska hämtas automatiskt 
+                                               AktuellRegion = NULL,                 # Till diagramrubriken - NULL om namnet ska hämtas automatiskt
                                                jmfrtid = 10,                         # antal år i jämförelsen, alltså hur många års sikt vi vill titta på
-                                               url_tabeller = "https://api.scb.se/OV0104/v1/doris/sv/ssd/BE/BE0401/BE0401A/BefProgRegFakN",         # url-adresser till tabellerna med befolkningsprognoser
-                                               output_fold ="G:/Samhällsanalys/API/Fran_R/Utskrift/",        # mapp på datorn som diagrammet skrivs till
-                                               logga_path = "G:/Samhällsanalys/MallarLoggor/logo_liggande_fri_svart.png",       # om vi vill ha logga med, annars kan vi ta bort denna rad eller ge variabeln värdet NULL
+                                               output_fold = NA,        # mapp på datorn som diagrammet skrivs till
+                                               logga_path = NA,       # om vi vill ha logga med, annars kan vi ta bort denna rad eller ge variabeln värdet NULL
                                                logga_storlek = 20,
                                                stodlinjer_avrunda_fem = TRUE,
                                                facet_scale = "free",
                                                ta_med_logga = TRUE,                 # TRUE om vi vill ha med logga, annars FALSE
                                                skapa_fil = TRUE,
+                                               filformat = "png",                   # format på diagrammet
                                                utan_diagramtitel = FALSE,           # TRUE om vi vill ha diagram utan diagramtitel, annars FALSE (vilket vi brukar vilja ha)
-                                               #anvand_senaste_befar = FALSE,        # TRUE om vi vill använda senaste tillgängliga år för befolkningsstatistik, annars används första tillgängliga befolkningsprognosår
-                                               #andel_istallet_for_antal = FALSE,    # om man vill ha procent istället för absolut antal, för skillnad mellan start- och slutår
                                                dataetiketter = FALSE,
-                                               farger_diagram = diagramfarger("rd_gron")[c(1,4)],
-                                               diagram_capt = "Källa: SCB:s befolkningsprognos\nBearbetning: Samhällsanalys, Region Dalarna"
+                                               spara_excelfil = FALSE,
+                                               farger_diagram = NA,
+                                               diagram_capt = "Källa: SCB:s befolkningsprognos och befolkningsstatistik\nBearbetning: Samhällsanalys, Region Dalarna"
                                                ) {
-    
-  # Initierar variabler
-  malar <- 0
-  startar <- 0
-  px_alla <- NULL
-  
-  # ================================================================================================================
-  
+
+  # Bara paket, ingen source() mot funktioner-/hamta_data-reporna och inget p_load(tidyverse). Anropas
+  # med fullt namespace (dplyr::filter() osv.) i stället för library(). Till skillnad från de två andra
+  # funktionerna i den här filen finns det ingen hamta_befprognos_scb_data.R-motsvarighet att sourca här
+  # - v1-tabellerna som den här funktionen byggde på (BE0401A/BefProgRegFakN för prognosen,
+  # BE0101E/InrUtrFoddaRegAlKon för befolkningsstatistiken, båda uppdelade på inrikes/utrikes födda)
+  # hämtas i stället direkt via pxweb2r, precis som redan gjorts (och verifierats) i den snarlika
+  # diag_bef_inrikes_utrikes_antal_forandring_prognos_IntRap.R:
+  # - TAB6008 = v2-motsvarighet till BE0401A/BefProgRegFakN (rullande aktuell befolkningsframskrivning)
+  # - TAB4823 = v2-motsvarighet till BE0101E/InrUtrFoddaRegAlKon, historik 2000-2024
+  # - TAB6645 = samma uppgift men CKM (röjandekontroll), 2025- (SCB bytte metod för nya årgångar)
+  # OBS: uppdelningen på inrikes/utrikes födda finns ännu inte alls i de lokala Profet-filerna (varken
+  # för prognosen eller befolkningsstatistiken) - därför finns det ingen möjlighet att peka den här
+  # funktionen mot en lokal mapp i stället för SCB:s API i dagsläget, till skillnad från
+  # SkapaBefPrognosDiagram()/SkapaBefPrognosDiagram_befforandr().
+  if (!requireNamespace("rddiagram", quietly = TRUE)) {
+    remotes::install_github("Region-Dalarna/rdpaket", subdir = "packages/rddiagram")
+  }
+  if (!requireNamespace("rdverktyg", quietly = TRUE)) {
+    remotes::install_github("Region-Dalarna/rdpaket", subdir = "packages/rdverktyg")
+  }
+  if (!requireNamespace("pxweb2r", quietly = TRUE)) remotes::install_github("FaluPeppe/pxweb2r")
+  if (!requireNamespace("writexl", quietly = TRUE)) install.packages("writexl")
+  # dplyr/stringr/readr följer med som beroenden till rddiagram/rdverktyg.
+
+  options(dplyr.summarise.inform = FALSE)
+  options(scipen = 999)
+
+  if (stringr::str_sub(filformat, 1, 1) != ".") filformat <- paste0(".", filformat)
+
+  # om det inte skickats med någon färgvektor så används två nyanser av rd_gron (samma som tidigare
+  # hårdkodade rgb-värden, vilka motsvarar just de två färgerna i den paletten)
+  if (all(is.na(farger_diagram))) farger_diagram <- rddiagram::diagramfarger("rd_gron")[c(1, 4)]
+
+  # hämta värde för output_fold om det inte skickats med
+  if (all(is.na(output_fold))) {
+    if (dir.exists(rdverktyg::utskriftsmapp())) {
+      output_fold <- rdverktyg::utskriftsmapp()
+    } else {
+      stop("Ingen output-mapp angiven, kör funktionen igen och ge parametern output_fold ett värde.")
+    }
+  }
+
   # Fyll regiontabell
-  regdf <- hamtaregtab()
-  
+  regdf <- rdverktyg::hamtaregtab()
+
   # Här väljer vi om vi ska ta med riket och länet också
   # Om vi bara vill ha län och inte kommuner, lägg in en vektor här nedan
-  if (bara_lan){
+  if (bara_lan) {
     location_aktRegion <- aktlan
   } else {
-    location_aktRegion <- hamtakommuner(aktlan, tamedriket = FALSE, tamedlan = FALSE) 
+    location_aktRegion <- rdverktyg::hamtakommuner(aktlan, tamedriket = FALSE, tamedlan = FALSE)
   }
-  
-  # plocka ut vanligaste län i vektorn med alla regioner i 
-  vanlan <- names(sort(table(substr(location_aktRegion,1,2)),decreasing=TRUE)[1])
-  if (is.null(AktuellRegion)) AktuellRegion <- ifelse(length(location_aktRegion) 
-                                                      > 1, paste0(regdf$region[regdf$regionkod
-                                                                               == vanlan], "s kommuner"), regdf$region[regdf$regionkod
-                                                                                                                       == aktlan])
-  
-  # =============== jämförelse x år framåt från senaste tillgängliga år ==========================
-  
-  # ========== Hämta befolkningsprognos för tabell(er) i vektor url_tabeller  ====================
-  # om vi valt att jämföra flera prognoser loopas hela vektorn med url:er till tabellerna
-  # annars kör vi bara första tabellen
-  slutloop <- 1   # vi kör bara en tabell i denna   #ifelse(JmfrFleraPrognoser, length(url_tabeller), 1) 
-  # först hämtar vi startåret för alla tabeller i vektorn, och skapar samtidigt målåret också
-  for (url_progn in 1:slutloop) {
-    # först plockar vi ut ett pyttelitet api-uttag för att få tidigaste år i prognos att skapa startår från
-    px_small <- pxweb_get(url = url_tabeller[url_progn],query = list(
-      Region = "20",ContentsCode = "*", Tid = "*")) 
-    px_df_small <- as.data.frame(px_small, column.name.type = "text", variable.value.type = "text")
-    startar[url_progn] <- as.character(as.numeric(min(px_df_small$år)) - 1)     # startår är alltid ett år innan första året i prognosen
-    malar[url_progn] <- as.character(as.numeric(startar[url_progn]) + jmfrtid)             # målår skapas genom att addera jämförelsetid till startåret
-    
-    
-    # API-uttag för att ta ut målåret som är det vi behöver från prognosen
-    px_uttag <- pxweb_get(url = url_tabeller[url_progn],
-                          query = list(
-                            Region = location_aktRegion,
-                            InrikesUtrikes = c("13","23"),
-                            Alder = '*',
-                            ContentsCode = '000005RC',
-                            Tid = malar[url_progn])) 
-    
-    # Lägg API-uttaget i px_df, lägg på ytterligare ett uttag men med koder istället för klartext,
-    # välj ut bara regionkolumnen i det andra uttaget, döp om den till regionkod och lägg den först av kolumnerna
-    px_df <- as.data.frame(px_uttag) %>% 
-      cbind(regionkod = as.data.frame(px_uttag, column.name.type = "code", variable.value.type = "code") %>% 
-              select(Region)) %>% rename(regionkod = Region) %>% relocate(regionkod, .before = region)
-    #px_df <- px_df %>% select(regionkod, region, ålder, år, Folkmängd)
-    
-    # bind ihop med tidigare
-    px_alla <- rbind(px_df, px_alla)
-    # slut på loop med alla url:er
+
+  # plocka ut vanligaste län i vektorn med alla regioner i
+  vanlan <- names(sort(table(substr(location_aktRegion, 1, 2)), decreasing = TRUE)[1])
+  if (is.null(AktuellRegion)) {
+    AktuellRegion <- if (length(location_aktRegion) > 1) {
+      paste0(regdf$region[regdf$regionkod == vanlan], "s kommuner")
+    } else {
+      regdf$region[regdf$regionkod == aktlan]
+    }
   }
-  
-  # =========================== hämta senaste tillgängliga år i befolkingsstatistiken ============================
-  
-  url_adress <- "https://api.scb.se/OV0104/v1/doris/sv/ssd/BE/BE0101/BE0101E/InrUtrFoddaRegAlKon"
-  
-  # Välj variabler
-  px_uttag_bef <- pxweb_get(url = url_adress,
-                            query = list(
-                              Region = location_aktRegion,
-                              Alder = '*',
-                              Fodelseregion = c("09","11"),
-                              ContentsCode = '*',
-                              Tid = startar)) 
-  
-  # Lägg API-uttaget i px_df, lägg på ytterligare ett uttag men med koder istället för klartext,
-  # välj ut bara regionkolumnen i det andra uttaget, döp om den till regionkod och lägg den först av kolumnerna
-  px_df_bef <- as.data.frame(px_uttag_bef) %>% 
-    cbind(regionkod = as.data.frame(px_uttag_bef, column.name.type = "code", variable.value.type = "code") %>% 
-            select(Region)) %>% rename(regionkod = Region) %>% relocate(regionkod, .before = region)
-  
+
+  # Hjälpfunktion: välj en enda kod per verklig ettårsålder (samma mönster/motivering som i
+  # diag_bef_inrikes_utrikes_antal_forandring_prognos_IntRap.R - CKM-tabellen har samma ålder
+  # representerad under flera olika aggregeringshierarkier).
+  hamta_individuella_aldrar <- function(table_id) {
+    v <- pxweb2r::pxweb2_get_values(table_id, "Alder")
+    v <- v[grepl("^[0-9]+\\+? år$", v$label), ]
+    v <- v[!duplicated(v$label), ]
+    v$code
+  }
+
+  # =============== bestäm start- och målår utifrån prognosens faktiska tidsspann ================
+
+  tab6008_ar <- as.numeric(pxweb2r::pxweb2_get_values("TAB6008", "Tid")$code)
+  startar <- min(tab6008_ar) - 1                # startår är alltid ett år innan första året i prognosen
+  malar <- startar + jmfrtid                    # målår skapas genom att addera jämförelsetid till startåret
+
+  # Felhantering: begripligt fel om jmfrtid pekar utanför prognosens faktiska tidsspann, i stället för
+  # att pxweb2r-anropet nedan misslyckas långt senare med ett svårtolkat felmeddelande.
+  if (!malar %in% tab6008_ar) {
+    stop("SkapaBefPrognosDiagram_InrUtrFodda(): jmfrtid = ", jmfrtid, " ger målåret ", malar,
+         ", vilket ligger utanför befolkningsprognosens (TAB6008) tillgängliga år (", min(tab6008_ar),
+         "-", max(tab6008_ar), "). Minska jmfrtid.")
+  }
+
+  # ========== Hämta befolkningsprognos (uppdelat på inrikes/utrikes födda) för målåret ===========
+
+  px_alla <- pxweb2r::pxweb2_get_data(
+    table = "TAB6008",
+    query = list(
+      Region = location_aktRegion,
+      InrikesUtrikes = c("inrikes födda", "utrikes födda"),
+      Kon = "*",
+      Alder = hamta_individuella_aldrar("TAB6008"),
+      ContentsCode = "Antal",
+      Tid = as.character(malar)
+    )) |>
+    dplyr::rename(regionkod = region_kod, Antal = value) |>
+    dplyr::select(-tabellinnehåll) |>
+    dplyr::relocate(regionkod, .before = region)
+
+  # ===== hämta befolkningsstatistik (uppdelat på inrikes/utrikes födda) för startåret ============
+  # välj rätt tabell (historik eller CKM) utifrån vilken av dem som faktiskt täcker startåret - med
+  # ett begripligt fel om ingen av dem gör det, i stället för att pxweb2r-anropet misslyckas långt
+  # senare med ett svårtolkat felmeddelande om ett ogiltigt Tid-värde.
+  tab4823_ar <- as.numeric(pxweb2r::pxweb2_get_values("TAB4823", "Tid")$code)
+  tab6645_ar <- as.numeric(pxweb2r::pxweb2_get_values("TAB6645", "Tid")$code)
+
+  historik_table <- if (startar %in% tab4823_ar) {
+    "TAB4823"
+  } else if (startar %in% tab6645_ar) {
+    "TAB6645"
+  } else {
+    stop("SkapaBefPrognosDiagram_InrUtrFodda(): befolkningsstatistik uppdelat på inrikes/utrikes födda ",
+         "saknas för startåret ", startar, " - finns varken i TAB4823 (", min(tab4823_ar), "-",
+         max(tab4823_ar), ") eller TAB6645 (", min(tab6645_ar), "-", max(tab6645_ar), "). Justera jmfrtid.")
+  }
+
+  px_df_bef <- pxweb2r::pxweb2_get_data(
+    table = historik_table,
+    query = list(
+      Region = location_aktRegion,
+      Alder = hamta_individuella_aldrar(historik_table),
+      Kon = "*",
+      Fodelseregion = c("född i Sverige", "utrikes född"),
+      ContentsCode = "Antal",
+      Tid = as.character(startar)
+    )) |>
+    dplyr::rename(regionkod = region_kod, Antal = value) |>
+    dplyr::select(-tabellinnehåll) |>
+    dplyr::relocate(regionkod, .before = region)
+
   # konvergera begreppen i denna tabell med tabellen för befolkningsprognosen
-  px_df_bef$födelseregion[px_df_bef$födelseregion == "Född i Sverige"] <- "inrikes födda"
-  px_df_bef$födelseregion[px_df_bef$födelseregion == "Utrikes född"] <- "utrikes födda"
-  px_df_bef <- px_df_bef %>% 
-    rename(`inrikes/utrikes född` = födelseregion) %>% 
-    relocate(`inrikes/utrikes född`, .after = region)
+  px_df_bef <- px_df_bef |>
+    dplyr::mutate(`inrikes/utrikes född` = dplyr::case_when(
+      födelseregion == "född i Sverige" ~ "inrikes födda",
+      födelseregion == "utrikes född" ~ "utrikes födda",
+      TRUE ~ födelseregion
+    )) |>
+    dplyr::select(-födelseregion) |>
+    dplyr::relocate(`inrikes/utrikes född`, .after = region)
 
   # skapa en df med både prognosvärden och befolkningssiffror för senaste året innan prognosen startar
-  progn_bef <- rbind(px_df_bef, px_alla)
-  
-  # Skapa en numerisk åldersvariabel 
-  progn_bef$aldernum <- suppressWarnings(parse_number(progn_bef$ålder))
-  
-  # Lägg ihop i åldersgrupper
-  progn_bef$aldergrp <- ifelse(progn_bef$aldernum < 20, "0-19 år", NA)
-  progn_bef$aldergrp <- ifelse(progn_bef$aldernum > 19 & progn_bef$aldernum < 65 , "20-64 år", progn_bef$aldergrp)
-  progn_bef$aldergrp <- ifelse(progn_bef$aldernum > 64 & progn_bef$aldernum < 80 , "65-79 år", progn_bef$aldergrp)
-  progn_bef$aldergrp <- ifelse(progn_bef$aldernum > 79, "80+ år", progn_bef$aldergrp)
-  progn_bef$aldergrp <- ifelse(progn_bef$ålder == "totalt ålder", "totalt", progn_bef$aldergrp)
-  
-  # Skapa df för startår 
-  dfstartar <- progn_bef %>%
-    filter(år %in% startar) %>% 
-    group_by(år, regionkod, region, `inrikes/utrikes född`, aldergrp) %>% 
-    summarize(antal = sum(Antal))
-  
-  # Skapa df för målår
-  dfmalar <- progn_bef %>% 
-    filter(år %in% malar) %>% 
-    group_by(år, regionkod, region, `inrikes/utrikes född`, aldergrp) %>% 
-    summarize(antal = sum(Antal))
-  
-  # Här skapar vi en rad med total folkmängd i dfmalar ==========================================
-  total_df <- dfmalar %>% 
-    group_by(år, region, `inrikes/utrikes född`) %>% 
-    summarize(regionkod = first(regionkod),
-              region = first(region),
-              antal = sum(antal))
-  # Lägg på total_df som rad på dfmalar
-  dfmalar <- rbind(dfmalar, total_df) %>% 
-    arrange(år)
-  
-  # döp åldersgruppen för totalbef till "totalt"
-  dfmalar$aldergrp[is.na(dfmalar$aldergrp)] <- "totalt"
-  
-  # se till att sorteringen blir korrekt
-  dfmalar <- dfmalar %>% arrange(år, regionkod, aldergrp)
-  
-  # och så skapar vi en rad med total folkmängd i dfstartar =====================================
-  total_df_start <- dfstartar %>% 
-    group_by(år, region, `inrikes/utrikes född`) %>% 
-    summarize(regionkod = first(regionkod),
-              region = first(region),
-              antal = sum(antal))
-  # Lägg på total_df som rad på dfmalar
-  dfstartar <- rbind(dfstartar, total_df_start) %>% 
-    arrange(år)
-  
-  # döp åldersgruppen för totalbef till "totalt"
-  dfstartar$aldergrp[is.na(dfstartar$aldergrp)] <- "totalt"
-  
-  # se till att sorteringen blir korrekt
-  dfstartar <- dfstartar %>% arrange(år, regionkod, aldergrp)
-  
-  # ====================================== Skapa diff-df ==================================================
-  dfdiff <- dfmalar
-  dfdiff$år <- paste0("Förändring ", dfstartar$år,"-", dfmalar$år, " (prognos våren ", 
-                      as.numeric(dfstartar$år) +1, ")")
-  dfdiff$antal <- dfmalar$antal - dfstartar$antal
-  
-  # Gör om aldergrp till factor som vi lägger i den ordning vi vill 
-  # plotta diagrammet
-  dfdiff$aldergrp <- factor(dfdiff$aldergrp, levels = 
-                              c("totalt", "0-19 år",
-                                "20-64 år", "65-79 år", "80+ år"))
-  
-  AktuellRegion <- ifelse(length(unique(dfdiff$region)) == 1, dfdiff$region[1], AktuellRegion)
+  progn_bef <- dplyr::bind_rows(px_df_bef, px_alla)
 
-  if (length(unique(dfdiff$region)) == 1) facet_installning <- FALSE else facet_installning <- TRUE
-  
-  
-    # ===================================== Gör diagram =====================================================
-  
-  diagramtitel <- paste0("Befolkningsförändring i ", AktuellRegion, " ",
-                           dfstartar$år[1],"-", dfmalar$år[1], "\n(enligt befolkningsprognos våren ", 
-                           as.numeric(dfstartar$år[1]) +1, ")")
-  
-  # Om det bara är en prognos som används, kör mörkgrönt, annars både ljus- och mörkgrönt
-  if (is.na(farger_diagram[1])) {
-    stapelfarger <- c(rgb(155,187,89, maxColorValue = 255), rgb(79,98,40, maxColorValue = 255))  
-  } else {
-    stapelfarger <- farger_diagram
+  # Skapa en numerisk åldersvariabel
+  progn_bef$aldernum <- suppressWarnings(readr::parse_number(progn_bef$ålder))
+
+  # Lägg ihop i åldersgrupper
+  progn_bef$aldergrp <- dplyr::case_when(progn_bef$aldernum < 20 ~ "0-19 år",
+                                          dplyr::between(progn_bef$aldernum, 20, 64) ~ "20-64 år",
+                                          dplyr::between(progn_bef$aldernum, 65, 79) ~ "65-79 år",
+                                          progn_bef$aldernum > 79 ~ "80+ år",
+                                          TRUE ~ NA_character_)
+
+  # Skapa df för startår
+  dfstartar <- progn_bef |>
+    dplyr::filter(år == as.character(startar)) |>
+    dplyr::group_by(år, regionkod, region, `inrikes/utrikes född`, aldergrp) |>
+    dplyr::summarise(antal = sum(Antal, na.rm = TRUE), .groups = "drop")
+
+  # Skapa df för målår
+  dfmalar <- progn_bef |>
+    dplyr::filter(år == as.character(malar)) |>
+    dplyr::group_by(år, regionkod, region, `inrikes/utrikes född`, aldergrp) |>
+    dplyr::summarise(antal = sum(Antal, na.rm = TRUE), .groups = "drop")
+
+  # Här skapar vi en rad med total folkmängd i dfmalar (summan av de fyra åldersgrupperna ovan) =====
+  total_df <- dfmalar |>
+    dplyr::group_by(år, regionkod, region, `inrikes/utrikes född`) |>
+    dplyr::summarise(antal = sum(antal), .groups = "drop")
+  dfmalar <- dplyr::bind_rows(dfmalar, total_df)
+  dfmalar$aldergrp[is.na(dfmalar$aldergrp)] <- "totalt"
+
+  # och så en rad med total folkmängd i dfstartar på samma sätt ====================================
+  total_df_start <- dfstartar |>
+    dplyr::group_by(år, regionkod, region, `inrikes/utrikes född`) |>
+    dplyr::summarise(antal = sum(antal), .groups = "drop")
+  dfstartar <- dplyr::bind_rows(dfstartar, total_df_start)
+  dfstartar$aldergrp[is.na(dfstartar$aldergrp)] <- "totalt"
+
+  # ====================================== Skapa diff-df ==================================================
+  # Bugfix/optimering (confirmed genom kodgranskning): tidigare drogs dfstartar$antal från dfmalar$antal
+  # rakt av, positionellt (dvs. rad 1 mot rad 1, rad 2 mot rad 2 osv.) utan någon join - det förutsätter
+  # att båda dataframes råkar ha exakt samma rader i exakt samma ordning, annars blir differensen fel
+  # helt tyst utan att något felmeddelande visas. Görs nu i stället som en explicit full_join på
+  # regionkod/region/inrikes-utrikes-född/åldersgrupp, vilket dessutom ger oss ett naturligt sätt att
+  # upptäcka och tydligt varna för databortfall (se felhanteringen nedan) - relevant eftersom
+  # uppdelningen på inrikes/utrikes födda är relativt ny i flera av SCB:s tabeller och inte alltid finns
+  # för alla kombinationer av region/år/ålder.
+  dfdiff <- dplyr::full_join(
+    dplyr::rename(dfstartar, antal_start = antal, ar_start = år),
+    dplyr::rename(dfmalar, antal_mal = antal, ar_mal = år),
+    by = c("regionkod", "region", "inrikes/utrikes född", "aldergrp")
+  )
+
+  # Felhantering: begripligt fel om data saknas för start- eller målåret för någon kombination av
+  # region/inrikes-utrikes-född/åldersgrupp (dyker upp som NA efter full_join ovan), i stället för att
+  # tyst räkna ut en felaktig differens eller krascha kryptiskt längre ned i diagramfunktionen.
+  saknas <- dplyr::filter(dfdiff, is.na(antal_start) | is.na(antal_mal))
+  if (nrow(saknas) > 0) {
+    stop("SkapaBefPrognosDiagram_InrUtrFodda(): data uppdelat på inrikes/utrikes födda saknas för ",
+         "start- eller målåret (", startar, "/", malar, ") för följande kombinationer av ",
+         "region/inrikes-utrikes-född/åldersgrupp - kan inte beräkna förändringen:\n",
+         paste(utils::capture.output(print(dplyr::select(saknas, regionkod, region, `inrikes/utrikes född`, aldergrp))), collapse = "\n"))
   }
-  #jmfr_pre <- ifelse(JmfrFleraPrognoser == TRUE, "_jmfr", "")   # lägger till ett "_jmfr" efter namnet om flera prognoser jämförs så att man kan skilja dessa prognoser från de med en prognos i filnamnet
-  #grp_pre <- ifelse(gruppera_ihop, "_grp", "_perRegion")
-  
-  
-  # filnamn_pre <- paste0("Befolkningsförändring inr utr födda i ", AktuellRegion, " på ", jmfrtid, " års sikt")
-  # filnamn <- paste0(filnamn_pre, ".png")
-  
-  filnamn_pre <- paste0("Befolkningsförändring i ", AktuellRegion, " inr_utr födda ", startar[1], " - ", malar[1])
-  filnamn <- paste0(filnamn_pre, ".png")
-  
-  # avrunda till heltal
-  dfdiff$antal <- round(dfdiff$antal)
-  
-  SkapaStapelDiagram(skickad_df = dfdiff,
+
+  dfdiff <- dfdiff |>
+    dplyr::mutate(år = paste0("Förändring ", ar_start, "-", ar_mal, " (prognos våren ", as.numeric(ar_start) + 1, ")"),
+                  antal = round(antal_mal - antal_start),
+                  aldergrp = factor(aldergrp, levels = c("totalt", "0-19 år", "20-64 år", "65-79 år", "80+ år"))) |>
+    dplyr::select(regionkod, region, `inrikes/utrikes född`, aldergrp, år, antal)
+
+  AktuellRegion <- if (length(unique(dfdiff$region)) == 1) dfdiff$region[1] else AktuellRegion
+
+  facet_installning <- length(unique(dfdiff$region)) > 1
+
+  # ===================================== Gör diagram =====================================================
+
+  diagramtitel <- paste0("Befolkningsförändring i ", AktuellRegion, " ", startar, "-", malar,
+                         "\n(enligt befolkningsprognos våren ", startar + 1, ")")
+
+  filnamn <- paste0("Befolkningsförändring i ", AktuellRegion, " inr_utr födda ", startar, " - ", malar, filformat)
+
+  gg_obj <- rddiagram::SkapaStapelDiagram(skickad_df = dfdiff,
                      skickad_x_var = "aldergrp",
                      skickad_y_var = "antal",
                      skickad_x_grupp = "inrikes/utrikes född",
-                     diagram_titel = diagramtitel,
+                     diagram_titel = if (utan_diagramtitel) NULL else diagramtitel,
                      output_mapp = output_fold,
                      diagram_capt = diagram_capt,
-                     diagram_facet = facet_installning,
-                     facet_grp = "region",
+                     facet_grp = if (facet_installning) "region" else NULL,
                      facet_scale = facet_scale,
                      facet_legend_bottom = facet_installning,
-                     manual_color = stapelfarger,
+                     manual_color = farger_diagram,
                      stodlinjer_avrunda_fem = stodlinjer_avrunda_fem,
-                     #legend_titel = "test",
                      manual_y_axis_title = "förändring antal invånare",
                      x_axis_lutning = 0,
                      manual_x_axis_text_vjust = 1,
                      manual_x_axis_text_hjust = 1,
-                     utan_diagramtitel = utan_diagramtitel,
-                     skriv_till_diagramfil = skapa_fil,
+                     logga_scaling = logga_storlek,
                      lagg_pa_logga = ta_med_logga,
-                     #logga_path = ,
+                     logga_path = logga_path,
+                     skriv_till_diagramfil = skapa_fil,
                      dataetiketter = dataetiketter,
+                     diagram_bildformat = stringr::str_sub(filformat, -3),
                      filnamn_diagram = filnamn)
-  
+
+  if (spara_excelfil) writexl::write_xlsx(dfdiff, paste0(output_fold, stringr::str_replace(filnamn, filformat, ".xlsx")))
+
+  retur_list <- list(gg_obj)
+  names(retur_list)[1] <- stringr::str_remove(filnamn, filformat)
+  return(retur_list)
+
 # slut på funktionen
 }
 
