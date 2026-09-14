@@ -89,7 +89,7 @@ diag_utbniva_tidserie_och_lansjmfr <- function(
   tabell_id <- "TAB3981"
 
   hamta_utbniva <- function(region_vekt, kon_klartext, alder_vekt, utbildningsniva_klartext, tid_vekt) {
-    giltiga_ar <- pxweb2r::pxweb2_get_values(tabell_id, "Tid")$code
+    giltiga_ar <- pxweb2r::pxweb2_get_values(tabell_id, "Tid", quiet = TRUE)$code
     tid_var <- if (identical(tid_vekt, "*")) giltiga_ar else as.character(tid_vekt)[as.character(tid_vekt) %in% giltiga_ar]
 
     px <- pxweb2r::pxweb2_get_data(
@@ -102,13 +102,13 @@ diag_utbniva_tidserie_och_lansjmfr <- function(
         ContentsCode = "UF0506A1",
         Tid = tid_var
       ),
-      on_all_values_invalid = "null")
+      on_all_values_invalid = "null", quiet = TRUE)
 
     dplyr::rename(px, regionkod = region_kod, Befolkning = value) |>
       dplyr::select(-tabellinnehåll)
   }
 
-  alla_giltiga_ar <- pxweb2r::pxweb2_get_values(tabell_id, "Tid")$code
+  alla_giltiga_ar <- pxweb2r::pxweb2_get_values(tabell_id, "Tid", quiet = TRUE)$code
 
   region_txt <- paste0(region_vekt, collapse = "_")
 

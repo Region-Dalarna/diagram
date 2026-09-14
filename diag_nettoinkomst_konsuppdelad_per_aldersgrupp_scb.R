@@ -61,7 +61,7 @@ diag_nettoinkomst_kon_aldersgrupp_scb <- function(
       Alder = alder_koder,
       ContentsCode = cont_klartext,
       Tid = "*"
-    )) |>
+    ), quiet = TRUE) |>
     dplyr::rename(regionkod = region_kod) |>
     dplyr::rename(!!cont_klartext := value) |>
     dplyr::select(-tabellinnehåll)

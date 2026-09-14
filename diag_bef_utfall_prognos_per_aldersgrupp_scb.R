@@ -79,7 +79,7 @@ diag_bef_utfall_prognos_per_aldersgrupp <- function(
   hamta_alderskoder <- function(table_id, aldrar) {
     totalkod <- if (table_id == "TAB638") "tot" else "TotSA"
     if (all(is.na(aldrar))) return(totalkod)
-    v <- pxweb2r::pxweb2_get_values(table_id, "Alder")
+    v <- pxweb2r::pxweb2_get_values(table_id, "Alder", quiet = TRUE)
     v <- v[grepl("^[0-9]+\\+? år$", v$label), ]
     v <- v[!duplicated(v$label), ]
     if (identical(aldrar, "*")) return(v$code)
@@ -97,13 +97,13 @@ diag_bef_utfall_prognos_per_aldersgrupp <- function(
       query = list(Region = region_vekt, Civilstand = civilstand_hamta,
                    Alder = hamta_alderskoder("TAB638", aldrar), Kon = c("män", "kvinnor"),
                    ContentsCode = "Folkmängd", Tid = "*"),
-      on_all_values_invalid = "null")
+      on_all_values_invalid = "null", quiet = TRUE)
     ckm <- pxweb2r::pxweb2_get_data(
       table = "TAB5557",
       query = list(Region = region_vekt, Civilstand = civilstand_hamta,
                    Alder = hamta_alderskoder("TAB5557", aldrar), Kon = c("män", "kvinnor"),
                    ContentsCode = "Folkmängd", Tid = "*"),
-      on_all_values_invalid = "null")
+      on_all_values_invalid = "null", quiet = TRUE)
 
     dplyr::bind_rows(historik, ckm) |>
       dplyr::rename(regionkod = region_kod, Antal = value) |>

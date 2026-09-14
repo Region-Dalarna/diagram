@@ -83,7 +83,7 @@ diag_etablering_diverse_scb <- function(region = "20", # Enbart ett i taget.
         BakgrVar = bakgrundsvariabler,
         ContentsCode = "Andel förvärvsarbetande (ny definition från och med 2019)",
         Tid = as.character(startar:2021)
-      )) |>
+      ), quiet = TRUE) |>
       dplyr::rename(Andel_forvarvsarbetande = value)
   }
 
@@ -97,7 +97,7 @@ diag_etablering_diverse_scb <- function(region = "20", # Enbart ett i taget.
         BakgrVar = bakgrundsvariabler,
         ContentsCode = "Andel förvärvsarbetande (ny definition från och med 2019)",
         Tid = as.character(startar:2021)
-      )) |>
+      ), quiet = TRUE) |>
       dplyr::rename(Andel_forvarvsarbetande = value)
   }
 
@@ -111,7 +111,7 @@ diag_etablering_diverse_scb <- function(region = "20", # Enbart ett i taget.
         BakgrVar = bakgrundsvariabler,
         ContentsCode = "Andel sysselsatta",
         Tid = "*"
-      )) |>
+      ), quiet = TRUE) |>
       dplyr::rename(Andel_forvarvsarbetande = value)
   }
 
@@ -125,7 +125,7 @@ diag_etablering_diverse_scb <- function(region = "20", # Enbart ett i taget.
         BakgrVar = bakgrundsvariabler,
         ContentsCode = "Andel sysselsatta",
         Tid = "*"
-      )) |>
+      ), quiet = TRUE) |>
       dplyr::rename(Andel_forvarvsarbetande = value)
   }
 

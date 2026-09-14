@@ -69,15 +69,15 @@ diagram_fodelsenetto <- function(region_vekt = "20", # Val av kommuner
     pxweb2r::pxweb2_get_data(
       table_id,
       query = list(Region = region_vekt, Kon = NA, AlderModer = alder_moder, Tid = tid),
-      on_all_values_invalid = "null"
-    )
+      on_all_values_invalid = "null",
+    quiet = TRUE)
   }
   hamta_doda <- function(table_id, alder) {
     pxweb2r::pxweb2_get_data(
       table_id,
       query = list(Region = region_vekt, Kon = NA, Alder = alder, Tid = tid),
-      on_all_values_invalid = "null"
-    )
+      on_all_values_invalid = "null",
+    quiet = TRUE)
   }
 
   fodda_hist <- hamta_fodda("TAB1264", NA)

@@ -87,7 +87,7 @@ diag_helarsekvivalenter <- function(
       Aldersgrupp = aldersgrupp_klartext,
       ContentsCode = cont_klartext,
       Tid = tid_koder
-    )) |>
+    ), quiet = TRUE) |>
     dplyr::rename(regionkod = region_kod, variabel = tabellinnehåll, varde = value)
 
   helarsekv_alla_df <- tibble::tibble()

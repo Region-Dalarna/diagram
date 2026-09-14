@@ -44,7 +44,7 @@ diagram_asylsokande_tidsserie <-function(output_mapp_figur = "G:/Samhällsanalys
       ContentsCode = "000003WL",
       Period = "hel",
       Tid = "*"
-    )) |>
+    ), quiet = TRUE) |>
     dplyr::rename(Antal = value) |>
     dplyr::select(år,Antal)
 

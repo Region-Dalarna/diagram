@@ -63,7 +63,7 @@ diag_bas_syss_per_bransch_manad_jmfr_1ar_tillbaka <- function(
   # (samma tabell, TAB3784, som redan används i diagram_forandring_sysselsatta_bransch.R/_kommun.R)
   # Räknar ut vilken månad som ska jämföras mot (N månader bakåt), samma
   # teknik som i diag_bas_arbloshet_jmfr_manad_1ar_tillbaka_region_scb.R.
-  giltiga_manader <- pxweb2r::pxweb2_get_values("TAB3784", "Tid")$code
+  giltiga_manader <- pxweb2r::pxweb2_get_values("TAB3784", "Tid", quiet = TRUE)$code
   tid_nu <- if (tid_koder == "9999") max(giltiga_manader) else tid_koder
   idx_nu <- which(giltiga_manader == tid_nu)
   idx_da <- idx_nu - jamfor_antal_manader_bakat
@@ -78,7 +78,7 @@ diag_bas_syss_per_bransch_manad_jmfr_1ar_tillbaka <- function(
       Fodelseregion = "*",
       ContentsCode = variabel_dag_nattbefolkning,
       Tid = tid_hamta
-    )) |>
+    ), quiet = TRUE) |>
     dplyr::rename(regionkod = region_kod, sni2007kod = `näringsgren sni 2007_kod`) |>
     dplyr::rename(!!variabel_dag_nattbefolkning := value) |>
     dplyr::select(-tabellinnehåll) |>

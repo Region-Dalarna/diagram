@@ -46,8 +46,8 @@ diag_sysselsatta_forandring_bransch_kommun <- function(region_vekt = "20", # Reg
   df <- pxweb2r::pxweb2_get_data(
       "TAB3784",
       query = list(Region = region_vekt, Kon = "totalt", SNI2007 = "*", Fodelseregion = "totalt",
-                   ContentsCode = "sysselsatta efter arbetsställets belägenhet", Tid = "*")
-    ) |>
+                   ContentsCode = "sysselsatta efter arbetsställets belägenhet", Tid = "*"),
+    quiet = TRUE) |>
     dplyr::rename(regionkod = region_kod, branschkod = `näringsgren sni 2007_kod`,
                   `sysselsatta efter arbetsställets belägenhet` = value, tid = månad) |>
     dplyr::mutate(branschkod = ifelse(branschkod == "US", "00", branschkod)) |>

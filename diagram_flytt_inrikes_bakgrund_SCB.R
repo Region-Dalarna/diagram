@@ -79,8 +79,8 @@ diag_inr_flyttnetto_inr_utr_fodda <- function(
                    Fodelseregion = c("född i Sverige", "utrikes född"),
                    ContentsCode = c("Flyttningsnetto, eget län", "Flyttningsnetto, övriga län"),
                    Tid = "*"),
-      on_all_values_invalid = "null"
-    )
+      on_all_values_invalid = "null",
+    quiet = TRUE)
   }
 
   flytt_hist <- hamta_flytt_bakgrund("TAB4693", NA)

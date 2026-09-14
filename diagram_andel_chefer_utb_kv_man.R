@@ -36,7 +36,7 @@ diag_chefer<-function(region_vekt = "20", # Enbart på län, max 1 åt gången
       BakgrVar = c("tot20-64"),
       ContentsCode = c("0000001Y"),
       Tid = "*"
-    )) |>
+    ), quiet = TRUE) |>
       dplyr::select(-region_kod,-tabellinnehåll) |>
       dplyr::rename(Andel = value)
 
@@ -49,8 +49,8 @@ diag_chefer<-function(region_vekt = "20", # Enbart på län, max 1 åt gången
       UtbNiv = c("000","F","3","EU","US"),
       BakgrVar = "TOT",
       ContentsCode=c("000007KF"),
-      Tid=c("*"))
-    ) |>
+      Tid=c("*")),
+    quiet = TRUE) |>
       dplyr::select(-region_kod,-tabellinnehåll) |>
       dplyr::rename(Andel = value)
 

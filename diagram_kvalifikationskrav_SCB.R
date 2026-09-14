@@ -72,7 +72,7 @@ diagram_kvalifikationskrav <- function(region_vekt = "20", # Vilken region vill 
       Kon = kon_klartext,
       ContentsCode = "Antal",
       Tid = "9999"
-    )) |>
+    ), quiet = TRUE) |>
     dplyr::rename(regionkod = region_kod,
                   yrkeskod = `yrke (ssyk 2012)_kod`,
                   Antal = value) |>

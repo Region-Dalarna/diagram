@@ -73,7 +73,7 @@ diag_bef_inr_utr_en_aldersgrupp <- function(
       ContentsCode = "Antal",
       Tid = "*"
     ),
-    on_all_values_invalid = "null")
+    on_all_values_invalid = "null", quiet = TRUE)
 
   bef_folkmangd_ckm <- pxweb2r::pxweb2_get_data(
     table = "TAB6645",
@@ -85,7 +85,7 @@ diag_bef_inr_utr_en_aldersgrupp <- function(
       ContentsCode = "Antal",
       Tid = "*"
     ),
-    on_all_values_invalid = "null")
+    on_all_values_invalid = "null", quiet = TRUE)
 
   bef_folkmangd <- rdverktyg::funktion_upprepa_forsok_om_fel(function()
     dplyr::bind_rows(bef_folkmangd_historik, bef_folkmangd_ckm) |>

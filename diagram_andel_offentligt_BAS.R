@@ -54,7 +54,7 @@ diagram_andel_offentligt <- function(region_vekt = rdverktyg::hamtakommuner("20"
       Fodelseregion = "totalt",
       ContentsCode = "sysselsatta efter arbetsställets belägenhet",
       Tid = "9999"
-    )) |>
+    ), quiet = TRUE) |>
     dplyr::rename(varde = value,
            regionkod = region_kod) |>
       dplyr::select(-tabellinnehåll)

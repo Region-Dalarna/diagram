@@ -87,12 +87,12 @@ diag_storsta_yrke_per_geografi <- function(
   # "senaste år" olika per tabell (t.ex. 2018 för den äldsta tabellen och 2024 för BAS-tabellen), och man
   # får då både 2018 och 2024 i utdata i stället för bara det verkliga senaste året.
   alla_tabeller <- c("TAB4396", "TAB3119", "TAB4434")
-  alla_giltiga_ar <- unlist(purrr::map(alla_tabeller, ~ pxweb2r::pxweb2_get_values(.x, "Tid")$code))
+  alla_giltiga_ar <- unlist(purrr::map(alla_tabeller, ~ pxweb2r::pxweb2_get_values(.x, "Tid", quiet = TRUE)$code))
   tid_koder <- if (identical(tid_koder, "9999")) max(alla_giltiga_ar) else tid_koder
 
   hamta_en_yrkestabell <- function(tabell_id, region_vekt, kon_klartext, tid_koder) {
 
-    giltiga_ar <- pxweb2r::pxweb2_get_values(tabell_id, "Tid")$code
+    giltiga_ar <- pxweb2r::pxweb2_get_values(tabell_id, "Tid", quiet = TRUE)$code
     tid_vekt <- if (identical(tid_koder, "*")) giltiga_ar else as.character(tid_koder)[as.character(tid_koder) %in% giltiga_ar]
 
     # RAMS ny tidsserie (2019-2021) och BAS (2020-) delar åren 2020-2021 - dessa tas alltid bort ur
@@ -109,7 +109,7 @@ diag_storsta_yrke_per_geografi <- function(
         ContentsCode = "*",
         Tid = tid_vekt
       ),
-      on_all_values_invalid = "null")
+      on_all_values_invalid = "null", quiet = TRUE)
     if (is.null(px)) return(NULL)
 
     dplyr::rename(px, regionkod = region_kod, yrkeskod = `yrke (ssyk 2012)_kod`,

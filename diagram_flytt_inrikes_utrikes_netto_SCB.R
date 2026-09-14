@@ -89,8 +89,8 @@ diagram_inr_utr_flytt <- function(region_vekt = "20", # Val av kommuner
       query = list(Region = region_vekt, Kon = c("Kvinnor", "Män"), Alder = alder,
                    ContentsCode = c("Inrikes flyttningsöverskott", "Invandringsöverskott", "Flyttningsöverskott"),
                    Tid = tid),
-      on_all_values_invalid = "null"
-    )
+      on_all_values_invalid = "null",
+    quiet = TRUE)
   }
 
   flytt_hist <- hamta_flytt("TAB1212", NA)

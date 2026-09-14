@@ -66,7 +66,7 @@ diag_gymnasiebehorighet_mm <- function(region_vekt = "20", # Enbart ett i taget.
           Bakgrund = till_endash(bakgrund_klartext),
           ContentsCode = cont_klartext,
           Tid = "*"
-        ))
+        ), quiet = TRUE)
     }
     if ("00" %in% region_vekt) {
       resultat$riket <- pxweb2r::pxweb2_get_data(
@@ -76,7 +76,7 @@ diag_gymnasiebehorighet_mm <- function(region_vekt = "20", # Enbart ett i taget.
           Bakgrund = till_endash(bakgrund_klartext),
           ContentsCode = cont_klartext,
           Tid = "*"
-        ))
+        ), quiet = TRUE)
     }
     dplyr::bind_rows(resultat) |>
       dplyr::rename(regionkod = region_kod, variabel = bakgrundsvariabel) |>

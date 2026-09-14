@@ -65,7 +65,7 @@ diag_aterstaende_medellivslangd_utbniva_lan_scb <- function(
       Alder = vald_alder,
       ContentsCode = cont_var_klartext,
       Tid = ar_vekt
-    ))
+    ), quiet = TRUE)
 
   new_name <- unique(medellivslangd_df$tabellinnehåll)
   medellivslangd_df <- medellivslangd_df |>

@@ -56,7 +56,7 @@ diag_bas_syss_arbloshet_aldersgrupp_kon_scb <- function(
       Fodelseregion = "*",
       ContentsCode = vald_cont,
       Tid = "*"
-    )) |>
+    ), quiet = TRUE) |>
     dplyr::rename(regionkod = region_kod, variabel = tabellinnehåll, varde = value)
 
   # ta bort rader med NA och fixa till månadsvariabeln

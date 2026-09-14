@@ -80,7 +80,7 @@ brp_lan_df <- rdverktyg::suppress_specific_warning(
       Region = rdverktyg::hamtaAllaLan(TRUE),
       ContentsCode = cont_klartext,
       Tid = tid_koder
-    )) |>
+    ), quiet = TRUE) |>
     dplyr::rename(regionkod = region_kod) |>
     dplyr::rename(!!cont_klartext := value) |>
     dplyr::select(-tabellinnehåll) |>

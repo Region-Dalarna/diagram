@@ -65,7 +65,7 @@ diag_UVAS_bakgrund_vistelsetid <- function(region = "20", # Enbart ett i taget.
                         "Andel personer 20-25 år som varken förvärvsarbetar eller studerar, procent"),
       Tid = "*"
     ),
-    on_all_values_invalid = "null") |>
+    on_all_values_invalid = "null", quiet = TRUE) |>
     dplyr::rename(regionkod = region_kod, variabel = bakgrundsvariabel, sysselsattning = tabellinnehåll, varde = value) |>
     dplyr::mutate(
       # normalisera en-dash till vanligt bindestreck innan vi matchar mot klartexterna nedan

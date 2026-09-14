@@ -46,7 +46,7 @@ diagram_storsta_fodelseland <-function(region_vekt = "20",# Max 1, län
       Kon = NA,
       ContentsCode = "*",
       Tid = "*"
-    )) |>
+    ), quiet = TRUE) |>
     dplyr::mutate(region = rdverktyg::skapa_kortnamn_lan(region)) |>
       dplyr::rename(regionkod = region_kod,
              Antal = value)

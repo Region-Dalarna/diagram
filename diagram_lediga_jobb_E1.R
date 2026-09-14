@@ -66,7 +66,7 @@ diagram_lediga_jobb_tid_sektor_E1 <- function(region_vekt = "20",			# Val av reg
         ContentsCode = cont_varden,
         Tid = tid_koder
       ),
-      on_all_values_invalid = "null")
+      on_all_values_invalid = "null", quiet = TRUE)
     if (!is.null(df)) df$tabell_id <- tabell_id
     df
   }

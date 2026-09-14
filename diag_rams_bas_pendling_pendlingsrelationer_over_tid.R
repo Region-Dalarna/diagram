@@ -73,7 +73,7 @@ diag_arbetspendling_over_tid <- function(
   hamta_en_pendlingstabell <- function(tabell_id, hamta_region_vekt, kommun_vekt, lan_vekt,
                                        kon_klartext_vekt, tid_vekt, regionnyckel) {
 
-    giltiga_ar <- pxweb2r::pxweb2_get_values(tabell_id, "Tid")$code
+    giltiga_ar <- pxweb2r::pxweb2_get_values(tabell_id, "Tid", quiet = TRUE)$code
     akt_tid_vekt <- if (all(tid_vekt == "*")) giltiga_ar else tid_vekt[tid_vekt %in% giltiga_ar]
     if (tabell_id == "TAB5850") akt_tid_vekt <- akt_tid_vekt[!akt_tid_vekt %in% c("2020", "2021")]
     if (length(akt_tid_vekt) == 0) return(NULL)
@@ -96,8 +96,8 @@ diag_arbetspendling_over_tid <- function(
           ContentsCode = "*",
           Tid = akt_tid_vekt
         ),
-        on_all_values_invalid = "null"
-      ))
+        on_all_values_invalid = "null",
+      quiet = TRUE))
     }
 
     stada_riktning <- function(px) {

@@ -59,7 +59,7 @@ diag_huv_ink_kalla_bakgrund_scb <- function(region = "20", # Enbart ett i taget.
       Fodelseregion = "*",
       ContentsCode = "antal totalt",
       Tid = "9999"
-    )) |>
+    ), quiet = TRUE) |>
     dplyr::rename(regionkod = region_kod, `antal totalt` = value) |>
     dplyr::select(-tabellinnehåll) |>
     dplyr::mutate(`huvudsaklig inkomstkälla` = dplyr::case_when(

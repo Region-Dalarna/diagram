@@ -71,8 +71,8 @@ diag_etablering_utb_kon_scb <- function(region = "20", # Enbart ett i taget.
         BakgrVar = bakgrundsvariabler,
         ContentsCode = "Andel förvärvsarbetande (ny definition från och med 2019)",
         Tid = "*"
-      )
-    )
+      ),
+    quiet = TRUE)
   }
 
   # Call municipality API once, only if there are municipality codes
@@ -86,8 +86,8 @@ diag_etablering_utb_kon_scb <- function(region = "20", # Enbart ett i taget.
         BakgrVar = bakgrundsvariabler,
         ContentsCode = "Andel förvärvsarbetande (ny definition från och med 2019)",
         Tid = "*"
-      )
-    )
+      ),
+    quiet = TRUE)
   }
 
   # 2022 och senare
@@ -102,8 +102,8 @@ diag_etablering_utb_kon_scb <- function(region = "20", # Enbart ett i taget.
         BakgrVar = bakgrundsvariabler,
         ContentsCode = "Andel sysselsatta",
         Tid = "*"
-      )
-    )
+      ),
+    quiet = TRUE)
   }
 
   # Call municipality API once, only if there are municipality codes
@@ -117,8 +117,8 @@ diag_etablering_utb_kon_scb <- function(region = "20", # Enbart ett i taget.
         BakgrVar = bakgrundsvariabler,
         ContentsCode = "Andel sysselsatta",
         Tid = "*"
-      )
-    )
+      ),
+    quiet = TRUE)
   }
 
   # If you want a single combined data frame afterwards (assuming same column structure):

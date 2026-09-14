@@ -58,7 +58,7 @@ diag_fodelsetal_summerad_fruktsamhet_jmfr_riket_lan_kommuner <- function(
       Kon = "kvinnor",
       ContentsCode = "*",
       Tid = "*"
-    )) |>
+    ), quiet = TRUE) |>
     dplyr::rename(regionkod = region_kod, Antal = value) |>
     dplyr::select(-tabellinnehåll)
 

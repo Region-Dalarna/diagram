@@ -58,7 +58,7 @@ diag_antal_utbniva_alder_kon <- function(
       UtbildningsNiva = "*",
       ContentsCode = "UF0506A1",
       Tid = tid_koder
-    )) |>
+    ), quiet = TRUE) |>
     dplyr::rename(regionkod = region_kod,
            utbildningsnivå_alla = utbildningsnivå,
            varde = value) |>

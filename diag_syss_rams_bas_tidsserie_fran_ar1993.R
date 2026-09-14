@@ -57,7 +57,7 @@ diag_syss_rams_bas_tidssserie_fran_ar1993 <- function(
 
   hamta_en_syss_tabell <- function(tabell_id, ar_bas_tabell) {
 
-    giltiga_ar <- pxweb2r::pxweb2_get_values(tabell_id, "Tid")$code
+    giltiga_ar <- pxweb2r::pxweb2_get_values(tabell_id, "Tid", quiet = TRUE)$code
     tid_vekt <- if (identical(tid_koder, "*")) giltiga_ar else as.character(tid_koder)[as.character(tid_koder) %in% giltiga_ar]
 
     # RAMS ny tidsserie (2019-2021) och BAS (2020-) delar åren 2020-2021 - dessa tas alltid bort ur
@@ -86,7 +86,7 @@ diag_syss_rams_bas_tidssserie_fran_ar1993 <- function(
           ContentsCode = "sysselsättningsgrad",
           Tid = tid_vekt
         ),
-        on_all_values_invalid = "null")
+        on_all_values_invalid = "null", quiet = TRUE)
       if (is.null(px)) return(NULL)
 
       px <- dplyr::rename(px, regionkod = region_kod, sysselsättningsgrad = value)
@@ -114,7 +114,7 @@ diag_syss_rams_bas_tidssserie_fran_ar1993 <- function(
           ContentsCode = "*",
           Tid = tid_vekt
         ),
-        on_all_values_invalid = "null")
+        on_all_values_invalid = "null", quiet = TRUE)
       if (is.null(px)) return(NULL)
 
       px <- dplyr::rename(px, regionkod = region_kod, sysselsättningsgrad = value)

@@ -25,7 +25,7 @@ diagram_ek_stod_bakgrund_SCB <- function(region_vekt = "20",
   # stället för library(). "here"/"openxlsx" togs bort - laddades men
   # användes aldrig. func_pxweb2.R:s pxweb2_hamta_data()-wrapper (som redan
   # var TAB1784-baserad, dvs. redan på v2-apiet) ersätts med ett direkt
-  # pxweb2r::pxweb2_get_data()-anrop - samma tabell, samma kolumnnamn
+  # pxweb2r::pxweb2_get_data(, quiet = TRUE)-anrop - samma tabell, samma kolumnnamn
   # (region_kod/tabellinnehåll) så resten av bearbetningen är oförändrad.
   if (!requireNamespace("rddiagram", quietly = TRUE)) {
     remotes::install_github("Region-Dalarna/rdpaket", subdir = "packages/rddiagram")
@@ -46,7 +46,7 @@ diagram_ek_stod_bakgrund_SCB <- function(region_vekt = "20",
       Fodelseregion = "*",
       ContentsCode = "antal totalt",
       Tid = "*"
-    )) |>
+    ), quiet = TRUE) |>
     dplyr::rename(`antal totalt` = value,
            regionkod = region_kod) |>
     dplyr::mutate(`antal totalt` = as.numeric(`antal totalt`)) |>

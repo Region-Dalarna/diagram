@@ -67,7 +67,7 @@ diag_inr_flyttnetto_inr_utr_fodda <- function(
   # filtrerar bort dem.
 
   hamta_individuella_aldrar <- function(table_id) {
-    pxweb2r::pxweb2_get_values(table_id, "Alder") |>
+    pxweb2r::pxweb2_get_values(table_id, "Alder", quiet = TRUE) |>
       dplyr::filter(grepl("^[0-9]+\\+? år$", label)) |>
       dplyr::filter(!duplicated(label)) |>
       dplyr::pull(code)
@@ -77,7 +77,7 @@ diag_inr_flyttnetto_inr_utr_fodda <- function(
   # slår upp den faktiska koden för respektive tabell när 999 (= högsta
   # ålder) skickas med i alder_grp.
   hamta_100plus_kod <- function(table_id) {
-    varden <- pxweb2r::pxweb2_get_values(table_id, "Alder")
+    varden <- pxweb2r::pxweb2_get_values(table_id, "Alder", quiet = TRUE)
     varden$code[varden$label == "100+ år" & varden$type == "Variable"][1]
   }
 
@@ -134,7 +134,7 @@ diag_inr_flyttnetto_inr_utr_fodda <- function(
       ContentsCode = cont_hamta,
       Tid = "*"
     ),
-    on_all_values_invalid = "null")
+    on_all_values_invalid = "null", quiet = TRUE)
 
   flytt_df_ckm <- pxweb2r::pxweb2_get_data(
     table = "TAB6657",
@@ -146,7 +146,7 @@ diag_inr_flyttnetto_inr_utr_fodda <- function(
       ContentsCode = cont_hamta,
       Tid = "*"
     ),
-    on_all_values_invalid = "null")
+    on_all_values_invalid = "null", quiet = TRUE)
 
   px_df <- dplyr::bind_rows(flytt_df_historik, flytt_df_ckm) |>
     dplyr::rename(regionkod = region_kod) |>
@@ -225,7 +225,7 @@ diag_inr_flyttnetto_inr_utr_fodda <- function(
         ContentsCode = "Antal",
         Tid = bef_ar_vekt
       ),
-      on_all_values_invalid = "null")
+      on_all_values_invalid = "null", quiet = TRUE)
 
     bef_df_ckm <- pxweb2r::pxweb2_get_data(
       table = "TAB6645",
@@ -237,7 +237,7 @@ diag_inr_flyttnetto_inr_utr_fodda <- function(
         ContentsCode = "Antal",
         Tid = bef_ar_vekt
       ),
-      on_all_values_invalid = "null")
+      on_all_values_invalid = "null", quiet = TRUE)
 
     bef_df <- dplyr::bind_rows(bef_df_historik, bef_df_ckm) |>
       dplyr::rename(regionkod = region_kod, Antal = value) |>

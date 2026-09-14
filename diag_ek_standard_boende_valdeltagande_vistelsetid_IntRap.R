@@ -46,7 +46,7 @@ diagram_diverse_vistelsetid <-function(region_vekt = c("20"),# Max 1,
   # SCB:s PxWeb-klartexter för ålders-/vistelsetidsintervall använder
   # gemenhetstecken (en-dash "–") i stället för vanligt bindestreck i
   # v2-tabellerna nedan - annars matchar inte klartexten som skickas till
-  # pxweb2r::pxweb2_get_data().
+  # pxweb2r::pxweb2_get_data(, quiet = TRUE).
   till_endash <- function(x) gsub("(?<=[0-9])-(?=[0-9 ])", "\u2013", x, perl = TRUE)
 
   if(diag_ek_standard == TRUE){
@@ -56,7 +56,7 @@ diagram_diverse_vistelsetid <-function(region_vekt = c("20"),# Max 1,
     # HE/HE0110/HE0110F/TabVXDispI69) hämtas här direkt via
     # v2-motsvarigheten TAB1125. "9999" (senaste år) är en v1-specifik
     # sentinel som pxweb2r inte känner till - slås upp explicit i stället.
-    senaste_ar_ekstd <- max(pxweb2r::pxweb2_get_values("TAB1125", "Tid")$code)
+    senaste_ar_ekstd <- max(pxweb2r::pxweb2_get_values("TAB1125", "Tid", quiet = TRUE)$code)
 
     ekonomisk_standard_bakgrund_df <- pxweb2r::pxweb2_get_data(
       table = "TAB1125",
@@ -68,7 +68,7 @@ diagram_diverse_vistelsetid <-function(region_vekt = c("20"),# Max 1,
         InkomstTyp = "disponibel inkomst per k.e. inkl. kapitalvinst",
         ContentsCode = "Inkomst < 60 procent",
         Tid = unique(c(as.character(jmf_ar), senaste_ar_ekstd))
-      )) |>
+      ), quiet = TRUE) |>
       dplyr::rename(regionkod = region_kod, `Inkomst < 60 procent` = value) |>
       dplyr::select(-tabellinnehåll) |>
       dplyr::mutate(region = rdverktyg::skapa_kortnamn_lan(region, byt_ut_riket_mot_sverige = TRUE),
@@ -136,10 +136,10 @@ diagram_diverse_vistelsetid <-function(region_vekt = c("20"),# Max 1,
         ContentsCode = cont_boende,
         Tid = tid_koder)
       if (boende_tabell == "TAB1798") query <- c(list(Region = region_vekt), query)
-      pxweb2r::pxweb2_get_data(table = boende_tabell, query = query)
+      pxweb2r::pxweb2_get_data(table = boende_tabell, query = query, quiet = TRUE)
     }
 
-    senaste_ar_boende <- max(pxweb2r::pxweb2_get_values(boende_tabell, "Tid")$code)
+    senaste_ar_boende <- max(pxweb2r::pxweb2_get_values(boende_tabell, "Tid", quiet = TRUE)$code)
 
     # Av oklar anledning saknas mycket data för senaste år. Jag gör därför ett enklare uttag för senaste år och om det saknas data väljs året innan
     boende_test <- hamta_boende(senaste_ar_boende)
@@ -242,7 +242,7 @@ diagram_diverse_vistelsetid <-function(region_vekt = c("20"),# Max 1,
     if (val_tabell != "TAB4255") query_val <- c(list(Region = region_vekt), query_val)
 
     # Hämtar data
-    valdeltagande_df <- pxweb2r::pxweb2_get_data(table = val_tabell, query = query_val) |>
+    valdeltagande_df <- pxweb2r::pxweb2_get_data(table = val_tabell, query = query_val, quiet = TRUE) |>
       dplyr::rename(regionkod = dplyr::any_of("region_kod"), variabel = bakgrundsvariabel, val = tabellinnehåll, varde = value) |>
       dplyr::mutate(regionkod = dplyr::if_else(is.na(regionkod), region_vekt[1], regionkod)) |>
       tidyr::pivot_wider(names_from = val, values_from = varde) |>

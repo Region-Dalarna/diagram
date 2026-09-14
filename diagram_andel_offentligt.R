@@ -49,7 +49,7 @@ diagram_andel_offentligt <- function(region_vekt = rdverktyg::hamtakommuner("20"
       Kon = c("män","kvinnor"),
       ContentsCode = "00000545",
       Tid = "9999"
-    )) |>
+    ), quiet = TRUE) |>
     dplyr::rename(regionkod = region_kod,
                   `Förvärvsarbetande 16-74 år med arbetsplats i regionen (dagbefolkning) (RAMS)` = value) |>
     dplyr::select(-tabellinnehåll)

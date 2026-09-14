@@ -82,10 +82,10 @@ gg_list <- list()
 # skickad_x_grupp nedan) - vill man ha ett enskilt år anges det
 # (eller "9999" för enbart senaste året).
 if (identical(tid_koder, "*")) {
-  giltiga_ar <- pxweb2r::pxweb2_get_values("TAB6329", "Tid")$code
+  giltiga_ar <- pxweb2r::pxweb2_get_values("TAB6329", "Tid", quiet = TRUE)$code
   tid_koder <- utils::tail(sort(giltiga_ar), 3)
 } else if (any(tid_koder == "9999")) {
-  senaste_ar <- max(pxweb2r::pxweb2_get_values("TAB6329", "Tid")$code)
+  senaste_ar <- max(pxweb2r::pxweb2_get_values("TAB6329", "Tid", quiet = TRUE)$code)
   tid_koder <- ifelse(tid_koder == "9999", senaste_ar, tid_koder)
 }
 
@@ -97,7 +97,7 @@ foradl_df <- rdverktyg::suppress_specific_warning(
       SNI2007 = sni2007_klartext,
       ContentsCode = cont_klartext,
       Tid = tid_koder
-    )) |>
+    ), quiet = TRUE) |>
     dplyr::rename(regionkod = region_kod, variabel = tabellinnehåll, varde = value)
 )
 

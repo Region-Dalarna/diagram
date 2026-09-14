@@ -68,7 +68,7 @@ c("https://region-dalarna.github.io/utskrivna_diagram/in_utpendling_Dalarna2021.
   # tydligt felmeddelande i stället för att i det tysta hämta fel data -
   # det historiska RAMS-flödet (pre-2020) är inte återskapat, eftersom
   # skriptets egen kommentar avråder från att någonsin ändra valt_ar.
-  giltiga_ar <- pxweb2r::pxweb2_get_values("TAB1828", "Tid")$code
+  giltiga_ar <- pxweb2r::pxweb2_get_values("TAB1828", "Tid", quiet = TRUE)$code
   valt_ar <- if (all(is.na(valt_ar)) || identical(valt_ar, "9999")) max(giltiga_ar) else as.character(valt_ar)
   if (!valt_ar %in% giltiga_ar) {
     stop(glue::glue("valt_ar = {valt_ar} finns inte i TAB1828 (giltiga år: {paste(giltiga_ar, collapse = ', ')}). Migreringen av det här skriptet återskapar bara BAS-tabellen (fr.o.m. 2020) - äldre RAMS-år stöds inte."))
@@ -119,7 +119,7 @@ c("https://region-dalarna.github.io/utskrivna_diagram/in_utpendling_Dalarna2021.
       Kon = kon_hamta,
       ContentsCode = "*",
       Tid = valt_ar
-    )) |>
+    ), quiet = TRUE) |>
     dplyr::rename(regionkod = kommun_kod, region = kommun, variabel = tabellinnehåll, varde = value) |>
     dplyr::mutate(variabel = dplyr::case_when(
       variabel == "bostad utanför kommunen men arbetsställe i kommunen" ~ "Inpendlare över kommungräns",

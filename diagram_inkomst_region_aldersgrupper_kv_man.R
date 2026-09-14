@@ -53,7 +53,7 @@ diag_inkomst_scb <- function(regionvekt = "20", # Enbart ett i taget. går även
       Alder = alder_klartext,
       ContentsCode = inkomst_typ,
       Tid = "*"
-    ))
+    ), quiet = TRUE)
 
   # Koden nedan används för att byta namn på den sista variabeln i df (för att efterlikna tidigare hämtning med gamla PXweb)
   new_name <- unique(forvarvsinkomst_df$tabellinnehåll)

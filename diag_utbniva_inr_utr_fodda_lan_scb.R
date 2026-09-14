@@ -56,11 +56,11 @@ diag_utbniva_inr_utr_fodda_kon_lan <- function(
 
   hamta_en_integrationstabell <- function(tabell_id, region_vekt, kon_klartext, bakgrund_klartext, cont_klartext, tid_koder) {
 
-    giltiga_regioner <- pxweb2r::pxweb2_get_values(tabell_id, "Region")$code
+    giltiga_regioner <- pxweb2r::pxweb2_get_values(tabell_id, "Region", quiet = TRUE)$code
     region_giltig <- region_vekt[region_vekt %in% giltiga_regioner]
     if (length(region_giltig) == 0) return(NULL)
 
-    giltiga_ar <- pxweb2r::pxweb2_get_values(tabell_id, "Tid")$code
+    giltiga_ar <- pxweb2r::pxweb2_get_values(tabell_id, "Tid", quiet = TRUE)$code
     tid_vekt <- if (identical(tid_koder, "9999")) max(giltiga_ar) else if (identical(tid_koder, "*")) giltiga_ar else as.character(tid_koder)[as.character(tid_koder) %in% giltiga_ar]
     if (length(tid_vekt) == 0) return(NULL)
 
@@ -73,7 +73,7 @@ diag_utbniva_inr_utr_fodda_kon_lan <- function(
         Tid = tid_vekt,
         Kon = kon_klartext
       ),
-      on_all_values_invalid = "null")
+      on_all_values_invalid = "null", quiet = TRUE)
     if (is.null(px)) return(NULL)
 
     # "tabellinnehåll" (ContentsCode, dvs. Födda i Sverige/Utrikes födda) döps om till "bakgrund" - samma

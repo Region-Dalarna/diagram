@@ -71,7 +71,7 @@ diag_befutv_per_komponent_ar <- function(
       ContentsCode = "Antal personer",
       Tid = "*"
     ),
-    on_all_values_invalid = "null")
+    on_all_values_invalid = "null", quiet = TRUE)
 
   beffor_df_ckm <- pxweb2r::pxweb2_get_data(
     table = "TAB6481",
@@ -83,7 +83,7 @@ diag_befutv_per_komponent_ar <- function(
       ContentsCode = "Befolkningsstatistik antal personer",
       Tid = "*"
     ),
-    on_all_values_invalid = "null")
+    on_all_values_invalid = "null", quiet = TRUE)
 
   beffor_df <- dplyr::bind_rows(beffor_df_historik, beffor_df_ckm) |>
     dplyr::rename(regionkod = region_kod, personer = value) |>

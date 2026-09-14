@@ -50,7 +50,7 @@ diagram_utrikes_fodda_tidsserie <-function(region_vekt = c("20"),# Max 1, län
   # flera olika aggregeringshierarkier (5-års-/10-årsklasser) - samma
   # problem och lösning som i diagram_flytt_inrikes_aldersgrupper_SCB.R.
   hamta_individuella_aldrar <- function(table_id) {
-    v <- pxweb2r::pxweb2_get_values(table_id, "Alder")
+    v <- pxweb2r::pxweb2_get_values(table_id, "Alder", quiet = TRUE)
     v <- v[grepl("^[0-9]+\\+? år$", v$label), ]
     v <- v[!duplicated(v$label), ]
     v$code
@@ -78,7 +78,7 @@ diagram_utrikes_fodda_tidsserie <-function(region_vekt = c("20"),# Max 1, län
         ContentsCode = "Antal",
         Tid = tid_koder
       ),
-      on_all_values_invalid = "null")
+      on_all_values_invalid = "null", quiet = TRUE)
 
     ckm <- pxweb2r::pxweb2_get_data(
       table = "TAB6645",
@@ -90,7 +90,7 @@ diagram_utrikes_fodda_tidsserie <-function(region_vekt = c("20"),# Max 1, län
         ContentsCode = "Antal",
         Tid = tid_koder
       ),
-      on_all_values_invalid = "null")
+      on_all_values_invalid = "null", quiet = TRUE)
 
     df <- dplyr::bind_rows(historik, ckm) |>
       dplyr::rename(regionkod = region_kod, Antal = value) |>
@@ -331,7 +331,7 @@ diagram_utrikes_fodda_tidsserie <-function(region_vekt = c("20"),# Max 1, län
         Alder = "*",
         ContentsCode = "Antal",
         Tid = "*"
-      )) |>
+      ), quiet = TRUE) |>
       dplyr::rename(regionkod = region_kod, Antal = value) |>
       dplyr::select(-tabellinnehåll) |>
       dplyr::rename(födelseregion = `inrikes/utrikes född`) |>

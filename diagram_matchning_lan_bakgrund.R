@@ -64,7 +64,7 @@ diag_matchning_lan <- function(region_vekt = "20", # Region vi är intresserade 
       AlderFodelselandgr = c("Sverige","Norden/EU","Afrika","Asien","Övriga_världen","totalt"),
       ContentsCode = "000007I3",
       Tid = "9999"
-    )) |>
+    ), quiet = TRUE) |>
     dplyr::select(-region_kod,-tabellinnehåll) |>
     dplyr::rename(matchningsgrad = value) |>
     dplyr::mutate(region = rdverktyg::skapa_kortnamn_lan(region,byt_ut_riket_mot_sverige = TRUE))

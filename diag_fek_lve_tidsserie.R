@@ -54,7 +54,7 @@ c("https://region-dalarna.github.io/utskrivna_diagram/fek_Förädlingsvärde_Dal
         SNI2007 = "*",
         ContentsCode = cont_klartext,
         Tid = "*"
-      )) |>
+      ), quiet = TRUE) |>
       dplyr::rename(regionkod = region_kod, sni2007kod = `näringsgren sni 2007_kod`, variabel = tabellinnehåll, varde = value)
 
     ny <- pxweb2r::pxweb2_get_data(
@@ -64,7 +64,7 @@ c("https://region-dalarna.github.io/utskrivna_diagram/fek_Förädlingsvärde_Dal
         SNI2007 = "*",
         ContentsCode = cont_klartext,
         Tid = "*"
-      )) |>
+      ), quiet = TRUE) |>
       dplyr::rename(regionkod = region_kod, variabel = tabellinnehåll, varde = value)
 
     dplyr::bind_rows(historik, ny)

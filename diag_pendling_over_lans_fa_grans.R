@@ -76,7 +76,7 @@ diag_pendling_over_lans_fa_grans <- function(region_vekt = rdverktyg::hamtaAllaL
       Kon = kon_hamta,
       ContentsCode = "*",
       Tid = valt_ar
-    )) |>
+    ), quiet = TRUE) |>
     dplyr::rename(regionkod = region_kod, variabel = tabellinnehåll, varde = value) |>
     dplyr::select(-utbildning_kod, -utbildning)
 

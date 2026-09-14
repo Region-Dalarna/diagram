@@ -90,7 +90,7 @@ diag_bas_status_alla_kat_prel_manad_scb <- function(
       Fodelseregion = fodelseregion_vekt,
       ContentsCode = cont_uttag,
       Tid = "*"
-    )) |>
+    ), quiet = TRUE) |>
     dplyr::rename(regionkod = region_kod, variabel = tabellinnehåll, varde = value) |>
     rdverktyg::manader_bearbeta_scbtabeller() |>
     dplyr::mutate(variabel = factor(variabel, levels = rev(c("antal sysselsatta", "antal arbetslösa", "antal studerande", "antal pensionärer", "antal sjuka", "antal övriga" ))))

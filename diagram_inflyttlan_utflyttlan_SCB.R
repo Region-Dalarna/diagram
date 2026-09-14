@@ -73,8 +73,8 @@ diagram_inflyttlan_utflyttlan <- function(output_mapp_figur= "G:/skript/jon/Figu
     pxweb2r::pxweb2_get_data(
       table_id,
       query = list(InflyttningsL = inflyttningsl_klartext, UtflyttningsL = utflyttningsl_klartext, Kon = NA, Tid = tid),
-      on_all_values_invalid = "null"
-    )
+      on_all_values_invalid = "null",
+    quiet = TRUE)
   }
   flytt_hist <- hamta_flytt("TAB4409")
   flytt_ckm  <- hamta_flytt("TAB6672")

@@ -56,7 +56,7 @@ diag_sysselsatta_andel <- function(region_vekt = "20", # Region vi är intresser
       Fodelseregion = "totalt",
       ContentsCode = "sysselsatta efter arbetsställets belägenhet",
       Tid = "9999"
-    )) |>
+    ), quiet = TRUE) |>
     dplyr::mutate(`näringsgren sni 2007_kod` = ifelse(`näringsgren sni 2007_kod` == "US", "00", `näringsgren sni 2007_kod`)) |>
       dplyr::filter(`näringsgren sni 2007_kod` != "A-U+US") |>
         dplyr::rename(branschkod = `näringsgren sni 2007_kod`,

@@ -62,7 +62,7 @@ diagram_befolkningsforandring <- function(region_vekt = rdverktyg::hamtaAllaLan(
       ContentsCode = c("Folkmängd","Folkökning"),
       Tid = tid
     ),
-    on_all_values_invalid = "null")
+    on_all_values_invalid = "null", quiet = TRUE)
 
   bef_ckm <- pxweb2r::pxweb2_get_data(
     table = "TAB5557",
@@ -74,7 +74,7 @@ diagram_befolkningsforandring <- function(region_vekt = rdverktyg::hamtaAllaLan(
       ContentsCode = c("Folkmängd","Folkökning"),
       Tid = tid
     ),
-    on_all_values_invalid = "null")
+    on_all_values_invalid = "null", quiet = TRUE)
 
   har_ckm_bef <- !is.null(bef_ckm) && nrow(bef_ckm) > 0
 
@@ -99,7 +99,7 @@ diagram_befolkningsforandring <- function(region_vekt = rdverktyg::hamtaAllaLan(
       ContentsCode = "*",
       Tid = tid
     ),
-    on_all_values_invalid = "null")
+    on_all_values_invalid = "null", quiet = TRUE)
 
   flytt_ckm <- pxweb2r::pxweb2_get_data(
     table = "TAB6640",
@@ -110,7 +110,7 @@ diagram_befolkningsforandring <- function(region_vekt = rdverktyg::hamtaAllaLan(
       ContentsCode = "*",
       Tid = tid
     ),
-    on_all_values_invalid = "null")
+    on_all_values_invalid = "null", quiet = TRUE)
 
   har_ckm_flytt <- !is.null(flytt_ckm) && nrow(flytt_ckm) > 0
 

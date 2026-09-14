@@ -68,7 +68,7 @@ c("https://region-dalarna.github.io/utskrivna_diagram/forandr_arbmstatus_Dalarna
       Fodelseregion = fodelseregion_txt,
       ContentsCode = cont_txt,
       Tid = "*"
-    )) |>
+    ), quiet = TRUE) |>
     dplyr::rename(regionkod = region_kod, variabel = tabellinnehåll, varde = value)
 
   # om man vill gruppera ihop de regioner som man skickat med

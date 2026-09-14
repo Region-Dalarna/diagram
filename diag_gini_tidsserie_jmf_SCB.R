@@ -59,7 +59,7 @@ diag_gini_SCB <- function(region_vekt = rdverktyg::hamtaAllaLan(tamedriket = TRU
       InkomstTyp = inkomsttyp_klartext,
       ContentsCode = "Gini-koefficient",
       Tid = "*"
-    )) |>
+    ), quiet = TRUE) |>
     dplyr::rename(regionkod = region_kod, `Gini-koefficient` = value) |>
     dplyr::select(-tabellinnehåll) |>
     dplyr::mutate(region = rdverktyg::skapa_kortnamn_lan(region))

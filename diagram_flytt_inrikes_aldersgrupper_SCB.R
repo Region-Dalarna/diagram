@@ -71,7 +71,7 @@ diagram_inrikes_flytt_alder <- function(region_vekt = "20", # Val av kommuner
   # och exkluderar femårs-/tioårsklasser och totalrader helt.
   hamta_giltiga_aldrar <- function(table_id) {
     meta <- pxweb2r::pxweb2_get_metadata(table_id)
-    vals <- pxweb2r::pxweb2_get_values(meta)
+    vals <- pxweb2r::pxweb2_get_values(meta, quiet = TRUE)
     vals$Alder |>
       dplyr::filter(grepl("^[0-9]+(\\+)? år$", label)) |>
       dplyr::distinct(label, .keep_all = TRUE) |>
@@ -83,8 +83,8 @@ diagram_inrikes_flytt_alder <- function(region_vekt = "20", # Val av kommuner
       table_id,
       query = list(Region = region_vekt, Kon = NA, Alder = hamta_giltiga_aldrar(table_id),
                    ContentsCode = c("Inrikes flyttningsöverskott", "Invandringsöverskott"), Tid = tid),
-      on_all_values_invalid = "null"
-    )
+      on_all_values_invalid = "null",
+    quiet = TRUE)
   }
 
   flytt_hist <- hamta_flytt("TAB1212")

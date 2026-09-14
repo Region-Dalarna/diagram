@@ -51,7 +51,7 @@ diag_bas_arbloshet_manad_jmfr_1ar_tillbaka_scb <- function(
   # sätt som den gamla hamta_data-funktionen gjorde: hitta positionen för
   # begärd månad i tabellens giltiga (kronologiskt sorterade) månadskoder,
   # och plocka koden N steg tidigare.
-  giltiga_manader <- pxweb2r::pxweb2_get_values("TAB6260", "Tid")$code
+  giltiga_manader <- pxweb2r::pxweb2_get_values("TAB6260", "Tid", quiet = TRUE)$code
   tid_nu <- if (tid_koder == "9999") max(giltiga_manader) else tid_koder
   idx_nu <- which(giltiga_manader == tid_nu)
   idx_da <- idx_nu - jamfor_antal_manader_bakat
@@ -66,7 +66,7 @@ diag_bas_arbloshet_manad_jmfr_1ar_tillbaka_scb <- function(
       Fodelseregion = fodelseregion_val,
       ContentsCode = "arbetslöshet",
       Tid = tid_hamta
-    )) |>
+    ), quiet = TRUE) |>
     dplyr::rename(regionkod = region_kod, arbetslöshet = value) |>
     dplyr::select(-tabellinnehåll, -dplyr::any_of("kön")) |>
     rdverktyg::manader_bearbeta_scbtabeller() |>

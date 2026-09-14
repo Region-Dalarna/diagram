@@ -60,7 +60,7 @@ diag_inr_flytt_in_ut_netto_per_alder <- function(region_vekt = "20",
   # utelämnas) hämtas här alltid båda könen explicit, och summeras ihop
   # själva om kon_klartext = NA (ingen könsuppdelning önskad).
   hamta_individuella_aldrar <- function(table_id) {
-    pxweb2r::pxweb2_get_values(table_id, "Alder") |>
+    pxweb2r::pxweb2_get_values(table_id, "Alder", quiet = TRUE) |>
       dplyr::filter(grepl("^[0-9]+\\+? år$", label)) |>
       dplyr::filter(!duplicated(label)) |>
       dplyr::pull(code)
@@ -84,8 +84,8 @@ diag_inr_flytt_in_ut_netto_per_alder <- function(region_vekt = "20",
   # upp det verkliga senaste året över båda tabellerna och använder det
   # explicit för båda uttagen.
   if (identical(tid_koder, "9999")) {
-    tid_koder <- max(c(pxweb2r::pxweb2_get_values("TAB1212", "Tid")$code,
-                        pxweb2r::pxweb2_get_values("TAB6640", "Tid")$code))
+    tid_koder <- max(c(pxweb2r::pxweb2_get_values("TAB1212", "Tid", quiet = TRUE)$code,
+                        pxweb2r::pxweb2_get_values("TAB6640", "Tid", quiet = TRUE)$code))
   }
 
   flytt_df_historik <- pxweb2r::pxweb2_get_data(
@@ -97,7 +97,7 @@ diag_inr_flytt_in_ut_netto_per_alder <- function(region_vekt = "20",
       ContentsCode = c("Inrikes inflyttningar", "Inrikes utflyttningar"),
       Tid = tid_koder
     ),
-    on_all_values_invalid = "null")
+    on_all_values_invalid = "null", quiet = TRUE)
 
   flytt_df_ckm <- pxweb2r::pxweb2_get_data(
     table = "TAB6640",
@@ -108,7 +108,7 @@ diag_inr_flytt_in_ut_netto_per_alder <- function(region_vekt = "20",
       ContentsCode = c("Inrikes inflyttningar", "Inrikes utflyttningar"),
       Tid = tid_koder
     ),
-    on_all_values_invalid = "null")
+    on_all_values_invalid = "null", quiet = TRUE)
 
   flytt_df <- dplyr::bind_rows(flytt_df_historik, flytt_df_ckm) |>
     dplyr::rename(regionkod = region_kod, variabel = tabellinnehåll, varde = value) |>

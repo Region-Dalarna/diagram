@@ -55,7 +55,7 @@ diag_SFI_bakgrund <- function(region = "20", # Enbart ett i taget.
       Bakgrund = c("utbildningsnivå: förgymnasial utbildning", "utbildningsnivå: gymnasial utbildning", "utbildningsnivå: eftergymnasial utbildning"),
       ContentsCode = "Vistelsetid för godkända i sfi, median i antal dagar",
       Tid = "*"
-    )) |>
+    ), quiet = TRUE) |>
     dplyr::rename(variabel = bakgrundsvariabel) |>
     dplyr::mutate(variabel = sub("utbildningsnivå: ", "", variabel),
            variabel = stringr::str_to_sentence(variabel)) |>

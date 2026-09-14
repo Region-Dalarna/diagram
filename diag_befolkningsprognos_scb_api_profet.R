@@ -88,8 +88,8 @@ SkapaBefPrognosDiagram <- function(region_vekt = "20",
   # röjandekontroll) för nya årgångar från och med 2025, så det verkliga senaste året finns numera i
   # CKM-tabellen (TAB5557), inte i historiktabellen (TAB638) - båda kollas här.
   senaste_ar_bef <- max(as.numeric(c(
-    pxweb2r::pxweb2_get_values("TAB638", "Tid")$code,
-    pxweb2r::pxweb2_get_values("TAB5557", "Tid")$code
+    pxweb2r::pxweb2_get_values("TAB638", "Tid", quiet = TRUE)$code,
+    pxweb2r::pxweb2_get_values("TAB5557", "Tid", quiet = TRUE)$code
   )))
 
   gg_list <- list()
@@ -184,7 +184,7 @@ SkapaBefPrognosDiagram <- function(region_vekt = "20",
   # "totalt"-etiketten över fyra koder (TotSA/TOT1/TOT10/TOT5) - "TotSA" är den kod originalskriptets
   # egen hamta_bef_folkmangd_alder_kon_ar_scb.R bytte till (str_replace("totalt", "TotSA")).
   hamta_individuella_aldrar <- function(table_id) {
-    pxweb2r::pxweb2_get_values(table_id, "Alder") |>
+    pxweb2r::pxweb2_get_values(table_id, "Alder", quiet = TRUE) |>
       dplyr::filter(grepl("^[0-9]+\\+? år$", label)) |>
       dplyr::filter(!duplicated(label)) |>
       dplyr::pull(code)
@@ -196,13 +196,13 @@ SkapaBefPrognosDiagram <- function(region_vekt = "20",
     query = list(Region = region_vekt, Civilstand = civilstand_hamta,
                  Alder = c(hamta_individuella_aldrar("TAB638"), "tot"), Kon = c("män", "kvinnor"),
                  ContentsCode = "Folkmängd", Tid = startar),
-    on_all_values_invalid = "null")
+    on_all_values_invalid = "null", quiet = TRUE)
   px_df_bef_ckm <- pxweb2r::pxweb2_get_data(
     table = "TAB5557",
     query = list(Region = region_vekt, Civilstand = civilstand_hamta,
                  Alder = c(hamta_individuella_aldrar("TAB5557"), "TotSA"), Kon = c("män", "kvinnor"),
                  ContentsCode = "Folkmängd", Tid = startar),
-    on_all_values_invalid = "null")
+    on_all_values_invalid = "null", quiet = TRUE)
 
   px_df_bef <- dplyr::bind_rows(px_df_bef_historik, px_df_bef_ckm) |>
     dplyr::rename(regionkod = region_kod, Folkmängd = value) |>
@@ -832,7 +832,7 @@ SkapaBefPrognosDiagram_InrUtrFodda <- function(aktlan = "20",
   # diag_bef_inrikes_utrikes_antal_forandring_prognos_IntRap.R - CKM-tabellen har samma ålder
   # representerad under flera olika aggregeringshierarkier).
   hamta_individuella_aldrar <- function(table_id) {
-    v <- pxweb2r::pxweb2_get_values(table_id, "Alder")
+    v <- pxweb2r::pxweb2_get_values(table_id, "Alder", quiet = TRUE)
     v <- v[grepl("^[0-9]+\\+? år$", v$label), ]
     v <- v[!duplicated(v$label), ]
     v$code
@@ -840,7 +840,7 @@ SkapaBefPrognosDiagram_InrUtrFodda <- function(aktlan = "20",
 
   # =============== bestäm start- och målår utifrån prognosens faktiska tidsspann ================
 
-  tab6008_ar <- as.numeric(pxweb2r::pxweb2_get_values("TAB6008", "Tid")$code)
+  tab6008_ar <- as.numeric(pxweb2r::pxweb2_get_values("TAB6008", "Tid", quiet = TRUE)$code)
   startar <- min(tab6008_ar) - 1                # startår är alltid ett år innan första året i prognosen
   malar <- startar + jmfrtid                    # målår skapas genom att addera jämförelsetid till startåret
 
@@ -863,7 +863,7 @@ SkapaBefPrognosDiagram_InrUtrFodda <- function(aktlan = "20",
       Alder = hamta_individuella_aldrar("TAB6008"),
       ContentsCode = "Antal",
       Tid = as.character(malar)
-    )) |>
+    ), quiet = TRUE) |>
     dplyr::rename(regionkod = region_kod, Antal = value) |>
     dplyr::select(-tabellinnehåll) |>
     dplyr::relocate(regionkod, .before = region)
@@ -872,8 +872,8 @@ SkapaBefPrognosDiagram_InrUtrFodda <- function(aktlan = "20",
   # välj rätt tabell (historik eller CKM) utifrån vilken av dem som faktiskt täcker startåret - med
   # ett begripligt fel om ingen av dem gör det, i stället för att pxweb2r-anropet misslyckas långt
   # senare med ett svårtolkat felmeddelande om ett ogiltigt Tid-värde.
-  tab4823_ar <- as.numeric(pxweb2r::pxweb2_get_values("TAB4823", "Tid")$code)
-  tab6645_ar <- as.numeric(pxweb2r::pxweb2_get_values("TAB6645", "Tid")$code)
+  tab4823_ar <- as.numeric(pxweb2r::pxweb2_get_values("TAB4823", "Tid", quiet = TRUE)$code)
+  tab6645_ar <- as.numeric(pxweb2r::pxweb2_get_values("TAB6645", "Tid", quiet = TRUE)$code)
 
   historik_table <- if (startar %in% tab4823_ar) {
     "TAB4823"
@@ -894,7 +894,7 @@ SkapaBefPrognosDiagram_InrUtrFodda <- function(aktlan = "20",
       Fodelseregion = c("född i Sverige", "utrikes född"),
       ContentsCode = "Antal",
       Tid = as.character(startar)
-    )) |>
+    ), quiet = TRUE) |>
     dplyr::rename(regionkod = region_kod, Antal = value) |>
     dplyr::select(-tabellinnehåll) |>
     dplyr::relocate(regionkod, .before = region)

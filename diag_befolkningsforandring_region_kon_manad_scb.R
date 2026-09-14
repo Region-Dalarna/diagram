@@ -45,7 +45,7 @@ diag_befolkningsforandring_manad_scb <- function(region_vekt = "20",
       ContentsCode = "Befolkning",
       Tid = tid_koder
     ),
-    on_all_values_invalid = "null")
+    on_all_values_invalid = "null", quiet = TRUE)
 
   beffor_df_ckm <- pxweb2r::pxweb2_get_data(
     table = "TAB6473",
@@ -56,7 +56,7 @@ diag_befolkningsforandring_manad_scb <- function(region_vekt = "20",
       ContentsCode = "Befolkning",
       Tid = tid_koder
     ),
-    on_all_values_invalid = "null")
+    on_all_values_invalid = "null", quiet = TRUE)
 
   beffor_df <- dplyr::bind_rows(beffor_df_historik, beffor_df_ckm) |>
     dplyr::rename(regionkod = region_kod, Befolkning = value) |>

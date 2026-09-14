@@ -72,7 +72,7 @@ diag_forandr_branscher_bubblor <- function(vald_geografi ="20",                 
 
   hamta_en_dagbef_sni_tabell <- function(tabell_id, region_vekt, tid_koder, har_totalt_kon) {
 
-    giltiga_ar <- pxweb2r::pxweb2_get_values(tabell_id, "Tid")$code
+    giltiga_ar <- pxweb2r::pxweb2_get_values(tabell_id, "Tid", quiet = TRUE)$code
     akt_ar_vekt <- if (identical(tid_koder, "*")) giltiga_ar else as.character(tid_koder)[as.character(tid_koder) %in% giltiga_ar]
 
     # RAMS ny tidsserie (2019-2021) och BAS (2020-) delar åren 2020-2021 - dessa tas alltid bort ur
@@ -84,14 +84,14 @@ diag_forandr_branscher_bubblor <- function(vald_geografi ="20",                 
       # BAS-tabellen (TAB3785) har en riktig "totalt"-kod för Kon, samt två ContentsCode-värden
       # (dagbefolkning/nattbefolkning) - vi vill bara ha dagbefolkning (den vars etikett inte
       # innehåller "bostad", samma urval som i originalskriptet).
-      cont_df <- pxweb2r::pxweb2_get_values(tabell_id, "ContentsCode")
+      cont_df <- pxweb2r::pxweb2_get_values(tabell_id, "ContentsCode", quiet = TRUE)
       cont_kod <- cont_df$code[!grepl("bostad", cont_df$label)]
 
       px <- pxweb2r::pxweb2_get_data(
         table = tabell_id,
         query = list(Region = region_vekt, SNI2007 = "*", Kon = "totalt",
                      Fodelseregion = "totalt", ContentsCode = cont_kod, Tid = akt_ar_vekt),
-        on_all_values_invalid = "null")
+        on_all_values_invalid = "null", quiet = TRUE)
       if (is.null(px)) return(NULL)
 
       px <- px |>
@@ -103,7 +103,7 @@ diag_forandr_branscher_bubblor <- function(vald_geografi ="20",                 
       px <- pxweb2r::pxweb2_get_data(
         table = tabell_id,
         query = list(Region = region_vekt, SNI2007 = "*", Kon = "*", ContentsCode = "*", Tid = akt_ar_vekt),
-        on_all_values_invalid = "null")
+        on_all_values_invalid = "null", quiet = TRUE)
       if (is.null(px)) return(NULL)
 
       px <- px |>

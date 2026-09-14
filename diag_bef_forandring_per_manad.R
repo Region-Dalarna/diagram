@@ -57,7 +57,7 @@ diag_fodda_manad_scb <- function(
       ContentsCode = "Befolkning",
       Tid = "*"
     ),
-    on_all_values_invalid = "null")
+    on_all_values_invalid = "null", quiet = TRUE)
 
   # CKM-tabellens klartext för "totalt" är "totalt, samtliga män och
   # kvinnor" (kod "TotSa") - inte bara "totalt" som i historiktabellen.
@@ -70,7 +70,7 @@ diag_fodda_manad_scb <- function(
       ContentsCode = "Befolkning",
       Tid = "*"
     ),
-    on_all_values_invalid = "null")
+    on_all_values_invalid = "null", quiet = TRUE)
 
   # Skriptet refererade en "år"-kolumn som aldrig fanns i pxweb-uttaget
   # (bara den råa månadskoden, t.ex. "2020M01") - manader_bearbeta_

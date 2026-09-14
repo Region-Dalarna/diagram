@@ -45,11 +45,11 @@ diag_syss_vistelsetid_inr_utr_fodda_ett_per_ar_scb <- function(
 
   hamta_en_tabell <- function(tabell_id, region_vekt, kon_klartext, cont_klartext_kod, bakgr_kod, tid_vekt) {
 
-    giltiga_regioner <- pxweb2r::pxweb2_get_values(tabell_id, "Region")$code
+    giltiga_regioner <- pxweb2r::pxweb2_get_values(tabell_id, "Region", quiet = TRUE)$code
     region_var <- region_vekt[region_vekt %in% giltiga_regioner]
     if (length(region_var) == 0) return(NULL)
 
-    giltiga_ar <- pxweb2r::pxweb2_get_values(tabell_id, "Tid")$code
+    giltiga_ar <- pxweb2r::pxweb2_get_values(tabell_id, "Tid", quiet = TRUE)$code
     tid_var <- if (identical(tid_vekt, "9999")) max(giltiga_ar) else if (all(is.na(tid_vekt))) giltiga_ar else as.character(tid_vekt)
     tid_var <- tid_var[tid_var %in% giltiga_ar]
     if (length(tid_var) == 0) return(NULL)
@@ -64,7 +64,7 @@ diag_syss_vistelsetid_inr_utr_fodda_ett_per_ar_scb <- function(
         ContentsCode = cont_klartext_kod,
         Tid = tid_var
       ),
-      on_all_values_invalid = "null")
+      on_all_values_invalid = "null", quiet = TRUE)
     if (is.null(px)) return(NULL)
 
     # pxweb2r ger alltid en generisk "value"-kolumn, oavsett vilket tabellinnehåll som begärts - döps

@@ -58,14 +58,14 @@ diagram_befolkningsforandring_ar <- function(region_vekt = "20", # Val av kommun
     "TAB638",
     query = list(Region = region_vekt, Kon = kon_klartext, Civilstand = NA,
                  Alder = NA, ContentsCode = c("Folkmängd", "Folkökning"), Tid = tid),
-    on_all_values_invalid = "null"
-  )
+    on_all_values_invalid = "null",
+  quiet = TRUE)
   befolkning_ckm <- pxweb2r::pxweb2_get_data(
     "TAB5557",
     query = list(Region = region_vekt, Kon = kon_klartext, Civilstand = "SC",
                  Alder = "TotSA", ContentsCode = c("Folkmängd", "Folkökning"), Tid = tid),
-    on_all_values_invalid = "null"
-  )
+    on_all_values_invalid = "null",
+  quiet = TRUE)
   if (!is.null(befolkning_ckm)) {
     befolkning_ckm <- dplyr::select(befolkning_ckm, -dplyr::any_of(c("civilstånd", "ålder")))
   }

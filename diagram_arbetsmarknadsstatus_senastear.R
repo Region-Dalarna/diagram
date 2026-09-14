@@ -64,7 +64,7 @@ diagram_arbetsmarknadsstatus <-function(region_vekt = rdverktyg::hamtakommuner("
       Fodelseregion = fodelseregion_klartext_vekt,
       ContentsCode = variabel,
       Tid = "9999"
-    )) |>
+    ), quiet = TRUE) |>
     dplyr::rename(varde = value,
            regionkod = region_kod,
            variabel = tabellinnehåll) |>

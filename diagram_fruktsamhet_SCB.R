@@ -75,15 +75,15 @@ diagram_fruktsamhet <- function(region_vekt = rdverktyg::hamtakommuner("20"), # 
   tid_str <- as.character(vald_period)
   tid_str <- unique(tid_str[tid_str %in% c("*", "9999") | (suppressWarnings(as.integer(tid_str)) <= ar_nu + 1)])
 
-  fodda_hist <- pxweb2r::pxweb2_get_data("TAB1264", query = list(Region = region_vekt, Kon = NA, AlderModer = alder_str, Tid = tid_str), on_all_values_invalid = "null")
-  fodda_ckm  <- pxweb2r::pxweb2_get_data("TAB6401", query = list(Region = region_vekt, Kon = NA, AlderModer = alder_str, Tid = tid_str), on_all_values_invalid = "null")
+  fodda_hist <- pxweb2r::pxweb2_get_data("TAB1264", query = list(Region = region_vekt, Kon = NA, AlderModer = alder_str, Tid = tid_str), on_all_values_invalid = "null", quiet = TRUE)
+  fodda_ckm  <- pxweb2r::pxweb2_get_data("TAB6401", query = list(Region = region_vekt, Kon = NA, AlderModer = alder_str, Tid = tid_str), on_all_values_invalid = "null", quiet = TRUE)
 
   fodda_df <- dplyr::bind_rows(fodda_hist, fodda_ckm) |>
     dplyr::rename(regionkod = region_kod, födda = value) |>
     dplyr::select(-dplyr::any_of("tabellinnehåll"))
 
   bef_hist <- pxweb2r::pxweb2_get_data("TAB638", query = list(Region = region_vekt, Kon = "kvinnor", Civilstand = NA, Alder = alder_str,
-                                                                ContentsCode = "Folkmängd", Tid = tid_str), on_all_values_invalid = "null")
+                                                                ContentsCode = "Folkmängd", Tid = tid_str), on_all_values_invalid = "null", quiet = TRUE)
   # Civilstånd är inte elimineringsbart i TAB5557 (CKM) - måste anges
   # explicit som totalkoden "SC", vilket också gör den till en egen kolumn
   # som plockas bort igen innan bind_rows().
@@ -91,8 +91,8 @@ diagram_fruktsamhet <- function(region_vekt = rdverktyg::hamtakommuner("20"), # 
     "TAB5557",
     query = list(Region = region_vekt, Kon = "kvinnor", Civilstand = "SC", Alder = alder_str,
                  ContentsCode = "Folkmängd", Tid = tid_str),
-    on_all_values_invalid = "null"
-  )
+    on_all_values_invalid = "null",
+  quiet = TRUE)
   if (!is.null(bef_ckm)) bef_ckm <- dplyr::select(bef_ckm, -dplyr::any_of("civilstånd"))
 
   har_ckm_data <- (!is.null(fodda_ckm) && nrow(fodda_ckm) > 0) || (!is.null(bef_ckm) && nrow(bef_ckm) > 0)

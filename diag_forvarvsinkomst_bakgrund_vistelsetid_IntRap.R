@@ -42,7 +42,7 @@ diag_inkomst_bakgrund_scb <- function(region = "20", # Enbart ett i taget.
   # dplyr/purrr/stringr följer med som beroenden till rddiagram/rdverktyg.
 
   # Tabellen TAB5278 (v2) har redan använts direkt (Tid = "9999" förstås
-  # av pxweb2r::pxweb2_get_data() som "senaste period" via dess egen
+  # av pxweb2r::pxweb2_get_data(, quiet = TRUE) som "senaste period" via dess egen
   # latest_period_code-inställning), så inget bakomliggande hamta_data-
   # skript att ersätta här.
   forvarvsinkomst_df <- pxweb2r::pxweb2_get_data(
@@ -55,8 +55,8 @@ diag_inkomst_bakgrund_scb <- function(region = "20", # Enbart ett i taget.
       Alder = alder_klartext,
       ContentsCode = inkomst_typ,
       Tid ="9999"
-    )
-  ) |>
+    ),
+  quiet = TRUE) |>
     dplyr::filter(!is.na(value)) |>
     dplyr::rename(!!inkomst_typ := value,
                      regionkod = region_kod,

@@ -106,20 +106,20 @@ diagram_forvarvsarbetande_90 <- function(region_vekt = "20", # Vilken region vil
     )
   }
 
-  d1 <- pxweb2r::pxweb2_get_data("TAB341", query = list(Region = region_vekt, SNI92 = "*", Kon = kon_klartext, Tid = "*")) |>
+  d1 <- pxweb2r::pxweb2_get_data("TAB341", query = list(Region = region_vekt, SNI92 = "*", Kon = kon_klartext, Tid = "*"), quiet = TRUE) |>
     dplyr::rename(regionkod = region_kod, Näringsgren = `näringsgren SNI92`, `Förvärvsarbetande 16+ år (dagbef)` = value) |>
     dplyr::select(regionkod, region, kön, Näringsgren, år, `Förvärvsarbetande 16+ år (dagbef)`)
 
-  d2 <- pxweb2r::pxweb2_get_data("TAB904", query = list(Region = region_vekt, SNI2002 = "*", Kon = kon_klartext, Tid = "*")) |>
+  d2 <- pxweb2r::pxweb2_get_data("TAB904", query = list(Region = region_vekt, SNI2002 = "*", Kon = kon_klartext, Tid = "*"), quiet = TRUE) |>
     dplyr::rename(regionkod = region_kod, Näringsgren = `näringsgren SNI 2002`, `Förvärvsarbetande 16+ år (dagbef)` = value) |>
     dplyr::select(regionkod, region, kön, Näringsgren, år, `Förvärvsarbetande 16+ år (dagbef)`)
 
-  d3 <- pxweb2r::pxweb2_get_data("TAB900", query = list(Region = region_vekt, SNI2007 = "*", Kon = kon_klartext, Tid = "*")) |>
+  d3 <- pxweb2r::pxweb2_get_data("TAB900", query = list(Region = region_vekt, SNI2007 = "*", Kon = kon_klartext, Tid = "*"), quiet = TRUE) |>
     dplyr::rename(regionkod = region_kod, `Förvärvsarbetande 16+ år (dagbef)` = value) |>
     dplyr::mutate(Näringsgren = sni2007_till_ramsfras(`näringsgren SNI 2007`)) |>
     dplyr::select(regionkod, region, kön, Näringsgren, år, `Förvärvsarbetande 16+ år (dagbef)`)
 
-  d4 <- pxweb2r::pxweb2_get_data("TAB5837", query = list(Region = region_vekt, SNI2007 = "*", Kon = kon_klartext, Tid = "2019")) |>
+  d4 <- pxweb2r::pxweb2_get_data("TAB5837", query = list(Region = region_vekt, SNI2007 = "*", Kon = kon_klartext, Tid = "2019"), quiet = TRUE) |>
     dplyr::rename(regionkod = region_kod, `Förvärvsarbetande 16+ år (dagbef)` = value) |>
     dplyr::mutate(Näringsgren = sni2007_till_ramsfras(`näringsgren SNI 2007`)) |>
     dplyr::select(regionkod, region, kön, Näringsgren, år, `Förvärvsarbetande 16+ år (dagbef)`)
@@ -127,8 +127,8 @@ diagram_forvarvsarbetande_90 <- function(region_vekt = "20", # Vilken region vil
   d5 <- pxweb2r::pxweb2_get_data(
       "TAB3785",
       query = list(Region = region_vekt, SNI2007 = "*", Kon = kon_klartext, Fodelseregion = "totalt",
-                   ContentsCode = "sysselsatta efter arbetsställets belägenhet", Tid = "*")
-    ) |>
+                   ContentsCode = "sysselsatta efter arbetsställets belägenhet", Tid = "*"),
+    quiet = TRUE) |>
     dplyr::filter(`näringsgren SNI 2007` != "Total") |>
     dplyr::rename(regionkod = region_kod, `Förvärvsarbetande 16+ år (dagbef)` = value) |>
     dplyr::mutate(Näringsgren = bas_till_ramsfras(`näringsgren SNI 2007`)) |>

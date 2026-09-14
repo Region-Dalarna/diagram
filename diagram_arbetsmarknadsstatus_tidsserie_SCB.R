@@ -56,7 +56,7 @@ diagram_arbetsmarknadsstatus_tidsserie <-function(region_vekt = "20", # Max 1 re
       Fodelseregion = fodelseregion,
       ContentsCode = "arbetslöshet",
       Tid = "*"
-    )) |>
+    ), quiet = TRUE) |>
     dplyr::rename(varde = value,
            regionkod = region_kod,
            variabel = tabellinnehåll) |>
