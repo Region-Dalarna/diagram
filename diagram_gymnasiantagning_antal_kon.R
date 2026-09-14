@@ -17,6 +17,8 @@ diag_gymnasieantagna_antal <- function(output_mapp_figur = "G:/Samhällsanalys/S
 
   # 1: Skapar diagram för antagna på gymnasiet, antingen för senaste år (uppdelat på kön eller inte) eller för valda år
   # Skapat av Jon Frank 2024-03-07
+  #
+  # Ändrat från las_in_data_gymnasieantagningen() till gymnasieantagningen_las_in_data() då funktionen bytt namn /Jon 2026-09-14
   # ========================================== Inställningar ============================================
   # Bara paket, ingen source() mot funktioner-repot och inget p_load(tidyverse).
   # Anropas med fullt namespace (dplyr::filter() osv.) i stället för library().
@@ -41,7 +43,8 @@ diag_gymnasieantagna_antal <- function(output_mapp_figur = "G:/Samhällsanalys/S
 
   # Hämtar data
   source("G:/skript/hamta_data/func_gymnasieantagningen.R", encoding = "utf-8", echo = FALSE)
-  df <- las_in_data_gymnasieantagningen() |>
+  df <- gymnasieantagningen_las_in_data() |> 
+  #df <- las_in_data_gymnasieantagningen() |>
     dplyr::group_by(ar,program) |>
     dplyr::summarize(Män=sum(Ant_Män),
               Kvinnor=sum(Ant_Kv), .groups = "drop") |>
