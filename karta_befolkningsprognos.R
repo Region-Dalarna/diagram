@@ -102,7 +102,7 @@ karta_befolkningsprognos <- function(
   hamta_alderskoder <- function(table_id, aldrar) {
     totalkod <- if (table_id == "TAB638") "tot" else "TotSA"
     if (all(is.na(aldrar))) return(totalkod)
-    v <- pxweb2r::pxweb2_get_values(table_id, "Alder")
+    v <- suppressMessages(pxweb2r::pxweb2_get_values(table_id, "Alder"))
     v <- v[grepl("^[0-9]+\\+? år$", v$label), ]
     v <- v[!duplicated(v$label), ]
     if (identical(aldrar, "*")) return(v$code)
@@ -118,22 +118,26 @@ karta_befolkningsprognos <- function(
   hamta_bef_folkmangd_v2 <- function(region_vekt, tid, aldrar) {
     if (identical(tid, "9999")) {
       tid <- as.character(max(as.numeric(c(
-        pxweb2r::pxweb2_get_values("TAB638", "Tid")$code,
-        pxweb2r::pxweb2_get_values("TAB5557", "Tid")$code
+        suppressMessages(pxweb2r::pxweb2_get_values("TAB638", "Tid"))$code,
+        suppressMessages(pxweb2r::pxweb2_get_values("TAB5557", "Tid"))$code
       ))))
     }
-    historik <- pxweb2r::pxweb2_get_data(
+    # suppressMessages() tystar bara pxweb2r:s helt ofarliga "include_aggregations = auto: hittade N
+    # kodlistor"-info (en riktig R message()) - inte de cat()-baserade "ogiltiga värden borttagna"-
+    # notiserna, som vi förväntar oss här (TAB638/TAB5557 täcker olika årsspann) men som inte går att
+    # tysta lika enkelt (se anteckning i minnet/commit-historiken om en tänkt warn-parameter i pxweb2r).
+    historik <- suppressMessages(pxweb2r::pxweb2_get_data(
       table = "TAB638",
       query = list(Region = region_vekt, Civilstand = civilstand_hamta,
                    Alder = hamta_alderskoder("TAB638", aldrar), Kon = c("män", "kvinnor"),
                    ContentsCode = "Folkmängd", Tid = tid),
-      on_all_values_invalid = "null")
-    ckm <- pxweb2r::pxweb2_get_data(
+      on_all_values_invalid = "null"))
+    ckm <- suppressMessages(pxweb2r::pxweb2_get_data(
       table = "TAB5557",
       query = list(Region = region_vekt, Civilstand = civilstand_hamta,
                    Alder = hamta_alderskoder("TAB5557", aldrar), Kon = c("män", "kvinnor"),
                    ContentsCode = "Folkmängd", Tid = tid),
-      on_all_values_invalid = "null")
+      on_all_values_invalid = "null"))
 
     dplyr::bind_rows(historik, ckm) |>
       dplyr::rename(regionkod = region_kod, Folkmängd = value) |>
@@ -219,7 +223,6 @@ karta_befolkningsprognos <- function(
             ) +
       ggplot2::labs(title = paste0("Prognosticerad befolkningsutveckling i ", kommuner_egetnamn),
            subtitle = paste0("år ", min_ar, "-", max_ar),
-           yaxis = "",
            fill = "Förändring (%)",
            caption = karta_capt_gg)
 
