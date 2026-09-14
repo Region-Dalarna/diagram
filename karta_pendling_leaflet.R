@@ -39,9 +39,9 @@ karta_arbetspendling <- function(
   # func_diagramfunktioner.R sourcades tidigare men användes inte alls i skriptet (inga av dess
   # funktioner - hamta_logga_path/nDigits/avrunda_till_multipel/hitta_div_for_jamn_intervall/
   # nice_breaks/Berakna_varden_stodlinjer/SkapaProcForandrTvaAr/diagramfarger - anropas någonstans i
-  # filen) - borttaget som död kod. hamta_pendling_rams_bas_scb.R (fyra olika RAMS/BAS-tabeller,
-  # 1993-2021) sourcas fortfarande direkt - ingen enkel 1:1 v2-motsvarighet att peka om mot, och inte
-  # del av dagens uppdrag.
+  # filen) - borttaget som död kod. hamta_pendling_rams_bas_scb.R sourcas fortfarande direkt, men är
+  # sedan 2026-09-14 själv omskriven till pxweb2r/rdverktyg (fyra v2-tabeller i stället för v1/pxweb) -
+  # se den filens egen header i hamta_data-repot för detaljer.
   if (!requireNamespace("rdverktyg", quietly = TRUE)) {
     remotes::install_github("Region-Dalarna/rdpaket", subdir = "packages/rdverktyg")
   }
