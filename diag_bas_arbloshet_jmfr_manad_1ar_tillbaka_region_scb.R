@@ -41,10 +41,12 @@ diag_bas_arbloshet_manad_jmfr_1ar_tillbaka_scb <- function(
 
   hamta_region <- if (all(is.na(vald_region))) rdverktyg::hamtaAllaLan(FALSE) else rdverktyg::hamtakommuner(lan = vald_region, tamedlan = TRUE, tamedriket = TRUE)
 
-  # Om man vill dela upp utrikes hanteras det här. Begär explicit
-  # "inrikes född"/"utrikes född" (inte "*") så att den eliminerbara
-  # totalkategorin inte kommer med som ett tredje, oönskat facet-fönster.
-  fodelseregion_val <- if (dela_upp_utrikes == TRUE) c("inrikes född","utrikes född") else "totalt"
+  # Om man vill dela upp utrikes hanteras det här. "*" ger tre facetter
+  # (inrikes född/totalt/utrikes född) - till skillnad från Kon nedan är
+  # Fodelseregion aldrig utelämnad ur frågan, så pxweb2r:s "*"-fyllnad för
+  # utelämnade variabler (se diagram_befolkningsforandring.R) är inte
+  # aktuell här och ger ingen dubbelräkning.
+  fodelseregion_val <- if (dela_upp_utrikes == TRUE) "*" else "totalt"
 
   # Länk till tabell: https://www.statistikdatabasen.scb.se/pxweb/sv/ssd/START__AM__AM0210__AM0210A/ArbStatusM/
   # Räknar ut vilken månad som ska jämföras mot (N månader bakåt), på samma
