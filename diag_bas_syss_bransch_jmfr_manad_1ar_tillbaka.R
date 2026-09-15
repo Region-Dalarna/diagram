@@ -1,5 +1,6 @@
 diag_bas_syss_per_bransch_manad_jmfr_1ar_tillbaka <- function(
     region_vekt = "20",
+    kon_val = c("kvinnor", "män"),          # välj bland "kvinnor", "män", "totalt" - vilka som ska visas
     diagram_capt = "Källa: SCB:s öppna statistikdatabas\nBearbetning: Samhällsanalys, Region Dalarna",
     output_mapp = NA,
     diag_fargvekt = NA,
@@ -41,9 +42,21 @@ diag_bas_syss_per_bransch_manad_jmfr_1ar_tillbaka <- function(
   if (!requireNamespace("readxl", quietly = TRUE)) install.packages("readxl")
   # dplyr/tidyr/purrr/stringr följer med som beroenden till rddiagram/rdverktyg.
 
-  # om ingen färgvektor är medskickad, använd rddiagram::diagramfarger("kon")
+  if (!all(kon_val %in% c("kvinnor", "män", "totalt"))) {
+    stop("kon_val måste vara en delmängd av c(\"kvinnor\", \"män\", \"totalt\").")
+  }
+
+  # om ingen färgvektor är medskickad väljs en utifrån kon_val: rus_sex om bara totalt visas (då
+  # passar inte tvåfärgspaletten "kon"), kon_och_total om alla tre visas, annars "kon" (standardfallet
+  # kvinnor+män)
   if (all(is.na(diag_fargvekt))) {
-    diag_fargvekt <- rddiagram::diagramfarger("kon")
+    diag_fargvekt <- if (setequal(kon_val, "totalt")) {
+      rddiagram::diagramfarger("rus_sex")[1]
+    } else if (setequal(kon_val, c("kvinnor", "män", "totalt"))) {
+      rddiagram::diagramfarger("kon_och_total")
+    } else {
+      rddiagram::diagramfarger("kon")
+    }
   }
 
   # om ingen output_mapp är angiven så läggs diagrammen i Region Dalarnas standardmapp för utskrifter, om den finns. Annars blir det felmeddelande
@@ -93,7 +106,7 @@ diag_bas_syss_per_bransch_manad_jmfr_1ar_tillbaka <- function(
     dplyr::select(-c(år, månad, månad_år, år_månad)) |>
     tidyr::pivot_wider(names_from = tid, values_from = {{variabel_dag_nattbefolkning}}) |>
     dplyr::mutate(diff = .data[[manad_nu]] - .data[[manad_da]]) |>
-    dplyr::filter(kön != "totalt",
+    dplyr::filter(kön %in% kon_val,
            `näringsgren SNI 2007` != "Total",
            födelseregion != "totalt") |>
     dplyr::left_join(dplyr::select(nyckel_bransch, Br15kod, Bransch), by = c("sni2007kod" = "Br15kod")) |>
@@ -140,7 +153,10 @@ diag_bas_syss_per_bransch_manad_jmfr_1ar_tillbaka <- function(
   # delen av filnamnet (kopieringsfel - titeln ovan gjorde det redan rätt med
   # manad_start/ar_start). Fixat så att filnamnet faktiskt visar båda
   # jämförda perioderna, inte samma period två gånger.
-  diagramfil <- glue::glue("bas_syss_{regionfil_txt}_{manad_slut}_ar{ar_slut}_jmfrt_med_{manad_start}_ar{ar_start}_{dagnatt_filnamn}.png")
+  # filnamnet får en extra kon_val-markör bara om urvalet avviker från standarden (kvinnor+män), så
+  # att befintliga filnamn inte påverkas av den nya parametern
+  kon_filnamn <- if (setequal(kon_val, c("kvinnor", "män"))) "" else paste0("_", paste(sort(kon_val), collapse = "_"))
+  diagramfil <- glue::glue("bas_syss_{regionfil_txt}_{manad_slut}_ar{ar_slut}_jmfrt_med_{manad_start}_ar{ar_start}_{dagnatt_filnamn}{kon_filnamn}.png")
 
 
   gg_obj <- rddiagram::SkapaStapelDiagram(
