@@ -17,7 +17,9 @@ diag_utbniva_tidserie_och_lansjmfr <- function(
                                        diag_lagutb_over_tid = FALSE,
                                        diag_andel_alla_utbnivaer = TRUE,
                                        diag_andel_utbniva_jmfr_lan = FALSE,
-                                       vald_utb_niva = "eftergymn"){
+                                       vald_utb_niva = "eftergymn",
+                                       spara_dataset_excel = FALSE,
+                                       excel_filnamn = NA){
 
   # =======================================================================================================
   #
@@ -50,6 +52,15 @@ diag_utbniva_tidserie_och_lansjmfr <- function(
   # diag_andel_alla_utbnivaer   - diagram 3 ovan, TRUE om man vill ha med det, annars FALSE
   # diag_andel_utbniva_jmfr_lan - diagram 4 ovan, TRUE om man vill ha med det, annars FALSE
   #                utbildningsnivå i diagram fyra styrs med parametern "vald_utb_niva", "eftergymn" är förvalt
+  #
+  # spara_dataset_excel - TRUE om man vill spara dataseten bakom de diagram som skrivs ut till en
+  #                       Excelfil, en flik per diagram. Fliknamnen byggs av samma namn som diagram-
+  #                       filerna (utan ".png"), trunkerat till Excels gräns på 31 tecken.
+  # excel_filnamn       - filnamn för Excelfilen (skrivs till output_mapp). NA = döps automatiskt
+  #                       utifrån vald region.
+  #
+  # 2026-09-15 - Lagt till spara_dataset_excel/excel_filnamn för att kunna spara dataseten bakom
+  #              diagrammen till en Excelfil (en flik per diagram).
   #
   # 2026-09-13 - Migrerad till pxweb2r/rddiagram/rdverktyg (fullt namespace, ingen source()/p_load()). Sedan
   #              v2-tabellen alltid ger en generisk "value"-kolumn (i st.f. att döpa kolumnen efter
@@ -84,7 +95,23 @@ diag_utbniva_tidserie_och_lansjmfr <- function(
   # dplyr/stringr följer med som beroenden till rddiagram/rdverktyg.
   options(dplyr.summarise.inform = FALSE)
 
-  gg_list <- list()  # skapa en tom lista att lägga flera ggplot-objekt i (om man skapar flera diagram)
+  gg_list <- list()       # skapa en tom lista att lägga flera ggplot-objekt i (om man skapar flera diagram)
+  dataset_list <- list()  # dataseten bakom diagrammen, ifyllt bara om spara_dataset_excel = TRUE
+
+  # bygger ett giltigt och unikt Excel-fliknamn (max 31 tecken, inga otillåtna tecken) utifrån
+  # diagramfilnamnet
+  saklig_fliknamn <- function(namn, tagna_namn) {
+    namn <- gsub("[\\\\/?*\\[\\]:]", "_", namn, perl = TRUE)  # otillåtna tecken i Excel-fliknamn
+    namn <- substr(namn, 1, 31)
+    unikt_namn <- namn
+    i <- 1
+    while (unikt_namn %in% tagna_namn) {
+      tillagg <- paste0("_", i)
+      unikt_namn <- paste0(substr(namn, 1, 31 - nchar(tillagg)), tillagg)
+      i <- i + 1
+    }
+    unikt_namn
+  }
 
   tabell_id <- "TAB3981"
 
@@ -201,9 +228,11 @@ diag_utbniva_tidserie_och_lansjmfr <- function(
       diagram_capt_hogutb <- paste0(diagram_capt, "\nDefinitionen av högutbildade är individer med minst 3 års eftergymnasial utbildning.")
     }
 
-    gg_obj <- rddiagram::SkapaStapelDiagram(skickad_df = dplyr::filter(px_df_utskrift_kon,
-                                     regionkod %in% region_vekt,
-                                     utb_niva == "Eftergymnasial utbildning, 3 år eller mer"),
+    diagram_data <- dplyr::filter(px_df_utskrift_kon,
+                                   regionkod %in% region_vekt,
+                                   utb_niva == "Eftergymnasial utbildning, 3 år eller mer")
+
+    gg_obj <- rddiagram::SkapaStapelDiagram(skickad_df = diagram_data,
                                  skickad_x_var = "år",
                                  skickad_y_var = "andel",
                                  skickad_x_grupp = "kön",
@@ -229,6 +258,11 @@ diag_utbniva_tidserie_och_lansjmfr <- function(
 
     gg_list <- c(gg_list, list(gg_obj))
     names(gg_list)[length(gg_list)] <- stringr::str_remove(diagramfilnamn, ".png")
+
+    if (spara_dataset_excel) {
+      fliknamn <- saklig_fliknamn(stringr::str_remove(diagramfilnamn, ".png"), names(dataset_list))
+      dataset_list[[fliknamn]] <- diagram_data
+    }
     } # slut if-sats om man vill skriva ut diagram över utvecklingen av högutbildade över tid
 
   if (diag_lagutb_over_tid) {
@@ -241,9 +275,11 @@ diag_utbniva_tidserie_och_lansjmfr <- function(
       diagram_capt_lagutb <- paste0(diagram_capt, "\nDefinitionen av lågutbildade är individer med endast förgymnasial utbildning.")
     }
 
-    gg_obj <- rddiagram::SkapaStapelDiagram(skickad_df = dplyr::filter(px_df_utskrift_kon,
-                                          regionkod %in% region_vekt,
-                                          utb_niva == "Förgymnasial utbildning"),
+    diagram_data <- dplyr::filter(px_df_utskrift_kon,
+                                   regionkod %in% region_vekt,
+                                   utb_niva == "Förgymnasial utbildning")
+
+    gg_obj <- rddiagram::SkapaStapelDiagram(skickad_df = diagram_data,
                                  skickad_x_var = "år",
                                  skickad_y_var = "andel",
                                  skickad_x_grupp = "kön",
@@ -269,6 +305,11 @@ diag_utbniva_tidserie_och_lansjmfr <- function(
 
     gg_list <- c(gg_list, list(gg_obj))
     names(gg_list)[length(gg_list)] <- stringr::str_remove(diagramfilnamn, ".png")
+
+    if (spara_dataset_excel) {
+      fliknamn <- saklig_fliknamn(stringr::str_remove(diagramfilnamn, ".png"), names(dataset_list))
+      dataset_list[[fliknamn]] <- diagram_data
+    }
   } # slut if-sats om man vill skriva ut diagram över utvecklingen av högutbildade över tid
 
 
@@ -278,10 +319,12 @@ diag_utbniva_tidserie_och_lansjmfr <- function(
 
     diagram_capt_niva <- if (diagram_capt_tabort == TRUE) NULL else diagram_capt
 
-    gg_obj <- rddiagram::SkapaStapelDiagram(skickad_df = dplyr::mutate(
-                                   dplyr::filter(px_df_utskrift, regionkod %in% region_vekt,
-                                          år %in% c("1985", "1990", "2000", "2010", valt_ar)),
-                                   andel = andel - 0.001),
+    diagram_data <- dplyr::mutate(
+                       dplyr::filter(px_df_utskrift, regionkod %in% region_vekt,
+                              år %in% c("1985", "1990", "2000", "2010", valt_ar)),
+                       andel = andel - 0.001)
+
+    gg_obj <- rddiagram::SkapaStapelDiagram(skickad_df = diagram_data,
                                  skickad_x_var = "år",
                                  skickad_y_var = "andel",
                                  skickad_x_grupp = "utb_niva",
@@ -308,6 +351,11 @@ diag_utbniva_tidserie_och_lansjmfr <- function(
 
     gg_list <- c(gg_list, list(gg_obj))
     names(gg_list)[length(gg_list)] <- stringr::str_remove(diagramfilnamn, ".png")
+
+    if (spara_dataset_excel) {
+      fliknamn <- saklig_fliknamn(stringr::str_remove(diagramfilnamn, ".png"), names(dataset_list))
+      dataset_list[[fliknamn]] <- diagram_data
+    }
   } # slut if-sats om man vill skriva ut diagram över alla utbildningsnivåer
 
   if (diag_andel_utbniva_jmfr_lan){
@@ -382,7 +430,9 @@ diag_utbniva_tidserie_och_lansjmfr <- function(
 
     diagram_capt_jmfr <- if (diagram_capt_tabort == TRUE) NULL else diagram_capt
 
-    gg_obj <- rddiagram::SkapaStapelDiagram(skickad_df = dplyr::filter(px_df_jmfr_lan, utb_niva %in% utb_niva_vec),
+    diagram_data <- dplyr::filter(px_df_jmfr_lan, utb_niva %in% utb_niva_vec)
+
+    gg_obj <- rddiagram::SkapaStapelDiagram(skickad_df = diagram_data,
                                  skickad_x_var = "region",
                                  skickad_y_var = "andel",
                                  skickad_x_grupp = "kön",
@@ -407,7 +457,21 @@ diag_utbniva_tidserie_och_lansjmfr <- function(
     gg_list <- c(gg_list, list(gg_obj))
     names(gg_list)[length(gg_list)] <- stringr::str_remove(diagramfilnamn, ".png")
 
+    if (spara_dataset_excel) {
+      fliknamn <- saklig_fliknamn(stringr::str_remove(diagramfilnamn, ".png"), names(dataset_list))
+      dataset_list[[fliknamn]] <- diagram_data
+    }
+
   } # slut if-sats om man vill skriva ut länsjämförelsediagram
+
+  if (spara_dataset_excel && length(dataset_list) > 0) {
+    if (!requireNamespace("rdverktyg", quietly = TRUE)) {
+      remotes::install_github("Region-Dalarna/rdpaket", subdir = "packages/rdverktyg")
+    }
+    if (is.na(excel_filnamn)) excel_filnamn <- paste0("utbniva_diagramdata_", region_txt, ".xlsx")
+    rdverktyg::excelfil_spara_formaterad(indata = dataset_list, output_mapp = output_mapp,
+                                         excelfil_namn = excel_filnamn)
+  }
 
   return(gg_list)
 
