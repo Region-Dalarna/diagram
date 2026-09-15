@@ -59,6 +59,11 @@ diag_utbniva_tidserie_och_lansjmfr <- function(
   # excel_filnamn       - filnamn för Excelfilen (skrivs till output_mapp). NA = döps automatiskt
   #                       utifrån vald region.
   #
+  # 2026-09-15 - region_txt (används i fil-/fliknamn) byggs nu smart med rdverktyg::ar_alla_kommuner_i_ett_lan()/
+  #              ar_alla_lan_i_sverige() - t.ex. "dalarnas_kommuner_riket" i stället för att rada upp
+  #              alla ~17 regionkoder. Faller tillbaka på koderna (med en gräns för hur långt det får
+  #              bli) om urvalet inte känns igen som en sådan samling.
+  #
   # 2026-09-15 - Lagt till spara_dataset_excel/excel_filnamn för att kunna spara dataseten bakom
   #              diagrammen till en Excelfil (en flik per diagram).
   #
@@ -137,7 +142,21 @@ diag_utbniva_tidserie_och_lansjmfr <- function(
 
   alla_giltiga_ar <- pxweb2r::pxweb2_get_values(tabell_id, "Tid", quiet = TRUE)$code
 
-  region_txt <- paste0(region_vekt, collapse = "_")
+  # Bygger en kort, filnamnsvänlig region_txt. Känns urvalet igen som "alla län i Sverige" eller
+  # "alla kommuner i ett län" (t.ex. Dalarnas 15 kommuner) blir det en kort etikett i stället för
+  # att alla koder radas upp - annars (ett godtyckligt/slumpmässigt urval) listas koderna som
+  # tidigare, men bara om det inte blir orimligt långt.
+  alla_lan_txt <- rdverktyg::ar_alla_lan_i_sverige(region_vekt, returnera_text = TRUE)
+  alla_komm_txt <- if (isFALSE(alla_lan_txt)) rdverktyg::ar_alla_kommuner_i_ett_lan(region_vekt, returnera_text = TRUE) else FALSE
+  kant_namn <- if (!isFALSE(alla_lan_txt)) alla_lan_txt else if (!isFALSE(alla_komm_txt)) alla_komm_txt else NA
+
+  if (!is.na(kant_namn)) {
+    region_txt <- stringr::str_replace_all(tolower(kant_namn), " ", "_")
+    if ("00" %in% region_vekt) region_txt <- paste0(region_txt, "_riket")
+  } else {
+    region_txt <- paste0(region_vekt, collapse = "_")
+    if (nchar(region_txt) > 40) region_txt <- paste0(length(region_vekt), "regioner")
+  }
 
   if (length(valt_ar) > 1) print("Endast ett år kan skickas med i funktionen, bara första året i vektorn kommer att användas.")
   if (is.na(valt_ar[1])) valt_ar <- max(alla_giltiga_ar) else {
