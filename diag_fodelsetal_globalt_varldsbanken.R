@@ -40,7 +40,7 @@ diag_fodelsetal_globalt_varldsbanken <- function(
   if (all(is.na(diag_fargvekt))) {
     diag_fargvekt <- rddiagram::diagramfarger("rd_primar_atta")[c(1,2,3,4,5,6,8,7)]
   }
-  
+    
   if (skriv_bildfil) {
     if (all(is.na(output_mapp))) {
       if (dir.exists(rdverktyg::utskriftsmapp())) {
