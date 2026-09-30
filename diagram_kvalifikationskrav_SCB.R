@@ -25,6 +25,8 @@ diagram_kvalifikationskrav <- function(region_vekt = "20", # Vilken region vill 
   #
   # Enligt SCB är åldersgruppen ändrad från 16-64 till 16-69 år från och med årgång 2023:
   # "Från årgång 2023 redovisas ålder 16-69 år, för tidigare år redovisas 16-64 år. Från år 2023 ingår modellimputerade yrken. Jämförelse av statistik för 2023 mot tidigare år bör därför göras med försiktighet."
+  # 
+  # Rättat felaktighet där ett "trailing space" gjorde att utbildning försvann från figuren. Claude föreslog ett säkrare alternativ str_squish / Jon 2026-09-30
   # =================================================================================================================
 
   # Bara paket, ingen source() mot funktioner-/hamta_data-reporna och inget
@@ -81,22 +83,23 @@ diagram_kvalifikationskrav <- function(region_vekt = "20", # Vilken region vill 
 
   # Ändra namn på vissa branscher
   px_df$Branschgrupp <- dplyr::case_when(
-    px_df$`näringsgren SNI 2007` == "jordbruk, skogsbruk och fiske" ~ "Jordbruk och skogsbruk",
-    px_df$`näringsgren SNI 2007` == "tillverkning och utvinning" ~ "Tillverkning och utvinning",
-    px_df$`näringsgren SNI 2007` == "energiförsörjning; miljöverksamhet" ~ "Energi och miljö",
-    px_df$`näringsgren SNI 2007` == "byggverksamhet" ~ "Bygg",
-    px_df$`näringsgren SNI 2007` == "handel" ~ "Handel",
-    px_df$`näringsgren SNI 2007` == "transport och magasinering"~ "Transport",
-    px_df$`näringsgren SNI 2007` == "hotell- och restaurangverksamhet" ~ "Hotell och restaurang",
-    px_df$`näringsgren SNI 2007` == "information och kommunikation" ~ "IT och kommunikation",
-    px_df$`näringsgren SNI 2007` == "finans- och försäkringsverksamhet" ~ "Finans och försäkring",
-    px_df$`näringsgren SNI 2007` == "fastighetsverksamhet" ~ "Fastighet",
-    px_df$`näringsgren SNI 2007` == "företagstjänster" ~ "Företagstjänster",
-    px_df$`näringsgren SNI 2007` == "offentlig förvaltning och försvar"~ "Offentlig förvaltning",
-    px_df$`näringsgren SNI 2007` == "utbildning " ~ "Utbildning",
-    px_df$`näringsgren SNI 2007` == "vård och omsorg; sociala tjänster" ~ "Vård och omsorg",
-    px_df$`näringsgren SNI 2007` == "kulturella och personliga tjänster m.m." ~ "Kultur m.m.",
-    px_df$`näringsgren SNI 2007` == "okänd verksamhet"~ "Okänd verksamhet")
+    stringr::str_squish(px_df$`näringsgren SNI 2007`) == "jordbruk, skogsbruk och fiske" ~ "Jordbruk och skogsbruk",
+    stringr::str_squish(px_df$`näringsgren SNI 2007`) == "tillverkning och utvinning" ~ "Tillverkning och utvinning",
+    stringr::str_squish(px_df$`näringsgren SNI 2007`) == "energiförsörjning; miljöverksamhet" ~ "Energi och miljö",
+    stringr::str_squish(px_df$`näringsgren SNI 2007`) == "byggverksamhet" ~ "Bygg",
+    stringr::str_squish(px_df$`näringsgren SNI 2007`) == "handel" ~ "Handel",
+    stringr::str_squish(px_df$`näringsgren SNI 2007`) == "transport och magasinering" ~ "Transport",
+    stringr::str_squish(px_df$`näringsgren SNI 2007`) == "hotell- och restaurangverksamhet" ~ "Hotell och restaurang",
+    stringr::str_squish(px_df$`näringsgren SNI 2007`) == "information och kommunikation" ~ "IT och kommunikation",
+    stringr::str_squish(px_df$`näringsgren SNI 2007`) == "finans- och försäkringsverksamhet" ~ "Finans och försäkring",
+    stringr::str_squish(px_df$`näringsgren SNI 2007`) == "fastighetsverksamhet" ~ "Fastighet",
+    stringr::str_squish(px_df$`näringsgren SNI 2007`) == "företagstjänster" ~ "Företagstjänster",
+    stringr::str_squish(px_df$`näringsgren SNI 2007`) == "offentlig förvaltning och försvar" ~ "Offentlig förvaltning",
+    stringr::str_squish(px_df$`näringsgren SNI 2007`) == "utbildning" ~ "Utbildning",
+    stringr::str_squish(px_df$`näringsgren SNI 2007`) == "vård och omsorg; sociala tjänster" ~ "Vård och omsorg",
+    stringr::str_squish(px_df$`näringsgren SNI 2007`) == "kulturella och personliga tjänster m.m." ~ "Kultur m.m.",
+    stringr::str_squish(px_df$`näringsgren SNI 2007`) == "okänd verksamhet" ~ "Okänd verksamhet"
+  )
 
   # Klassificerar yrken utifrån hur avancerade de är
   px_df$kompetensniva <- dplyr::case_when(
