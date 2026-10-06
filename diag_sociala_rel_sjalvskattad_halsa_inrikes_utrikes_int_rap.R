@@ -22,6 +22,8 @@ diag_fohm <- function(alder = "16- år", # Finns även "16-84 år"
   # båda hämtar mot samma sorts FoHM-tabell (riksnivå, ingen Region-variabel i frågan trots att
   # hamta-funktionerna hade ett oanvänt region_vekt-argument) - uttaget är därför skrivet om med en
   # gemensam intern hjälpfunktion mot pxweb-paketet (fortsatt v1, ingen v2 finns), i modern stil.
+  #
+  # Kommenterat bort legend_vand_ordning då legenden blev omvänd. Jon 2026-10-06
   # =======================================================================================================================
 
   # om parametern demo är satt till TRUE så öppnas en flik i webbläsaren med ett exempel på hur diagrammet ser ut och därefter avslutas funktionen
@@ -115,7 +117,7 @@ diag_fohm <- function(alder = "16- år", # Finns även "16-84 år"
                                  diagram_capt = diagram_capt,
                                  x_axis_lutning = 45,
                                  procent_0_100_10intervaller = TRUE,
-                                 legend_vand_ordning = TRUE,
+                                 #legend_vand_ordning = TRUE,
                                  diagram_liggande = FALSE,
                                  manual_x_axis_text_hjust = 1,
                                  manual_x_axis_text_vjust = 1,
