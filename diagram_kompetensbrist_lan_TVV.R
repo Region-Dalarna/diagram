@@ -94,7 +94,7 @@ diag_kompetensbrist <- function(diagram_capt =  diagram_capt <- "Källa: Tillvä
     assign("kompetensbrist", kompetensbrist_df, envir = .GlobalEnv)
   }
   
-  diagram_titel <- paste0("Upplevd kompetensbrist i Sveriges regioner")
+  diagram_titel <- paste0("Upplevd kompetensbrist i Sveriges län")
   diagramfil <- "kompetensbrist.png"
   
   gg_obj <- rddiagram::SkapaStapelDiagram(
