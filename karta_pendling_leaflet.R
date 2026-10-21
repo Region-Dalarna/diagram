@@ -28,9 +28,12 @@ karta_arbetspendling <- function(
   # - valt_ar                                                     # "9999" = senaste år. Det ska gå att skicka med fler år framöver men det går inte ännu
   # - output_mapp                                                      # hit skrivs filen/filerna som är resultatet av skriptet
   # - filformat                                                   # "html" (standard) ger en interaktiv leaflet-karta per fil. "gpkg" skriver i stället
-  #                                                                   pendlingslinjerna (med attribut som pendlare/regionkod_bo/regionkod_arb m.fl.) som en
-  #                                                                   GeoPackage-fil (SWEREF99 TM, EPSG:3006) för vidare GIS-bearbetning - ingen leaflet-karta
-  #                                                                   byggs då, så det går snabbare när man bara vill ha ut geodatan.
+  #                                                                   pendlingslinjerna (med attribut som pendlare/regionkod_bo/regionkod_arb m.fl., samt
+  #                                                                   linjefarg (hex) och linjebredd (px) - samma färg-/tjockleksskala som html-kartan,
+  #                                                                   beräknad från linjefarg_*/linjebredd_*-parametrarna nedan, så linjerna kan stilsättas
+  #                                                                   direkt i QGIS/ArcGIS via data-defined override på dessa två fält) som en GeoPackage-fil
+  #                                                                   (SWEREF99 TM, EPSG:3006) för vidare GIS-bearbetning - ingen leaflet-karta byggs då, så
+  #                                                                   det går snabbare när man bara vill ha ut geodatan.
   #
   # Skapat av Peter Möller och Henrik Aldén i november 2023.
   # Senast uppdaterad: 21 okt 2026 av Peter Möller - lade till filformat = "gpkg" som alternativ till html
@@ -171,28 +174,8 @@ karta_arbetspendling <- function(
 
     kommunnamn <- rdverktyg::hamtaregion_kod_namn(karta_kommunkod)$region             # för att döpa filen
 
-    # om vi vill ha ut pendlingslinjerna som GeoPackage i stället för en html-karta så skriver vi filen
-    # här och hoppar över resten av funktionen (legend/zoom/leaflet-uppbyggnad behövs bara för html)
-    if (filformat == "gpkg") {
-      filnamn_gpkg <- paste0(output_mapp, tolower(skickad_pendlingstyp), "_pendlingslinjer_", kommunnamn,
-                             "_ar_", unique(giskarta_vald_kommun$år), ".gpkg")
-      sf::st_write(sf::st_transform(giskarta_vald_kommun, crs = 3006), filnamn_gpkg, delete_dsn = TRUE, quiet = TRUE)
-      return(invisible(NULL))
-    }
-
-    lanets_kommuner_gis <- dplyr::filter(kommuner_gis, lanskod_tx %in% unique(stringr::str_sub(karta_kommunkod, 1, 2)))
-
-    vald_kommun_gis <- dplyr::filter(kommuner_gis, knkod == karta_kommunkod)
-
-    lanets_kommuner_centroid <- suppressWarnings(sf::st_centroid(lanets_kommuner_gis))
-
-    kom_point <- dplyr::filter(kommuner_point, knkod %in% giskarta_vald_kommun$relationskommun_kod)
-
-    # beräkna centroid för vald kommun, används för att zooma in kartan på rätt plats
-    vald_kommun_centroid <- sf::st_centroid(sf::st_geometry(vald_kommun_gis))
-    centroid_coords <- as.numeric(sf::st_coordinates(vald_kommun_centroid))       # vi extraherar latitude and longitude för att använda till att zooma kartan rätt
-
-    # ================================ beräkningar för legenden ===============================
+    # ========= beräkningar för linjefärg/-tjocklek (används både för html-legenden/kartan och för =========
+    # ========= att stilsätta linjerna som attribut i gpkg-utdata) ===========================================
     # Skapa en funktion för att beräkna linjetjocklek baserat på ett kontinuerligt värde
     calculateWeightContinuous <- function(pends, min_width, max_width, min_pend, max_pend) {
       # Skala linjetjockleken linjärt mellan min_width och max_width
@@ -219,12 +202,6 @@ karta_arbetspendling <- function(
     calculated_weights <- calculateWeightContinuous(
       giskarta_vald_kommun$pendlare, min_width, max_width, min_pend, max_pend)
 
-    # beräkna vettiga intervaller med antal pendlare utifrån datasetet
-    pendlare_intervaller <- rdverktyg::skapa_intervaller(giskarta_vald_kommun$pendlare, antal_intervaller = legend_intervaller)
-    # beräkna tjocklek
-    pendlare_bredd <- calculateWeightContinuous(pendlare_intervaller, min_width, max_width, min_pend, max_pend)
-
-
     # skapa funktion för att styra färg utifrån om det är ett positivt eller negativt tal
     farg_pos_neg_tal <- function(antal_pendlare) {
         retur_varde <- ifelse(antal_pendlare > 0, linjefarg_positiva_tal, linjefarg_negativa_tal)
@@ -232,6 +209,40 @@ karta_arbetspendling <- function(
         if (skickad_pendlingstyp == "Inpendling") retur_varde <- linjefarg_inpendling
         return(retur_varde)
     }
+
+    # om vi vill ha ut pendlingslinjerna som GeoPackage i stället för en html-karta så lägger vi på
+    # beräknad linjefärg (som hex, portabelt mellan GIS-program) och -tjocklek som attribut - så att
+    # linjerna redan är stilsatta när filen öppnas i t.ex. QGIS/ArcGIS - och skriver filen här. Resten
+    # av funktionen (legend/zoom/leaflet-uppbyggnad) behövs bara för html, så vi hoppar över den.
+    if (filformat == "gpkg") {
+      linjefarg_hex <- apply(grDevices::col2rgb(farg_pos_neg_tal(giskarta_vald_kommun$pendlare)), 2,
+                             function(rgb) grDevices::rgb(rgb[1], rgb[2], rgb[3], maxColorValue = 255))
+      giskarta_vald_kommun <- dplyr::mutate(giskarta_vald_kommun,
+                                            linjefarg = linjefarg_hex,
+                                            linjebredd = calculated_weights)
+      filnamn_gpkg <- paste0(output_mapp, tolower(skickad_pendlingstyp), "_pendlingslinjer_", kommunnamn,
+                             "_ar_", unique(giskarta_vald_kommun$år), ".gpkg")
+      sf::st_write(sf::st_transform(giskarta_vald_kommun, crs = 3006), filnamn_gpkg, delete_dsn = TRUE, quiet = TRUE)
+      return(invisible(NULL))
+    }
+
+    lanets_kommuner_gis <- dplyr::filter(kommuner_gis, lanskod_tx %in% unique(stringr::str_sub(karta_kommunkod, 1, 2)))
+
+    vald_kommun_gis <- dplyr::filter(kommuner_gis, knkod == karta_kommunkod)
+
+    lanets_kommuner_centroid <- suppressWarnings(sf::st_centroid(lanets_kommuner_gis))
+
+    kom_point <- dplyr::filter(kommuner_point, knkod %in% giskarta_vald_kommun$relationskommun_kod)
+
+    # beräkna centroid för vald kommun, används för att zooma in kartan på rätt plats
+    vald_kommun_centroid <- sf::st_centroid(sf::st_geometry(vald_kommun_gis))
+    centroid_coords <- as.numeric(sf::st_coordinates(vald_kommun_centroid))       # vi extraherar latitude and longitude för att använda till att zooma kartan rätt
+
+    # ================================ beräkningar för legenden ===============================
+    # beräkna vettiga intervaller med antal pendlare utifrån datasetet
+    pendlare_intervaller <- rdverktyg::skapa_intervaller(giskarta_vald_kommun$pendlare, antal_intervaller = legend_intervaller)
+    # beräkna tjocklek
+    pendlare_bredd <- calculateWeightContinuous(pendlare_intervaller, min_width, max_width, min_pend, max_pend)
 
 
     # ========================= här skapas legenden som html-kod ============================
