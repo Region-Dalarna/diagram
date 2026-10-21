@@ -12,7 +12,8 @@ karta_arbetspendling <- function(
     linjebredd_min = 3,                                   # linjebredd på linjer för det minsta värdet
     linjebredd_max = 25,                                  # linjebredd på linjer för det största värdet
     output_mapp = NA,                  # "G:/Samhällsanalys/GIS/projekt/strukturbilder/pendling_flytt/"
-    filformat = "html"                 # "html" (standard, interaktiv leaflet-karta) eller "gpkg" (GeoPackage med pendlingslinjerna som vektordata, för t.ex. QGIS/ArcGIS)
+    filformat = "html",                # "html" (standard, interaktiv leaflet-karta) eller "gpkg" (GeoPackage med pendlingslinjerna som vektordata, för t.ex. QGIS/ArcGIS)
+    skriv_stilfiler = TRUE             # bara relevant om filformat = "gpkg": TRUE skriver en .qml (QGIS) och en .lyrx (ArcGIS Pro) bredvid gpkg-filen
 ) {
 
   # ===========================================================================================================
@@ -34,9 +35,17 @@ karta_arbetspendling <- function(
   #                                                                   direkt i QGIS/ArcGIS via data-defined override på dessa två fält) som en GeoPackage-fil
   #                                                                   (SWEREF99 TM, EPSG:3006) för vidare GIS-bearbetning - ingen leaflet-karta byggs då, så
   #                                                                   det går snabbare när man bara vill ha ut geodatan.
+  # - skriv_stilfiler                                             # bara relevant om filformat = "gpkg". TRUE (standard) skriver en .qml- och en .lyrx-fil
+  #                                                                   med samma basnamn som gpkg-filen, så att linjerna redan är färdigstilade (färg/bredd
+  #                                                                   från fälten ovan, rundade linjeändar/hörn) när filen öppnas i QGIS respektive ArcGIS
+  #                                                                   Pro. .qml är ett enkelt, väldokumenterat XML-format. .lyrx (ArcGIS Pro:s eget
+  #                                                                   JSON-baserade CIM-format) är mer komplext och är inte testat mot riktig ArcGIS Pro -
+  #                                                                   kontrollera att den fungerar som väntat, annars sätt skriv_stilfiler = FALSE och
+  #                                                                   stilsätt med fälten linjefarg/linjebredd för hand i stället.
   #
   # Skapat av Peter Möller och Henrik Aldén i november 2023.
-  # Senast uppdaterad: 21 okt 2026 av Peter Möller - lade till filformat = "gpkg" som alternativ till html
+  # Senast uppdaterad: 21 okt 2026 av Peter Möller - skriver nu även .qml-/.lyrx-stilfiler till gpkg-utdata
+  #                     (tidigare, samma dag: lade till filformat = "gpkg" som alternativ till html)
   #                     (tidigare: 30 okt 2024 av Peter Möller)
   #
   # ===========================================================================================================
@@ -68,6 +77,9 @@ karta_arbetspendling <- function(
   # tidigare - annars "kunde inte hitta funktionen 'mapshot'".
   if (!requireNamespace("mapview", quietly = TRUE)) install.packages("mapview")
   if (!requireNamespace("webshot", quietly = TRUE)) install.packages("webshot")
+  # jsonlite behövs bara för att bygga .lyrx-stilfilen (ren JSON) när filformat = "gpkg" och
+  # skriv_stilfiler = TRUE.
+  if (!requireNamespace("jsonlite", quietly = TRUE)) install.packages("jsonlite")
   # dplyr/purrr/stringr/tidyr följer med som beroenden till rdverktyg/rdgis.
 
   source("https://raw.githubusercontent.com/Region-Dalarna/hamta_data/main/hamta_pendling_rams_bas_scb.R")
@@ -111,6 +123,139 @@ karta_arbetspendling <- function(
 
   kommuner_gis_sweref <- rdgis::hamta_karta("kommun")
   kommuner_point_sweref <- suppressWarnings(sf::st_centroid(kommuner_gis_sweref))
+
+  # ========== hjälpfunktioner: skriv .qml-/.lyrx-stilfiler bredvid gpkg-filen (filformat = "gpkg") =======
+  # Stilsätter linjerna (färg från fältet linjefarg, bredd från fältet linjebredd, rundade ändar/hörn) så
+  # att man slipper göra det för hand i QGIS/ArcGIS. .qml är ett enkelt, väldokumenterat XML-format och
+  # testat (öppnas korrekt i QGIS). .lyrx (ArcGIS Pro:s egna JSON-baserade CIM-format) är betydligt mer
+  # komplext och är INTE testat mot riktig ArcGIS Pro härifrån - sätt skriv_stilfiler = FALSE om den inte
+  # fungerar som väntat, och stilsätt i så fall för hand med fälten linjefarg/linjebredd i stället.
+
+  skriv_qml_stilfil <- function(gpkg_filnamn, min_bredd, max_bredd) {
+    qml <- paste0(
+'<!DOCTYPE qgis PUBLIC \'http://mrcc.com/qgis.dtd\' \'SYSTEM\'>
+<qgis version="3.34" styleCategories="Symbology">
+  <renderer-v2 type="singleSymbol" symbollevels="0" forceraster="0" enableorderby="0">
+    <symbols>
+      <symbol type="line" name="0" alpha="1" clip_to_extent="1" force_rhr="0">
+        <layer class="SimpleLine" enabled="1" locked="0" pass="0">
+          <Option type="Map">
+            <Option type="QString" name="capstyle" value="round"/>
+            <Option type="QString" name="joinstyle" value="round"/>
+            <Option type="QString" name="line_color" value="35,35,35,255"/>
+            <Option type="QString" name="line_style" value="solid"/>
+            <Option type="QString" name="line_width" value="', round((min_bredd + max_bredd) / 2, 2), '"/>
+            <Option type="QString" name="line_width_unit" value="Pixel"/>
+          </Option>
+          <data_defined_properties>
+            <Option type="Map">
+              <Option type="QString" name="name" value=""/>
+              <Option name="properties">
+                <Option type="Map">
+                  <Option name="color">
+                    <Option type="Map">
+                      <Option type="bool" name="active" value="true"/>
+                      <Option type="QString" name="field" value="linjefarg"/>
+                      <Option type="int" name="type" value="1"/>
+                    </Option>
+                  </Option>
+                  <Option name="line_width">
+                    <Option type="Map">
+                      <Option type="bool" name="active" value="true"/>
+                      <Option type="QString" name="field" value="linjebredd"/>
+                      <Option type="int" name="type" value="1"/>
+                    </Option>
+                  </Option>
+                </Option>
+              </Option>
+              <Option type="QString" name="type" value="collection"/>
+            </Option>
+          </data_defined_properties>
+        </layer>
+      </symbol>
+    </symbols>
+  </renderer-v2>
+</qgis>
+')
+    writeLines(qml, stringr::str_replace(gpkg_filnamn, "\\.gpkg$", ".qml"), useBytes = TRUE)
+  }
+
+  skriv_lyrx_stilfil <- function(gpkg_filnamn, lagernamn, giskarta_vald_kommun, min_bredd, max_bredd) {
+    unika_farger <- unique(giskarta_vald_kommun$linjefarg)
+
+    klasser <- lapply(unika_farger, function(farg) {
+      rgb <- as.integer(grDevices::col2rgb(farg))
+      list(
+        type = "CIMUniqueValueClass",
+        label = farg,
+        patch = "Default",
+        symbol = list(
+          type = "CIMSymbolReference",
+          symbol = list(
+            type = "CIMLineSymbol",
+            symbolLayers = list(list(
+              type = "CIMSolidStroke",
+              enable = TRUE,
+              capStyle = "Round",
+              joinStyle = "Round",
+              lineStyle3D = "Strip",
+              miterLimit = 10,
+              width = (min_bredd + max_bredd) / 2,
+              color = list(type = "CIMRGBColor", values = c(rgb, 100))
+            ))
+          )
+        ),
+        values = list(list(type = "CIMUniqueValue", fieldValues = list(farg)))
+      )
+    })
+
+    renderer <- list(
+      type = "CIMUniqueValueRenderer",
+      fields = list("linjefarg"),
+      groups = list(list(heading = "", classes = klasser)),
+      useDefaultSymbol = FALSE,
+      defaultLabel = "Övriga värden",
+      visualVariables = list(list(
+        type = "CIMSizeVisualVariable",
+        authoringInfo = list(type = "CIMVisualVariableAuthoringInfo",
+                             minSliderValue = min_bredd, maxSliderValue = max_bredd),
+        minSize = min_bredd, maxSize = max_bredd,
+        minValue = min_bredd, maxValue = max_bredd,
+        valueExpressionInfo = list(type = "CIMExpressionInfo", expression = "$feature.linjebredd",
+                                   title = "linjebredd"),
+        variableType = "Graduated"
+      ))
+    )
+
+    lager <- list(
+      type = "CIMFeatureLayer",
+      name = lagernamn,
+      uRI = paste0("CIMPATH=map/", lagernamn, ".xml"),
+      featureTable = list(
+        type = "CIMFeatureTable",
+        displayField = "linjefarg",
+        editable = TRUE,
+        dataConnection = list(
+          type = "CIMStandardDataConnection",
+          workspaceConnectionString = paste0("DATABASE=", basename(gpkg_filnamn)),
+          workspaceFactory = "Geopackage",
+          dataset = lagernamn,
+          datasetType = "esriDTFeatureClass"
+        )
+      ),
+      renderer = renderer
+    )
+
+    dok <- list(
+      type = "CIMLayerDocument",
+      version = "2.9.0",
+      layers = list(paste0("CIMPATH=map/", lagernamn, ".xml")),
+      layerDefinitions = list(lager)
+    )
+
+    jsonlite::write_json(dok, stringr::str_replace(gpkg_filnamn, "\\.gpkg$", ".lyrx"),
+                         auto_unbox = TRUE, pretty = TRUE, null = "null")
+  }
 
   # ==================================== funktion för att skapa karta ========================================
 
@@ -222,7 +367,13 @@ karta_arbetspendling <- function(
                                             linjebredd = calculated_weights)
       filnamn_gpkg <- paste0(output_mapp, tolower(skickad_pendlingstyp), "_pendlingslinjer_", kommunnamn,
                              "_ar_", unique(giskarta_vald_kommun$år), ".gpkg")
-      sf::st_write(sf::st_transform(giskarta_vald_kommun, crs = 3006), filnamn_gpkg, delete_dsn = TRUE, quiet = TRUE)
+      lagernamn_gpkg <- tools::file_path_sans_ext(basename(filnamn_gpkg))
+      sf::st_write(sf::st_transform(giskarta_vald_kommun, crs = 3006), filnamn_gpkg, layer = lagernamn_gpkg,
+                  delete_dsn = TRUE, quiet = TRUE)
+      if (skriv_stilfiler) {
+        skriv_qml_stilfil(filnamn_gpkg, linjebredd_min, linjebredd_max)
+        skriv_lyrx_stilfil(filnamn_gpkg, lagernamn_gpkg, giskarta_vald_kommun, linjebredd_min, linjebredd_max)
+      }
       return(invisible(NULL))
     }
 
