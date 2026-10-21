@@ -11,24 +11,30 @@ karta_arbetspendling <- function(
     linjefarg_inpendling = "darkblue",
     linjebredd_min = 3,                                   # linjebredd på linjer för det minsta värdet
     linjebredd_max = 25,                                  # linjebredd på linjer för det största värdet
-    output_mapp = NA                   # "G:/Samhällsanalys/GIS/projekt/strukturbilder/pendling_flytt/"
+    output_mapp = NA,                  # "G:/Samhällsanalys/GIS/projekt/strukturbilder/pendling_flytt/"
+    filformat = "html"                 # "html" (standard, interaktiv leaflet-karta) eller "gpkg" (GeoPackage med pendlingslinjerna som vektordata, för t.ex. QGIS/ArcGIS)
 ) {
 
   # ===========================================================================================================
   #
   # Skript för att hämta pendlingsdata från RAMS, SCB, för valt år. Därefter ritas en karta ut för vald pendlingstyp
-  # för valda kommuner. Skickar man med flera kommuner så skriver skriptet ut en html-fil för varje kommmun. Man kan
+  # för valda kommuner. Skickar man med flera kommuner så skriver skriptet ut en fil för varje kommmun. Man kan
   # skicka med flera pendlingstyper också (brutto-, netto-, in- och utpendling), det blir en karta per pendlingstyp
-  # och kommun som man skickar med. Varje karta blir en egen html-fil.
+  # och kommun som man skickar med. Varje karta blir en egen fil (html eller gpkg, se filformat nedan).
   # Man kan styra klassindelningar med parametrarna nedan.
   #
   # Parametrar som skickas med:
   # - Vald_kommun_kod                                             # bara kommuner kan skickas med i nuläget
   # - valt_ar                                                     # "9999" = senaste år. Det ska gå att skicka med fler år framöver men det går inte ännu
-  # - output_mapp                                                      # hit skrivs html-filen/filerna som är resultatet av skriptet (dvs. en interaktiv leaflet-karta)
+  # - output_mapp                                                      # hit skrivs filen/filerna som är resultatet av skriptet
+  # - filformat                                                   # "html" (standard) ger en interaktiv leaflet-karta per fil. "gpkg" skriver i stället
+  #                                                                   pendlingslinjerna (med attribut som pendlare/regionkod_bo/regionkod_arb m.fl.) som en
+  #                                                                   GeoPackage-fil (SWEREF99 TM, EPSG:3006) för vidare GIS-bearbetning - ingen leaflet-karta
+  #                                                                   byggs då, så det går snabbare när man bara vill ha ut geodatan.
   #
   # Skapat av Peter Möller och Henrik Aldén i november 2023.
-  # Senast uppdaterad: 30 okt 2024 av Peter Möller
+  # Senast uppdaterad: 21 okt 2026 av Peter Möller - lade till filformat = "gpkg" som alternativ till html
+  #                     (tidigare: 30 okt 2024 av Peter Möller)
   #
   # ===========================================================================================================
 
@@ -69,6 +75,10 @@ karta_arbetspendling <- function(
     } else {
       stop("Ingen output-mapp angiven, kör funktionen igen och ge parametern output-mapp ett värde.")
     }
+  }
+
+  if (!filformat %in% c("html", "gpkg")) {
+    stop("karta_arbetspendling(): filformat måste vara \"html\" eller \"gpkg\", fick \"", filformat, "\".")
   }
 
   if (any(tolower(vald_pendlingstyp) == "alla")) vald_pendlingstyp <- c("Bruttopendling", "Nettopendling", "Inpendling", "Utpendling")
@@ -159,7 +169,16 @@ karta_arbetspendling <- function(
     if (skickad_pendlingstyp == "Inpendling") giskarta_vald_kommun <- dplyr::filter(giskarta_vald_kommun, regionkod_arb == karta_kommunkod)     # Om det är inpendling behåller vi enbart de koder som sammanfaller med den valda kommun för arbetskommun
     if (skickad_pendlingstyp == "Utpendling") giskarta_vald_kommun <- dplyr::filter(giskarta_vald_kommun, regionkod_bo == karta_kommunkod)
 
-    kommunnamn <- rdverktyg::hamtaregion_kod_namn(karta_kommunkod)$region             # för att döpa html-filen
+    kommunnamn <- rdverktyg::hamtaregion_kod_namn(karta_kommunkod)$region             # för att döpa filen
+
+    # om vi vill ha ut pendlingslinjerna som GeoPackage i stället för en html-karta så skriver vi filen
+    # här och hoppar över resten av funktionen (legend/zoom/leaflet-uppbyggnad behövs bara för html)
+    if (filformat == "gpkg") {
+      filnamn_gpkg <- paste0(output_mapp, tolower(skickad_pendlingstyp), "_pendlingslinjer_", kommunnamn,
+                             "_ar_", unique(giskarta_vald_kommun$år), ".gpkg")
+      sf::st_write(sf::st_transform(giskarta_vald_kommun, crs = 3006), filnamn_gpkg, delete_dsn = TRUE, quiet = TRUE)
+      return(invisible(NULL))
+    }
 
     lanets_kommuner_gis <- dplyr::filter(kommuner_gis, lanskod_tx %in% unique(stringr::str_sub(karta_kommunkod, 1, 2)))
 
