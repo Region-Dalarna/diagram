@@ -78,8 +78,12 @@ karta_arbetspendling <- function(
   if (!requireNamespace("mapview", quietly = TRUE)) install.packages("mapview")
   if (!requireNamespace("webshot", quietly = TRUE)) install.packages("webshot")
   # jsonlite behövs bara för att bygga .lyrx-stilfilen (ren JSON) när filformat = "gpkg" och
-  # skriv_stilfiler = TRUE.
+  # skriv_stilfiler = TRUE. RSQLite behövs för att skriva in QML-stilen direkt i gpkg-filens egen
+  # layer_styles-tabell - en lös .qml bredvid filen läses INTE in automatiskt av QGIS för GeoPackage
+  # (till skillnad från t.ex. Shapefile), så utan detta steg blev linjerna kvar i QGIS standardutseende
+  # (svarta) tills man manuellt gjorde Style > Load Style... och pekade ut .qml-filen.
   if (!requireNamespace("jsonlite", quietly = TRUE)) install.packages("jsonlite")
+  if (!requireNamespace("RSQLite", quietly = TRUE)) install.packages("RSQLite")
   # dplyr/purrr/stringr/tidyr följer med som beroenden till rdverktyg/rdgis.
 
   source("https://raw.githubusercontent.com/Region-Dalarna/hamta_data/main/hamta_pendling_rams_bas_scb.R")
@@ -131,8 +135,8 @@ karta_arbetspendling <- function(
   # komplext och är INTE testat mot riktig ArcGIS Pro härifrån - sätt skriv_stilfiler = FALSE om den inte
   # fungerar som väntat, och stilsätt i så fall för hand med fälten linjefarg/linjebredd i stället.
 
-  skriv_qml_stilfil <- function(gpkg_filnamn, min_bredd, max_bredd) {
-    qml <- paste0(
+  bygg_qml_text <- function(min_bredd, max_bredd) {
+    paste0(
 '<!DOCTYPE qgis PUBLIC \'http://mrcc.com/qgis.dtd\' \'SYSTEM\'>
 <qgis version="3.34" styleCategories="Symbology">
   <renderer-v2 type="singleSymbol" symbollevels="0" forceraster="0" enableorderby="0">
@@ -177,7 +181,47 @@ karta_arbetspendling <- function(
   </renderer-v2>
 </qgis>
 ')
-    writeLines(qml, stringr::str_replace(gpkg_filnamn, "\\.gpkg$", ".qml"), useBytes = TRUE)
+  }
+
+  skriv_qml_stilfil <- function(gpkg_filnamn, qml_text) {
+    writeLines(qml_text, stringr::str_replace(gpkg_filnamn, "\\.gpkg$", ".qml"), useBytes = TRUE)
+  }
+
+  # Skriver in samma QML-stil i gpkg-filens egen layer_styles-tabell (GeoPackage är i grunden en SQLite-
+  # databas) med useAsDefault = 1 - detta är den konvention QGIS faktiskt läser för att automatiskt
+  # stilsätta ett GeoPackage-lager när det läggs till. En fristående .qml bredvid filen (skriv_qml_stilfil
+  # ovan) läses INTE in automatiskt för GeoPackage (bara för enfilsformat som Shapefile), så utan detta
+  # steg visas lagret med QGIS standardsymbol (svart linje) tills man manuellt kör Style > Load Style...
+  skriv_stil_i_gpkg <- function(gpkg_filnamn, lagernamn, qml_text) {
+    con <- RSQLite::dbConnect(RSQLite::SQLite(), gpkg_filnamn)
+    on.exit(RSQLite::dbDisconnect(con), add = TRUE)
+
+    geom_kolumn <- RSQLite::dbGetQuery(con,
+      "SELECT column_name FROM gpkg_geometry_columns WHERE table_name = ?", params = list(lagernamn))$column_name
+
+    RSQLite::dbExecute(con, "
+      CREATE TABLE IF NOT EXISTS layer_styles (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        f_table_catalog TEXT(256),
+        f_table_schema TEXT(256),
+        f_table_name TEXT(256),
+        f_geometry_column TEXT(256),
+        styleName TEXT(30),
+        styleQML TEXT,
+        styleSLD TEXT,
+        useAsDefault BOOLEAN,
+        description TEXT,
+        owner TEXT(30),
+        ui_fileid TEXT,
+        update_time DATETIME DEFAULT CURRENT_TIMESTAMP
+      )")
+    # ta bort en ev. tidigare stil för samma lager (om funktionen körs om mot en befintlig fil)
+    RSQLite::dbExecute(con, "DELETE FROM layer_styles WHERE f_table_name = ?", params = list(lagernamn))
+    RSQLite::dbExecute(con,
+      "INSERT INTO layer_styles (f_table_catalog, f_table_schema, f_table_name, f_geometry_column,
+                                 styleName, styleQML, useAsDefault, description, owner)
+       VALUES ('', '', ?, ?, ?, ?, 1, 'Automatiskt genererad stil (farg/bredd fran faelten linjefarg/linjebredd)', '')",
+      params = list(lagernamn, geom_kolumn, lagernamn, qml_text))
   }
 
   skriv_lyrx_stilfil <- function(gpkg_filnamn, lagernamn, giskarta_vald_kommun, min_bredd, max_bredd) {
@@ -371,7 +415,9 @@ karta_arbetspendling <- function(
       sf::st_write(sf::st_transform(giskarta_vald_kommun, crs = 3006), filnamn_gpkg, layer = lagernamn_gpkg,
                   delete_dsn = TRUE, quiet = TRUE)
       if (skriv_stilfiler) {
-        skriv_qml_stilfil(filnamn_gpkg, linjebredd_min, linjebredd_max)
+        qml_text <- bygg_qml_text(linjebredd_min, linjebredd_max)
+        skriv_qml_stilfil(filnamn_gpkg, qml_text)
+        skriv_stil_i_gpkg(filnamn_gpkg, lagernamn_gpkg, qml_text)
         skriv_lyrx_stilfil(filnamn_gpkg, lagernamn_gpkg, giskarta_vald_kommun, linjebredd_min, linjebredd_max)
       }
       return(invisible(NULL))
