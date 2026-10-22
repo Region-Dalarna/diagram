@@ -154,22 +154,16 @@ karta_arbetspendling <- function(
           <data_defined_properties>
             <Option type="Map">
               <Option type="QString" name="name" value=""/>
-              <Option name="properties">
-                <Option type="Map">
-                  <Option name="line_color">
-                    <Option type="Map">
-                      <Option type="bool" name="active" value="true"/>
-                      <Option type="QString" name="field" value="linjefarg"/>
-                      <Option type="int" name="type" value="2"/>
-                    </Option>
-                  </Option>
-                  <Option name="line_width">
-                    <Option type="Map">
-                      <Option type="bool" name="active" value="true"/>
-                      <Option type="QString" name="field" value="linjebredd"/>
-                      <Option type="int" name="type" value="2"/>
-                    </Option>
-                  </Option>
+              <Option name="properties" type="Map">
+                <Option name="line_color" type="Map">
+                  <Option name="active" type="bool" value="true"/>
+                  <Option name="field" type="QString" value="linjefarg"/>
+                  <Option name="type" type="int" value="2"/>
+                </Option>
+                <Option name="line_width" type="Map">
+                  <Option name="active" type="bool" value="true"/>
+                  <Option name="field" type="QString" value="linjebredd"/>
+                  <Option name="type" type="int" value="2"/>
                 </Option>
               </Option>
               <Option type="QString" name="type" value="collection"/>
