@@ -160,14 +160,14 @@ karta_arbetspendling <- function(
                     <Option type="Map">
                       <Option type="bool" name="active" value="true"/>
                       <Option type="QString" name="field" value="linjefarg"/>
-                      <Option type="int" name="type" value="1"/>
+                      <Option type="int" name="type" value="2"/>
                     </Option>
                   </Option>
                   <Option name="line_width">
                     <Option type="Map">
                       <Option type="bool" name="active" value="true"/>
                       <Option type="QString" name="field" value="linjebredd"/>
-                      <Option type="int" name="type" value="1"/>
+                      <Option type="int" name="type" value="2"/>
                     </Option>
                   </Option>
                 </Option>
