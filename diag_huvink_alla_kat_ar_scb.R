@@ -77,6 +77,12 @@ diag_huvink_alla_kat_ar_scb <- function(
   # tankstreck här, samma fix som i systerskriptet.
   alder_vekt_fetch <- gsub("(?<=[0-9])-(?=[0-9])", "–", alder_vekt, perl = TRUE)
 
+  # Radbryter långa kategorinamn (facet-rubriker/legend-etiketter) vid ordgränser. "/" räknas inte
+  # som en ordgräns av stringr::str_wrap(), så "föräldraledighet/närståendeomvårdnad" bryts annars
+  # aldrig och blir då för bred för smala facet-paneler/legend-kolumner - lägger till ett mellanslag
+  # efter "/" innan radbrytningen så det finns en giltig brytpunkt även där.
+  wrap_kat <- function(x) stringr::str_wrap(stringr::str_replace_all(x, "/", "/ "), width = 25)
+
   # Länk till tabell: https://www.statistikdatabasen.scb.se/pxweb/sv/ssd/START__AM__AM0210__AM0210A/HuvudForsTyp1Ar/
   # TAB3202, årsregistret till samma statistikprodukt (AM0210) som TAB1784/BAS men uppdelat på HuvudFoT1m
   # (huvudsaklig inkomstkälla) i stället för ArbStatus. ContentsCode väljs till EN grupp (default
@@ -96,15 +102,11 @@ diag_huvink_alla_kat_ar_scb <- function(
     ), quiet = TRUE) |>
     dplyr::rename(regionkod = region_kod, variabel = `huvudsaklig inkomstkälla`, varde = value) |>
     dplyr::select(-tabellinnehåll) |>
-    # str_wrap() på kategorierna så att facet-rubrikerna radbryts i stället för att klippas av
-    # (de två längsta, "ersättning vid långvarigt nedsatt arbetsförmåga" och "ersättning vid
-    # föräldraledighet/närståendeomvårdnad", får annars inte plats i en smal facet-panel).
-    dplyr::mutate(variabel = stringr::str_wrap(variabel, width = 25),
-                  variabel = factor(variabel, levels = rev(stringr::str_wrap(c(
+    dplyr::mutate(variabel = wrap_kat(variabel),
+                  variabel = factor(variabel, levels = rev(wrap_kat(c(
                     "ersättning för arbete", "ersättning vid arbetslöshet", "ersättning för studier", "pension",
                     "ersättning vid långvarigt nedsatt arbetsförmåga", "ersättning vid sjukdom",
-                    "ersättning vid föräldraledighet/närståendeomvårdnad", "ekonomiskt stöd", "saknar ersättningar"),
-                    width = 25))))
+                    "ersättning vid föräldraledighet/närståendeomvårdnad", "ekonomiskt stöd", "saknar ersättningar")))))
 
   vald_region <- if(is.na(gruppering_namn)) {
     rdverktyg::list_komma_och(rdverktyg::skapa_kortnamn_lan(rdverktyg::hamtaregion_kod_namn(region_vekt)$region, byt_ut_riket_mot_sverige = TRUE))
@@ -267,10 +269,13 @@ diag_huvink_alla_kat_ar_scb <- function(
     # variabel-kolumnen i huvink_aggr är str_wrap()-ad (se ovan), så fokus_variabel - som skickas in
     # oradbruten - måste wrap:as på samma sätt innan den matchas mot variabel. Titel/filnamn använder
     # dock det oradbrutna fokus_variabel så de inte får inbäddade radbrytningar.
-    fokus_variabel_wrap <- stringr::str_wrap(fokus_variabel, width = 25)
+    fokus_variabel_wrap <- wrap_kat(fokus_variabel)
 
     diagram_titel <- stringr::str_wrap(paste0("Huvudsaklig inkomstkälla för befolkningen ", aldrar_titel, " i ", vald_region, " - ", stringr::str_flatten_comma(fokus_variabel)), titel_bredd)
-    diagramfil <- paste0("huvink_arsreg_", stringr::str_flatten(fokus_variabel, collapse = "_"), "_tid_", aldrar_txt, "_", paste0(region_vekt, collapse = "_"), ".png")
+    # "/" i t.ex. "ersättning vid föräldraledighet/närståendeomvårdnad" är inte tillåtet i ett
+    # filnamn (tolkas som sökvägsavgränsare) - byts ut mot "-" bara i filnamnet, titeln ovan
+    # använder fortfarande det oförändrade fokus_variabel.
+    diagramfil <- paste0("huvink_arsreg_", stringr::str_replace_all(stringr::str_flatten(fokus_variabel, collapse = "_"), "/", "-"), "_tid_", aldrar_txt, "_", paste0(region_vekt, collapse = "_"), ".png")
 
     gg_obj <- rddiagram::SkapaStapelDiagram(
       skickad_df = dplyr::filter(huvink_aggr, variabel %in% fokus_variabel_wrap),
