@@ -26,8 +26,9 @@ diag_arbloshet_procent_utbildning_facet_ar_scb <- function(
     utb_typ = c("niva", "inriktning"),   # vilken utbildningsindelning som ska facet:as på
     utb_vekt = NA,                       # NA = default-koder för utb_typ (se nedan), annars egna Utbildngrupp-koder
     ta_med_tidigare_data = TRUE,         # TRUE = slå ihop med TAB5400 (2006-2018) till en tidsserie 2006-2024
+    lagga_till_punkter = FALSE,          # TRUE lägger till punkter vid varje observation
     titel_bredd = 80,
-    diagram_capt = "Källa: SCB:s öppna statistikdatabas, Arbetsmarknadsställning (U1a) i befolkningen 20-64 år\nefter utbildningsnivå/-inriktning (nattbefolkning)\nBearbetning: Samhällsanalys, Region Dalarna",
+    diagram_capt = "Källa: SCB:s öppna statistikdatabas, Arbetsmarknadsställning (U1a)\nBearbetning: Samhällsanalys, Region Dalarna",
     output_mapp = NA,
     diag_fargvekt = NA,
     skickad_logga_path = NA,               # NA om man vill köra med standard, bra att sätta en lokal om man är på resande fot
@@ -112,13 +113,17 @@ diag_arbloshet_procent_utbildning_facet_ar_scb <- function(
     dplyr::rename(forvarvsarbetande = `Förvärvsarbetande (A)`,
                   arbetslosa = `Inskrivna arbetslösa på Arbetsförmedlingen (B)`) |>
     dplyr::mutate(andel_arbetslosa = round(arbetslosa / (forvarvsarbetande + arbetslosa) * 100, 1),
-                  utbildning = wrap_kat(utbildning)) |>
+                  utbildning = wrap_kat(utbildning),
+                  # Facet-panelerna ska komma i kodordning (samma ordning som utb_vekt), inte
+                  # bokstavsordning på klartexten - utbildning görs om till en factor vars nivåer
+                  # är de wrap:ade klartextnamnen men ordnade efter utbildning_kod:s plats i utb_vekt.
+                  utbildning = factor(utbildning, levels = unique(utbildning[order(match(utbildning_kod, utb_vekt))]))) |>
     dplyr::arrange(år)
 
   vald_region <- rdverktyg::list_komma_och(rdverktyg::skapa_kortnamn_lan(rdverktyg::hamtaregion_kod_namn(region_vekt)$region, byt_ut_riket_mot_sverige = TRUE))
 
   utb_typ_titel <- if (utb_typ == "niva") "utbildningsnivå" else "utbildningsinriktning"
-  diagram_titel <- stringr::str_wrap(paste0("Arbetslöshet i procent efter ", utb_typ_titel, " i ", vald_region), titel_bredd)
+  diagram_titel <- stringr::str_wrap(paste0("Arbetslöshet efter ", utb_typ_titel, " i ", vald_region, ", nattbefolkning 20-64 år"), titel_bredd)
   diagramfil <- paste0("arbloshet_procent_utb_", utb_typ, "_facet_", paste0(region_vekt, collapse = "_"), ".png")
 
   flera_regioner <- length(unique(arbl_df$regionkod)) > 1
@@ -128,12 +133,11 @@ diag_arbloshet_procent_utbildning_facet_ar_scb <- function(
     skickad_x_var = "år",
     skickad_y_var = "andel_arbetslosa",
     skickad_x_grupp = if (flera_regioner) "region" else NULL,
-    lagga_till_punkter = TRUE,
+    lagga_till_punkter = lagga_till_punkter,
     diagram_titel = diagram_titel,
     diagram_capt = diagram_capt,
-    manual_y_axis_title = "andel arbetslösa, procent",
+    manual_y_axis_title = "procent",
     manual_color = if (flera_regioner) diag_fargvekt else diag_fargvekt[1],
-    x_axis_lutning = 0,
     legend_vand_ordning = TRUE,
     legend_byrow = TRUE,
     facet_grp = "utbildning",
