@@ -14,12 +14,18 @@
 # Vill man ha andra/fler koder (t.ex. "09" okänd nivå, "9" okänd inriktning, eller någon av de ~120
 # detaljerade SUN-grupperna) går det att skicka med egna koder i utb_vekt.
 #
+# TAB6367 täcker 2019-2024 (uppdateras). TAB5400 är samma tabelltyp (samma dimensioner, samma
+# ContentsCode-texter) men med äldre, numera frysta data (2006-2018, "uppdateras ej" enligt SCB).
+# Som standard hämtas båda och slås ihop till en sammanhängande tidsserie 2006-2024
+# (ta_med_tidigare_data = FALSE hämtar bara TAB6367, dvs. 2019-2024).
+#
 # ===========================================================================================================
 
 diag_arbloshet_procent_utbildning_facet_ar_scb <- function(
     region_vekt = "20",                 # c("20", "17", "21"), flera regioner jämförs då som linjer inom varje facet
     utb_typ = c("niva", "inriktning"),   # vilken utbildningsindelning som ska facet:as på
     utb_vekt = NA,                       # NA = default-koder för utb_typ (se nedan), annars egna Utbildngrupp-koder
+    ta_med_tidigare_data = TRUE,         # TRUE = slå ihop med TAB5400 (2006-2018) till en tidsserie 2006-2024
     titel_bredd = 80,
     diagram_capt = "Källa: SCB:s öppna statistikdatabas, Arbetsmarknadsställning (U1a) i befolkningen 20-64 år\nefter utbildningsnivå/-inriktning (nattbefolkning)\nBearbetning: Samhällsanalys, Region Dalarna",
     output_mapp = NA,
@@ -70,8 +76,9 @@ diag_arbloshet_procent_utbildning_facet_ar_scb <- function(
   # ordgränser av stringr::str_wrap(), så ett mellanslag läggs till efter dem innan radbrytningen.
   wrap_kat <- function(x) stringr::str_wrap(stringr::str_replace_all(x, "([/,])(?=\\S)", "\\1 "), width = 25)
 
+  # rus_sex är standardpaletten för RD:s diagram - används även här om inget annat skickas med.
   if (all(is.na(diag_fargvekt))) {
-    diag_fargvekt <- rddiagram::diagramfarger("rd_alla_primar")
+    diag_fargvekt <- rddiagram::diagramfarger("rus_sex")
   }
 
   if (all(is.na(output_mapp))) {
@@ -81,20 +88,32 @@ diag_arbloshet_procent_utbildning_facet_ar_scb <- function(
   # Länk till tabell: https://www.statistikdatabasen.scb.se/pxweb/sv/ssd/START__AM__AM0208__AM0208C/ArbStallnU1Ar/
   # ContentsCode hämtas som text (inte kod) - A = förvärvsarbetande, B = inskrivna arbetslösa på
   # Arbetsförmedlingen. Arbetskraften = A + B (C, "inte i arbetskraften", räknas INTE in i nämnaren).
-  arbl_df <- pxweb2r::pxweb2_get_data(
-    table = "TAB6367",
-    query = list(
-      Region = region_vekt,
-      Utbildngrupp = utb_vekt,
-      ContentsCode = c("Förvärvsarbetande (A)", "Inskrivna arbetslösa på Arbetsförmedlingen (B)"),
-      Tid = "*"
-    ), quiet = TRUE) |>
+  hamta_tabell <- function(tabell) {
+    pxweb2r::pxweb2_get_data(
+      table = tabell,
+      query = list(
+        Region = region_vekt,
+        Utbildngrupp = utb_vekt,
+        ContentsCode = c("Förvärvsarbetande (A)", "Inskrivna arbetslösa på Arbetsförmedlingen (B)"),
+        Tid = "*"
+      ), quiet = TRUE)
+  }
+
+  # TAB6367 (2019-2024) och - om ta_med_tidigare_data - TAB5400 (2006-2018, fryst historisk data)
+  # har identiska dimensioner/kolumnnamn och överlappar inte i tid, så de kan radbindas direkt.
+  arbl_raw <- hamta_tabell("TAB6367")
+  if (ta_med_tidigare_data) {
+    arbl_raw <- dplyr::bind_rows(arbl_raw, hamta_tabell("TAB5400"))
+  }
+
+  arbl_df <- arbl_raw |>
     dplyr::rename(regionkod = region_kod) |>
     tidyr::pivot_wider(names_from = tabellinnehåll, values_from = value) |>
     dplyr::rename(forvarvsarbetande = `Förvärvsarbetande (A)`,
                   arbetslosa = `Inskrivna arbetslösa på Arbetsförmedlingen (B)`) |>
     dplyr::mutate(andel_arbetslosa = round(arbetslosa / (forvarvsarbetande + arbetslosa) * 100, 1),
-                  utbildning = wrap_kat(utbildning))
+                  utbildning = wrap_kat(utbildning)) |>
+    dplyr::arrange(år)
 
   vald_region <- rdverktyg::list_komma_och(rdverktyg::skapa_kortnamn_lan(rdverktyg::hamtaregion_kod_namn(region_vekt)$region, byt_ut_riket_mot_sverige = TRUE))
 
