@@ -96,10 +96,15 @@ diag_huvink_alla_kat_ar_scb <- function(
     ), quiet = TRUE) |>
     dplyr::rename(regionkod = region_kod, variabel = `huvudsaklig inkomstkälla`, varde = value) |>
     dplyr::select(-tabellinnehåll) |>
-    dplyr::mutate(variabel = factor(variabel, levels = rev(c(
+    # str_wrap() på kategorierna så att facet-rubrikerna radbryts i stället för att klippas av
+    # (de två längsta, "ersättning vid långvarigt nedsatt arbetsförmåga" och "ersättning vid
+    # föräldraledighet/närståendeomvårdnad", får annars inte plats i en smal facet-panel).
+    dplyr::mutate(variabel = stringr::str_wrap(variabel, width = 25),
+                  variabel = factor(variabel, levels = rev(stringr::str_wrap(c(
                     "ersättning för arbete", "ersättning vid arbetslöshet", "ersättning för studier", "pension",
                     "ersättning vid långvarigt nedsatt arbetsförmåga", "ersättning vid sjukdom",
-                    "ersättning vid föräldraledighet/närståendeomvårdnad", "ekonomiskt stöd", "saknar ersättningar"))))
+                    "ersättning vid föräldraledighet/närståendeomvårdnad", "ekonomiskt stöd", "saknar ersättningar"),
+                    width = 25))))
 
   vald_region <- if(is.na(gruppering_namn)) {
     rdverktyg::list_komma_och(rdverktyg::skapa_kortnamn_lan(rdverktyg::hamtaregion_kod_namn(region_vekt)$region, byt_ut_riket_mot_sverige = TRUE))
@@ -259,11 +264,16 @@ diag_huvink_alla_kat_ar_scb <- function(
 
   if (diag_fokusvariabel) {
 
+    # variabel-kolumnen i huvink_aggr är str_wrap()-ad (se ovan), så fokus_variabel - som skickas in
+    # oradbruten - måste wrap:as på samma sätt innan den matchas mot variabel. Titel/filnamn använder
+    # dock det oradbrutna fokus_variabel så de inte får inbäddade radbrytningar.
+    fokus_variabel_wrap <- stringr::str_wrap(fokus_variabel, width = 25)
+
     diagram_titel <- stringr::str_wrap(paste0("Huvudsaklig inkomstkälla för befolkningen ", aldrar_titel, " i ", vald_region, " - ", stringr::str_flatten_comma(fokus_variabel)), titel_bredd)
     diagramfil <- paste0("huvink_arsreg_", stringr::str_flatten(fokus_variabel, collapse = "_"), "_tid_", aldrar_txt, "_", paste0(region_vekt, collapse = "_"), ".png")
 
     gg_obj <- rddiagram::SkapaStapelDiagram(
-      skickad_df = dplyr::filter(huvink_aggr, variabel %in% fokus_variabel),
+      skickad_df = dplyr::filter(huvink_aggr, variabel %in% fokus_variabel_wrap),
       skickad_x_var = "år",
       skickad_y_var = "varde",
       skickad_x_grupp = if (length(fokus_variabel) > 1) "variabel" else NA,
